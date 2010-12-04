@@ -31,7 +31,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 // INCLUDES ======================================================================
 
-#include "puzl/utility/GameShell.h"
+#include "puzl/core/GameShell.h"
 
 #ifdef WINDOWS
 	#include <SDL/SDL_syswm.h>
