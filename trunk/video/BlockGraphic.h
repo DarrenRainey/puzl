@@ -20,53 +20,26 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 //================================================================================
-// VideoSystem.h
+// BlockGraphic.h
 // Authors:  Andrew Dieffenbach
-// Date:     March 28, 2004
+// Date:     September 03, 2010
 // Description:
-// NOTE:  This version uses SDL and OpenGL
-//
+// 
+// 
 //================================================================================
 
 // Watch for multiple inclusions
-#ifndef VIDEO_SYSTEM
-#define VIDEO_SYSTEM
+#ifndef BLOCK_GRAPHIC
+#define BLOCK_GRAPHIC
 
 // INCLUDES ======================================================================
 
-// Add the SDL and OpenGL header files for appropriate OS builds
-#include <SDL/SDL.h>
-#include <SDL/SDL_opengl.h>
-
-#ifdef WINDOWS
-	#include <windows.h>
-	#include <SDL/SDL_image.h>
-	//#include <GL/gl.h>
-	//#include <GL/glu.h>
-#endif
-#ifdef MACOSX
-	#include <SDL_image/SDL_image.h>
-	//#include <OpenGL/gl.h>
-	//#include <OpenGL/glu.h>
-#endif
-#ifdef LINUX
-	#include <SDL/SDL_image.h>
-	//#include <GL/gl.h>
-	//#include <GL/glu.h>
-#endif
-
-//#include <string>
-#include "puzl/video/VideoObject.h"		// VideoObject header file
-#include "puzl/video/VideoDisplay.h"		// VideoDisplay header file
-#include "puzl/video/VideoImage.h"		// VideoImage header file
 #include "puzl/video/VideoSprite.h"		// VideoSprite header file
-#include "puzl/video/BlockGraphic.h"
-#include "puzl/video/CharacterGraphic.h"
-
 
 // DEFINES =======================================================================
 
-//using namespace std;
+#define BLOCK_MODE_CELL		0
+#define BLOCK_MODE_ABSOLUTE	1
 
 // Define return values
 #ifndef SUCCESS
@@ -76,15 +49,24 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 // TYPES =========================================================================
 
-// VideoSystemtem class
-// Used as container class for everything to do with video/graphics
-class VideoSystem
+// BlockGraphic class
+class BlockGraphic : public VideoSprite
 {
 public:
-	VideoSystem();
-	~VideoSystem();
-		
-private:
+	//BlockGraphic();
+	BlockGraphic( VideoImage &videoImage, int width, int height, int attributes );
+	//~BlockGraphic();
+	
+	int getMode();
+	void setMode( int mode );
+	
+	void draw( VideoImage* destinationImage, int tileIndex, int xPosition, int yPosition );
+	void draw( int tileIndex, int xPosition, int yPosition );
+	
+	void print( char text[], int xPosition, int yPosition );
+	
+protected:
+	int mode;
 };
 
 // PROTOTYPES ====================================================================

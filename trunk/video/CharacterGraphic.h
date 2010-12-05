@@ -20,53 +20,28 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 //================================================================================
-// VideoSystem.h
+// CharacterGraphic.h
 // Authors:  Andrew Dieffenbach
-// Date:     March 28, 2004
+// Date:     September 11, 2010
 // Description:
-// NOTE:  This version uses SDL and OpenGL
-//
+// 
+// 
 //================================================================================
 
 // Watch for multiple inclusions
-#ifndef VIDEO_SYSTEM
-#define VIDEO_SYSTEM
+#ifndef CHARACTER_GRAPHIC
+#define CHARACTER_GRAPHIC
 
 // INCLUDES ======================================================================
 
-// Add the SDL and OpenGL header files for appropriate OS builds
-#include <SDL/SDL.h>
-#include <SDL/SDL_opengl.h>
+#include <string>
+#include <sstream>
 
-#ifdef WINDOWS
-	#include <windows.h>
-	#include <SDL/SDL_image.h>
-	//#include <GL/gl.h>
-	//#include <GL/glu.h>
-#endif
-#ifdef MACOSX
-	#include <SDL_image/SDL_image.h>
-	//#include <OpenGL/gl.h>
-	//#include <OpenGL/glu.h>
-#endif
-#ifdef LINUX
-	#include <SDL/SDL_image.h>
-	//#include <GL/gl.h>
-	//#include <GL/glu.h>
-#endif
-
-//#include <string>
-#include "puzl/video/VideoObject.h"		// VideoObject header file
-#include "puzl/video/VideoDisplay.h"		// VideoDisplay header file
-#include "puzl/video/VideoImage.h"		// VideoImage header file
-#include "puzl/video/VideoSprite.h"		// VideoSprite header file
-#include "puzl/video/BlockGraphic.h"
-#include "puzl/video/CharacterGraphic.h"
-
+#include "BlockGraphic.h"		// BlockGraphic header file
 
 // DEFINES =======================================================================
 
-//using namespace std;
+using namespace std;
 
 // Define return values
 #ifndef SUCCESS
@@ -74,17 +49,32 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 	#define FAILURE	       -1
 #endif
 
+#define PRINT_ATTR_ALIGN_LEFT		0
+#define PRINT_ATTR_ALIGN_RIGHT		1
+
+
 // TYPES =========================================================================
 
-// VideoSystemtem class
-// Used as container class for everything to do with video/graphics
-class VideoSystem
+// BlockGraphic class
+class CharacterGraphic
 {
 public:
-	VideoSystem();
-	~VideoSystem();
-		
+	//CharacterGraphic();
+	CharacterGraphic( BlockGraphic &blockGraphic, int* map );
+	//~CharacterGraphic();
+	
+	int* getColor();
+	void setColor( int color[] );
+	
+	void print( const char* text, int xPosition, int yPosition, int attributes = PRINT_ATTR_ALIGN_LEFT );
+	void print( string text, int xPosition, int yPosition, int attributes = PRINT_ATTR_ALIGN_LEFT );
+	void print( int number, int xPosition, int yPosition, int attributes = PRINT_ATTR_ALIGN_LEFT );
+	
+protected:
+	BlockGraphic* blockGraphic;
+	int* map;
 private:
+	int numberOfFrames;
 };
 
 // PROTOTYPES ====================================================================
