@@ -56,7 +56,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #endif
 
 //#include <string>
-#include "puzl/video/VideoObject.h"		// VideoObject header file
+//#include "puzl/video/VideoObject.h"		// VideoObject header file
 #include "puzl/video/VideoDisplay.h"		// VideoDisplay header file
 #include "puzl/video/VideoImage.h"		// VideoImage header file
 #include "puzl/video/VideoSprite.h"		// VideoSprite header file
