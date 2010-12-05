@@ -198,7 +198,7 @@ int GameShell::initializeInput( void )
 		numberOfJoysticks = MAX_NUM_OF_JOYSTICKS;
 	
 	for( index = 0; index < numberOfJoysticks; index++ )
-		inputSystem.registerJoystick( joystick[index].Initialize() );
+		inputSystem.registerJoystick( joystick[index].initialize() );
 	
 	return( 0 );
 }
@@ -225,7 +225,7 @@ int GameShell::shutdownInput( void )
 	int index;
 	
 	for( index = 0; index < numberOfJoysticks; index++ )
-		joystick[index].Shutdown();
+		joystick[index].shutdown();
 	
 	return( 0 );
 }

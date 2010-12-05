@@ -49,6 +49,9 @@ using namespace std;
 	#define FAILURE	       -1
 #endif
 
+#define CHARACTER_MODE_CELL		BLOCK_MODE_CELL
+#define CHARACTER_MODE_ABSOLUTE		BLOCK_MODE_ABSOLUTE
+
 #define PRINT_ATTR_ALIGN_LEFT		0
 #define PRINT_ATTR_ALIGN_RIGHT		1
 
@@ -62,6 +65,14 @@ public:
 	//CharacterGraphic();
 	CharacterGraphic( BlockGraphic &blockGraphic, int* map );
 	//~CharacterGraphic();
+	
+	int getWidth();
+	int getHeight();
+	
+	void setDimensions( int width, int height );
+	
+	int getMode();
+	void setMode( int mode );
 	
 	int* getColor();
 	void setColor( int color[] );

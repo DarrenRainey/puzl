@@ -76,6 +76,61 @@ CharacterGraphic::~CharacterGraphic()
 
 
 //--------------------------------------------------------------------------------
+// Name: CharacterGraphic::getWidth()
+// Description:
+// 
+//--------------------------------------------------------------------------------
+int CharacterGraphic::getWidth()
+{
+	return blockGraphic->getWidth();
+}
+
+
+//--------------------------------------------------------------------------------
+// Name: CharacterGraphic::getHeight()
+// Description:
+// 
+//--------------------------------------------------------------------------------
+int CharacterGraphic::getHeight()
+{
+	return blockGraphic->getHeight();
+}
+
+
+//--------------------------------------------------------------------------------
+// Name: CharacterGraphic::setDimensions()
+// Description:
+// 
+//--------------------------------------------------------------------------------
+void CharacterGraphic::setDimensions( int width, int height )
+{
+	blockGraphic->setDimensions( width, height );
+}
+
+
+//--------------------------------------------------------------------------------
+// Name: CharacterGraphic::getMode()
+// Description:
+// 
+//--------------------------------------------------------------------------------
+int CharacterGraphic::getMode()
+{
+	return blockGraphic->getMode();
+}
+
+
+//--------------------------------------------------------------------------------
+// Name: CharacterGraphic::setMode()
+// Description:
+// 
+//--------------------------------------------------------------------------------
+void CharacterGraphic::setMode( int mode )
+{
+	blockGraphic->setMode( mode );
+}
+
+
+//--------------------------------------------------------------------------------
 // Name: CharacterGraphic::getColor()
 // Description:
 // 
@@ -116,34 +171,76 @@ void CharacterGraphic::print( const char* text, int xPosition, int yPosition, in
 //--------------------------------------------------------------------------------
 void CharacterGraphic::print( string text, int xPosition, int yPosition, int attributes )
 {
-	if( attributes == PRINT_ATTR_ALIGN_LEFT )
+	if( blockGraphic->getMode() == BLOCK_MODE_CELL )
 	{
-		int textLength = text.length();
-		for( int charIndex = 0; charIndex < textLength; charIndex++ )
+		if( attributes == PRINT_ATTR_ALIGN_LEFT )
 		{
-			char letter = text[charIndex];
-			if( letter < numberOfFrames )
+			int textLength = text.length();
+			for( int charIndex = 0; charIndex < textLength; charIndex++ )
 			{
-				blockGraphic->draw( map[( int )letter], xPosition, yPosition );
+				char letter = text[charIndex];
+				if( letter < numberOfFrames )
+				{
+					blockGraphic->draw( map[( int )letter], xPosition, yPosition );
+				}
+				
+				xPosition++;
 			}
-			
-			xPosition++;
+		}
+		else
+		//if( attributes == PRINT_ATTR_ALIGN_RIGHT )
+		{
+			int textLength = text.length();
+			xPosition -= textLength;
+			for( int charIndex = 0; charIndex < textLength; charIndex++ )
+			{
+				char letter = text[charIndex];
+				if( letter < numberOfFrames )
+				{
+					blockGraphic->draw( map[( int )letter], xPosition, yPosition );
+				}
+				
+				xPosition++;
+			}
 		}
 	}
-	else
-	//if( attributes == PRINT_ATTR_ALIGN_RIGHT )
+	else //( blockGraphic->getMode() == BLOCK_MODE_ABSOLUTE )
 	{
-		int textLength = text.length();
-		xPosition -= textLength;
-		for( int charIndex = 0; charIndex < textLength; charIndex++ )
+		// NOTE: The only key difference between align left and right is the starting position--that's it.
+		// TODO: Meaning we could optimize here.
+		if( attributes == PRINT_ATTR_ALIGN_LEFT )
 		{
-			char letter = text[charIndex];
-			if( letter < numberOfFrames )
+			int textLength = text.length();
+			int blockWidth = blockGraphic->getWidth();
+			int currentXPosition = xPosition;
+			for( int charIndex = 0; charIndex < textLength; charIndex++ )
 			{
-				blockGraphic->draw( map[( int )letter], xPosition, yPosition );
+				char letter = text[charIndex];
+				if( letter < numberOfFrames )
+				{
+					blockGraphic->draw( map[( int )letter], currentXPosition, yPosition );
+				}
+				
+				currentXPosition += blockWidth;
 			}
-			
-			xPosition++;
+		}
+		else
+		//if( attributes == PRINT_ATTR_ALIGN_RIGHT )
+		{
+			int textLength = text.length();
+			int blockWidth = blockGraphic->getWidth();
+			int currentXPosition = xPosition - ( textLength * blockWidth );	// TODO: Needs testing.
+			xPosition -= textLength;
+			for( int charIndex = 0; charIndex < textLength; charIndex++ )
+			{
+				char letter = text[charIndex];
+				if( letter < numberOfFrames )
+				{
+					blockGraphic->draw( map[( int )letter], currentXPosition, yPosition );
+				}
+				
+				currentXPosition += blockWidth;
+			}
 		}
 	}
 }

@@ -131,7 +131,7 @@ int InputSystem::registerMouse( InputMouse *mouse_ptr )
 //--------------------------------------------------------------------------------
 int InputSystem::registerJoystick( InputJoystick *joystick_ptr )
 {
-	joystick[joystick_ptr->ID] = joystick_ptr;	// TODO Move ID/Count referencing from
+	joystick[joystick_ptr->Id] = joystick_ptr;	// TODO Move ID/Count referencing from
 							// InputJoystick to InputSystem?
 
 	return( 0 );

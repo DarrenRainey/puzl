@@ -74,40 +74,40 @@ public:
 	InputMouse();
 	~InputMouse();
 
-	int Read( void );
+	int read();
 
-	int GetXPosition( void );
-	int GetYPosition( void );
+	int getXPosition();
+	int getYPosition();
 
-	int GetXDelta( void );
-	int GetYDelta( void );
+	int getXDelta();
+	int getYDelta();
 	
-	int ClearDeltas( void );
+	int clearDeltas();
 
-	int GetButton( int button );
+	int getButton( int button );
 	int getLastInputId();
 	
-	void SetLock( bool state );
-	int GetLock( void );
+	void setLock( bool state );
+	int getLock();
 	
-	void Warp( int x, int y );
+	void warp( int x, int y );
 	
 private:
-	void update( SDL_Event *event );			// Update the state of mouse
+	void update( SDL_Event *event );		// Update the state of mouse.
 
-	int XPosition;
-	int YPosition;
-	int XDelta;
-	int YDelta;
+	int xPosition;
+	int yPosition;
+	int xDelta;
+	int yDelta;
 
-	int Lock;
+	int lock;
 	bool doWarp;
 
-	int ButtonState[NUM_MOUSE_BUTTONS];		// States of mouse buttons
+	int buttonState[NUM_MOUSE_BUTTONS];		// States of mouse buttons.
 
-	SDL_Event EventBuffer[MOUSE_BUFFER_SIZE];	// Buffers mouse events
+	SDL_Event eventBuffer[MOUSE_BUFFER_SIZE];	// Buffers mouse events.
 
-	friend class InputSystem;				// InputSys is omniscent of InputMouse's data
+	friend class InputSystem;			// InputSys is omniscent of InputMouse's data.
 };
 
 // PROTOTYPES ====================================================================

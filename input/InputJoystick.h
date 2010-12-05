@@ -87,35 +87,35 @@ public:
 	InputJoystick();
 	~InputJoystick();
 
-	InputJoystick* Initialize( void );	// Initialize this object for use
-	int Shutdown( void );			// Shut down this object
+	InputJoystick* initialize( void );	// Initialize this object for use
+	int shutdown( void );			// Shut down this object
 
-	int Read( void );
+	int read( void );
 
-	int GetAxis( int axis );		// Get state of an axis (direction-pad)
-	int GetXAxis( void );			// Get state of the X axis
-	int GetYAxis( void );			// Get state of the Y axis
+	int getAxis( int axis );		// Get state of an axis (direction-pad)
+	int getXAxis( void );			// Get state of the X axis
+	int getYAxis( void );			// Get state of the Y axis
 
-	int GetButton( int button );		// Get state of a button
+	int getButton( int button );		// Get state of a button
 	
 	int getLastInputId();
 	
 private:
 	void update( SDL_Event *event  );	// Update the state of joystick
 
-	int ID;					// ID number of this joystick device
+	int Id;					// ID number of this joystick device
 						// on the current system
 
-	string Name;				// Name of this joystick device
+	string name;				// Name of this joystick device
 
-	int ButtonState[NUM_JOYSTICK_BUTTONS];	// States of joystick buttons
-	int AxisState[NUM_JOYSTICK_AXES];	// States of joystick axes
+	int buttonState[NUM_JOYSTICK_BUTTONS];	// States of joystick buttons
+	int axisState[NUM_JOYSTICK_AXES];	// States of joystick axes
 
-	SDL_Event EventBuffer[JOYSTICK_BUFFER_SIZE];// Buffers joystick events
+	SDL_Event eventBuffer[JOYSTICK_BUFFER_SIZE];// Buffers joystick events
 
-	SDL_Joystick* Joystick;			// Joystick device object (SDL)
+	SDL_Joystick* joystick;			// Joystick device object (SDL)
 
-	static int Count;
+	static int count;
 
 	friend class InputSystem;		// InputSys is omniscent of InputJoystick's data
 };

@@ -56,15 +56,17 @@ InputMouse::InputMouse()
 {
 	int index;
 
-	XPosition = 0;
-	YPosition = 0;
-	XDelta	  = 0;
-	YDelta	  = 0;
+	xPosition = 0;
+	yPosition = 0;
+	xDelta	  = 0;
+	yDelta	  = 0;
 
 	for( index = 0; index < NUM_MOUSE_BUTTONS; index++ )
-		ButtonState[index] = BUTTON_STATE_UP;
+	{
+		buttonState[index] = BUTTON_STATE_UP;
+	}
 
-	Lock = LOCK_STATE_OFF;
+	lock = LOCK_STATE_OFF;
 	//doWarp = false;
 }
 
@@ -81,70 +83,68 @@ InputMouse::~InputMouse()
 
 
 //--------------------------------------------------------------------------------
-// Name: GetXPosition()
+// Name: getXPosition()
 // Description:
 // 
 //--------------------------------------------------------------------------------
-int InputMouse::GetXPosition( void )
+int InputMouse::getXPosition()
 {
-	return( XPosition );
+	return( xPosition );
 }
 
 
 //--------------------------------------------------------------------------------
-// Name: GetYPosition()
+// Name: getYPosition()
 // Description:
 // 
 //--------------------------------------------------------------------------------
-int InputMouse::GetYPosition( void )
+int InputMouse::getYPosition()
 {
-	return( YPosition );
+	return( yPosition );
 }
 
 
 //--------------------------------------------------------------------------------
-// Name: GetXDelta()
+// Name: getXDelta()
 // Description:
 // 
 //--------------------------------------------------------------------------------
-int InputMouse::GetXDelta( void )
+int InputMouse::getXDelta()
 {
-	return( XDelta );
+	return( xDelta );
 }
 
 
 //--------------------------------------------------------------------------------
-// Name: GetYDelta()
+// Name: getYDelta()
 // Description:
 // 
 //--------------------------------------------------------------------------------
-int InputMouse::GetYDelta( void )
+int InputMouse::getYDelta()
 {
-	return( YDelta );
+	return( yDelta );
 }
 
 
 //--------------------------------------------------------------------------------
-// Name: ClearDeltas()
+// Name: clearDeltas()
 // Description:
 // 
 //--------------------------------------------------------------------------------
-int InputMouse::ClearDeltas( void )
+int InputMouse::clearDeltas()
 {
-	XDelta = YDelta = 0;
-	
-	return( 0 );
+	return xDelta = yDelta = 0;
 }
 
 
 //--------------------------------------------------------------------------------
-// Name: GetButton()
+// Name: getButton()
 // Description:
 // 
 //--------------------------------------------------------------------------------
-int InputMouse::GetButton( int button )
+int InputMouse::getButton( int button )
 {
-	return( ButtonState[button] );
+	return buttonState[button];
 }
 
 
@@ -160,46 +160,46 @@ int InputMouse::getLastInputId()
 
 
 //--------------------------------------------------------------------------------
-// Name: Lock()
+// Name: setLock()
 // Description:
 // 
 //--------------------------------------------------------------------------------
-void InputMouse::SetLock( bool state )
+void InputMouse::setLock( bool state )
 {
 	if( state )
 	{
 		SDL_ShowCursor( 0 );
 		SDL_WM_GrabInput( SDL_GRAB_ON );
 		
-		Lock = LOCK_STATE_START;
+		lock = LOCK_STATE_START;
 	}
 	else
 	{
-		SDL_ShowCursor( 1 );			// TODO Conditional check here if program has its own cursor
+		SDL_ShowCursor( 1 );			// TODO Conditional check here if program has its own cursor.
 		SDL_WM_GrabInput( SDL_GRAB_OFF );
 		
-		Lock = LOCK_STATE_OFF;
+		lock = LOCK_STATE_OFF;
 	}
 }
 
 
 //--------------------------------------------------------------------------------
-// Name: GetLock()
+// Name: getLock()
 // Description:
 // 
 //--------------------------------------------------------------------------------
-int InputMouse::GetLock( void )
+int InputMouse::getLock()
 {
-	return( Lock );
+	return lock;
 }
 
 
 //--------------------------------------------------------------------------------
-// Name: Warp()
+// Name: warp()
 // Description:
 // 
 //--------------------------------------------------------------------------------
-void InputMouse::Warp( int x, int y )
+void InputMouse::warp( int x, int y )
 {
 	int index;
 	
@@ -208,13 +208,15 @@ void InputMouse::Warp( int x, int y )
 	SDL_WarpMouse( x, y );
 	
 	SDL_PumpEvents();
-	int numberOfEvents = SDL_PeepEvents( EventBuffer, MOUSE_BUFFER_SIZE, SDL_GETEVENT,
-					 SDL_EVENTMASK( SDL_MOUSEMOTION ) );
+	
+	// NOTE: Need numberOfEvents here?
+	int numberOfEvents = SDL_PeepEvents( eventBuffer, MOUSE_BUFFER_SIZE, SDL_GETEVENT,
+					     SDL_EVENTMASK( SDL_MOUSEMOTION ) );
 }
 
 
 //--------------------------------------------------------------------------------
-// Name: Update()
+// Name: update()
 // Description:
 // 
 //--------------------------------------------------------------------------------
@@ -235,20 +237,20 @@ void InputMouse::update( SDL_Event *event )
 				<< " Motion" << endl;
 			#endif
 		
-			XPosition = event->motion.x;
-			YPosition = event->motion.y;
+			xPosition = event->motion.x;
+			yPosition = event->motion.y;
 			
-			if( Lock != LOCK_STATE_START )
+			if( lock != LOCK_STATE_START )
 			{
-				XDelta	  = 0;
-				YDelta	  = 0;
+				xDelta	  = 0;
+				yDelta	  = 0;
 				
-				//Lock = LOCK_STATE_ON;
+				//lock = LOCK_STATE_ON;
 			}
 			else
 			{
-				XDelta	  = event->motion.xrel;
-				YDelta	  = event->motion.yrel;
+				xDelta	  = event->motion.xrel;
+				yDelta	  = event->motion.yrel;
 			}
 			
 		} break;
@@ -262,10 +264,10 @@ void InputMouse::update( SDL_Event *event )
 				<< " Down" << endl;
 			#endif
 
-			ButtonState[event->button.button] = BUTTON_STATE_DOWN;
+			buttonState[event->button.button] = BUTTON_STATE_DOWN;
 
-			XPosition = event->button.x;
-			YPosition = event->button.y;
+			xPosition = event->button.x;
+			yPosition = event->button.y;
 		} break;
 
 		// A button was just released
@@ -277,10 +279,10 @@ void InputMouse::update( SDL_Event *event )
 				<< " Up" << endl;
 			#endif
 
-			ButtonState[event->button.button] = BUTTON_STATE_UP;
+			buttonState[event->button.button] = BUTTON_STATE_UP;
 
-			XPosition = event->button.x;
-			YPosition = event->button.y;
+			xPosition = event->button.x;
+			yPosition = event->button.y;
 		} break;
 	}
 }
