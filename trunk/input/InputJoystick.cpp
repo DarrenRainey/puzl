@@ -43,7 +43,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 // EXTERNALS =====================================================================
 
-int InputJoystick::Count = 0;
+int InputJoystick::count = 0;
 
 
 // GLOBALS =======================================================================
@@ -59,16 +59,20 @@ InputJoystick::InputJoystick()
 {
 	int index;
 	
-	// Make this joystick object invalid initially
-	ID = -1;
+	// Make this joystick object invalid initially.
+	Id = -1;
 
-	// Clear the button states
+	// Clear the button states.
 	for( index = 0; index < NUM_JOYSTICK_BUTTONS; index++ )
-		ButtonState[index] = BUTTON_STATE_UP;
+	{
+		buttonState[index] = BUTTON_STATE_UP;
+	}
 
 	// Clear the axis states
 	for( index = 0; index < NUM_JOYSTICK_AXES; index++ )
-		AxisState[index] = AXIS_STATE_CENTER;
+	{
+		axisState[index] = AXIS_STATE_CENTER;
+	}
 }
 
 
@@ -80,125 +84,129 @@ InputJoystick::InputJoystick()
 InputJoystick::~InputJoystick()
 {
 	#ifdef DEBUG
-	if( ID != -1 )
-		cout << "Joystick(" << ID << ") was not shutdown!" << endl; 
+	if( Id != -1 )
+	{
+		cout << "Joystick(" << Id << ") was not shutdown!" << endl; 
+	}
 	#endif
 }
 
 
 //--------------------------------------------------------------------------------
-// Name: Initialize()
+// Name: initialize()
 // Description:
 // 
 //--------------------------------------------------------------------------------
-InputJoystick* InputJoystick::Initialize( void )
+InputJoystick* InputJoystick::initialize( void )
 {
-	// Increase the reference counter for a 'new' joystick
-	// Get the unique system-level ID of this joystick
-	ID = Count++;
+	// Increase the reference counter for a 'new' joystick.
+	// Get the unique system-level ID of this joystick.
+	Id = count++;
 
 	#ifdef DEBUG
-	cout << "ID#" << ID << " ";
+	cout << "Id# " << Id;
 	#endif
 
-	// Switch on the joystick event system
-	if( Count == 1 )
+	// Switch on the joystick event system.
+	if( count == 1 )
+	{
 		SDL_JoystickEventState( SDL_ENABLE );
+	}
 
-	// Open this joystick device for SDL
-	Joystick = SDL_JoystickOpen( ID );
+	// Open this joystick device for SDL.
+	joystick = SDL_JoystickOpen( Id );
 
-	// Check if this is a valid joystick; else fill default values
-	if( Joystick == NULL )
+	// Check if this is a valid joystick; else fill default values.
+	if( joystick == NULL )
 	{
 		#ifdef DEBUG
 		cout << "Invalid Joystick(" <<
-			ID <<
+			Id <<
 			")" << endl;
 		#endif
-
-		Count--;
-
-		if( Count == 0 )
+		
+		if( --count == 0 )
+		{
 			SDL_JoystickEventState( SDL_IGNORE );
+		}
 
-		return( NULL );
+		return NULL;
 	}
 	else
 	{
-		// Get name of this joystick
-		Name = SDL_JoystickName( ID );
+		// Get name of this joystick.
+		name = SDL_JoystickName( Id );
 
 		#ifdef DEBUG
-		cout << Name << endl;
+		cout << name << endl;
 		#endif
 	}
 
-	return( this );
+	return this;
 }
 
 
 //--------------------------------------------------------------------------------
-// Name: Shutdown()
+// Name: shutdown()
 // Description:
 // 
 //--------------------------------------------------------------------------------
-int InputJoystick::Shutdown( void )
+int InputJoystick::shutdown( void )
 {
-	SDL_JoystickClose( Joystick );
+	SDL_JoystickClose( joystick );
 
-	Count--;
-
-	// If this is the last active joystick, switch off the joystick event system
-	if( Count == 0 )
+	// If this is the last active joystick, switch off the joystick event system.
+	if( --count == 0 )
+	{
 		SDL_JoystickEventState( SDL_IGNORE );
+	}
 
-	// Make this joystick object invalid
-	ID = -1;
+	// Make this joystick object invalid.
+	Id = -1;
 	
-	return( 0 );
+	return 0;
 }
 
 
 //--------------------------------------------------------------------------------
-// Name: GetAxis()
+// Name: getAxis()
 // Description:
 // 
 //--------------------------------------------------------------------------------
-int InputJoystick::GetAxis( int axis )
+int InputJoystick::getAxis( int axis )
 {
-	return( AxisState[axis] );
+	return axisState[axis];
 }
 
 //--------------------------------------------------------------------------------
-// Name: GetXAxis()
+// Name: getXAxis()
 // Description:
 // 
 //--------------------------------------------------------------------------------
-int InputJoystick::GetXAxis( void )
+int InputJoystick::getXAxis( void )
 {
-	return( GetAxis( X_AXIS ) );
+	return getAxis( X_AXIS );
 }
 
 //--------------------------------------------------------------------------------
-// Name: GetYAxis()
+// Name: getYAxis()
 // Description:
 // 
 //--------------------------------------------------------------------------------
-int InputJoystick::GetYAxis( void )
+int InputJoystick::getYAxis( void )
 {
-	return( GetAxis( Y_AXIS ) );
+	return getAxis( Y_AXIS );
 }
 
 
 //--------------------------------------------------------------------------------
-// Name: GetButton()
+// Name: getButton()
 // Description:
 // 
 //--------------------------------------------------------------------------------
-int InputJoystick::GetButton( int button )
+int InputJoystick::getButton( int button )
 {
-	return( ButtonState[button] );
+	return buttonState[button];
 }
 
 
@@ -214,7 +222,7 @@ int InputJoystick::getLastInputId()
 
 
 //--------------------------------------------------------------------------------
-// Name: Update()
+// Name: update()
 // Description:
 // 
 //--------------------------------------------------------------------------------
@@ -234,10 +242,10 @@ void InputJoystick::update( SDL_Event *event )
 
 			if( ( event->jaxis.value >= AXIS_STATE_CENTER_MIN ) &&
 			    ( event->jaxis.value <= AXIS_STATE_CENTER_MAX )	   )
-				AxisState[event->jaxis.axis] =
+				axisState[event->jaxis.axis] =
 					AXIS_STATE_CENTER;
 			else
-				AxisState[event->jaxis.axis] =
+				axisState[event->jaxis.axis] =
 					( int )( event->jaxis.value );
 
 		} break;
@@ -251,7 +259,7 @@ void InputJoystick::update( SDL_Event *event )
 				<< " Down" << endl;
 			#endif
 
-			ButtonState[event->jbutton.button] = BUTTON_STATE_DOWN;
+			buttonState[event->jbutton.button] = BUTTON_STATE_DOWN;
 		} break;
 
 		// A button was just released
@@ -263,7 +271,7 @@ void InputJoystick::update( SDL_Event *event )
 				<< " Up" << endl;
 			#endif
 
-			ButtonState[event->jbutton.button] = BUTTON_STATE_UP;
+			buttonState[event->jbutton.button] = BUTTON_STATE_UP;
 		} break;
 	}
 }
