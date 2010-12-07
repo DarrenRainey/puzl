@@ -83,7 +83,15 @@ class VideoSystem
 public:
 	VideoSystem();
 	~VideoSystem();
-		
+	
+	int initialize( int displayWidth, int displayHeight, int displayAttributes );
+	int shutdown();
+	
+	VideoDisplay* getDisplay();
+	
+protected:
+	VideoDisplay* display;		// Main video display
+
 private:
 };
 

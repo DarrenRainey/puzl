@@ -57,18 +57,9 @@ AudioSystem::AudioSystem()
 	if( SDL_InitSubSystem( SDL_INIT_AUDIO ) != 0 )
 	{
 		cout << "Error: Unable to set up sound system." << endl;
-		return;
-	}
- 
-	int audio_rate = 44100;
-	Uint16 audio_format = AUDIO_S16SYS;
-	int audio_channels = 2;
-	int audio_buffers = 4096;
- 
-	if( Mix_OpenAudio( audio_rate, audio_format, audio_channels, audio_buffers ) != 0 )
-	{
-		cout << "Error: Unable to set up sound system mixer." << endl;
-		return;
+		
+		SDL_QuitSubSystem( SDL_INIT_AUDIO );
+		Mix_CloseAudio();
 	}
 }
 
@@ -83,4 +74,33 @@ AudioSystem::~AudioSystem()
 	SDL_QuitSubSystem( SDL_INIT_AUDIO );
 	Mix_CloseAudio();
 }
+
+
+//--------------------------------------------------------------------------------
+// Name: AudioSystem::initialize()
+// Description:
+// 
+//--------------------------------------------------------------------------------
+int AudioSystem::initialize( int bitRate, int numberOfChannels, int numberOfBuffers )
+{
+	if( Mix_OpenAudio( bitRate, AUDIO_S16SYS, numberOfChannels, numberOfBuffers ) != 0 )
+	{
+		cout << "Error: Unable to set up sound system mixer." << endl;
+		return -1;
+	}
+	
+	return 0;
+}
+
+
+//--------------------------------------------------------------------------------
+// Name: AudioSystem::shutdown()
+// Description:
+// 
+//--------------------------------------------------------------------------------
+int AudioSystem::shutdown()
+{
+	
+}
+
 

@@ -86,42 +86,39 @@ public:
 	int run();
 	
 protected:
-	VideoSystem	videoSystem;		// Video system object
-	AudioSystem	audioSystem;		// Audio system object
-	InputSystem	inputSystem;		// Input system object
+	VideoSystem* videoSystem;		// Video system object
+	AudioSystem* audioSystem;		// Audio system object
+	InputSystem* inputSystem;		// Input system object
 
-	VideoDisplay	display;		// Main video display
+	VideoDisplay* display;			// Main video display
 
-	InputKeyboard	keyboard;		// Keyboard object
-	InputMouse	mouse;			// Mouse object
-	InputJoystick	joystick[MAX_NUM_OF_JOYSTICKS];// Joystick objects (maximum)
+	InputKeyboard** keyboard;		// Keyboard object
+	InputMouse** mouse;			// Mouse object
+	InputJoystick** joystick;		// Joystick objects (maximum)
 
-	int		numberOfKeyboards;	// NOTE: Assuming only one keyboard
-	int		numberOfMice;		// NOTE: Assuming only one mouse
-	int		numberOfJoysticks;	// Actual number of joysticks found
-	int		numberOfNetwork;	// Number of network client/players
+	//int numberOfNetwork;			// Number of network client/players
 
-	int		screenWidth;
-	int		screenHeight;
+	int screenWidth;
+	int screenHeight;
 	
-	virtual int initializeVideo( void );
-	virtual int shutdownVideo( void );
-
-	virtual int initializeInput( void );
-	virtual int shutdownInput( void );
+	bool quit;				// Program terminator flag
 	
-	virtual int initializeAudio( void );
-	virtual int shutdownAudio( void );
+	virtual int initializeVideo();
+	virtual int shutdownVideo();
+
+	virtual int initializeInput();
+	virtual int shutdownInput();
+	
+	virtual int initializeAudio();
+	virtual int shutdownAudio();
 	
 	void setCaption( string caption );
 	void setIcon( string filePath );
 	
-	bool		quit;			// Program terminator flag
-	
 private:
-	unsigned int	nowTime;
-	unsigned int	lastTime;
-	unsigned int	nextTime;
+	unsigned int nowTime;
+	unsigned int lastTime;
+	unsigned int nextTime;
 	
 	int initialize();
 	int shutdown();
@@ -129,8 +126,8 @@ private:
 	virtual void loop() = 0;
 	virtual void draw() = 0;
 	
-	int updateSystem( void );
-	int getDeviceInput( void );
+	int updateSystem();
+	int getDeviceInput();
 };
 
 // PROTOTYPES ====================================================================

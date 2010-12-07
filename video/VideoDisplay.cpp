@@ -70,7 +70,7 @@ VideoDisplay::VideoDisplay( void )
 // Description:
 // 
 //--------------------------------------------------------------------------------
-VideoDisplay::~VideoDisplay( void )
+VideoDisplay::~VideoDisplay()
 {
 	
 }
@@ -271,11 +271,10 @@ int VideoDisplay::setRealDimensions( int width, int height )
 // Description:
 // 
 //--------------------------------------------------------------------------------
-int VideoDisplay::shutdown( void )
+int VideoDisplay::shutdown()
 {
 	fullScreen = false;
-	
-	return( SUCCESS );
+	return SUCCESS;
 }
 
 
@@ -311,7 +310,7 @@ int VideoDisplay::reset( int width, int height,
 	glEnable( GL_TEXTURE_2D );
 	*/
 	
-	return( 0 );
+	return 0;
 }
 
 
@@ -320,9 +319,9 @@ int VideoDisplay::reset( int width, int height,
 // Description:
 // 
 //--------------------------------------------------------------------------------
-bool VideoDisplay::isFullscreen( void )
+bool VideoDisplay::isFullscreen()
 {
-	return( fullScreen );
+	return fullScreen;
 }
 
 

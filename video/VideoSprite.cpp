@@ -158,7 +158,7 @@ VideoSprite::VideoSprite( VideoImage &videoImage, int width, int height, int num
 //--------------------------------------------------------------------------------
 VideoSprite::~VideoSprite()
 {
-	destroy();
+	//destroy();
 }
 
 /*

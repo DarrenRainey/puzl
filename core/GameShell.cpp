@@ -50,6 +50,16 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ===============================================================================
 GameShell::GameShell()
 {
+	videoSystem = NULL;
+	audioSystem = NULL;
+	inputSystem = NULL;
+
+	display = NULL;
+
+	keyboard = NULL;
+	mouse = NULL;
+	joystick = NULL;
+	
 	// TODO: Just get/set these with a VideoDisplay.
 	screenWidth = 0;
 	screenHeight = 0;
@@ -134,9 +144,9 @@ int GameShell::run()
 		nowTime = SDL_GetTicks();
 		while( nowTime > nextTime && loops < MAX_FRAMESKIP )
 		{
-			display.clear();
+			display->clear();
 			draw();
-			display.present();
+			display->present();
 		
 			updateSystem();
 			loop();
@@ -171,43 +181,60 @@ int GameShell::initialize()
 }
 
 // ===============================================================================
-int GameShell::initializeVideo( void )
+int GameShell::initializeVideo()
 {
-	// TODO: Set screen dimensions here?
-	display.initialize( screenWidth, screenHeight, DISPLAY_ATTRIBUTE_RESIZABLE );
+	videoSystem = new VideoSystem();
+	if( videoSystem->initialize( screenWidth, screenHeight, DISPLAY_ATTRIBUTE_RESIZABLE ) < 0 )
+	{
+		cout << "GameShell::initializeVideo(): Failed to initialize video system." << endl;
+		delete videoSystem;
+		return -1;
+	}
 	
-	return( SUCCESS );
+	display = videoSystem->getDisplay();
+	if( display == NULL )
+	{
+		cout << "GameShell::initializeVideo(): Failed to initialize video display." << endl;
+		videoSystem->shutdown();
+		delete videoSystem;
+		return -1;
+	}
+	
+	return 0;
 }
 
 
 // ===============================================================================
-int GameShell::initializeInput( void )
+int GameShell::initializeInput()
 {
-	int index;
+	inputSystem = new InputSystem();
+	if( inputSystem->initialize() < 0 )
+	{
+		cout << "GameShell::initializeInput(): Failed to initialize input system." << endl;
+		delete inputSystem;
+		return -1;
+	}
 	
-	numberOfKeyboards = 1;	// NOTE: Assuming only one keyboard
-	numberOfMice = 1;	// NOTE: Assuming only one mouse
-	numberOfJoysticks;
-
-	inputSystem.registerKeyboard( &keyboard );
-	inputSystem.registerMouse( &mouse );
+	keyboard = inputSystem->getKeyboards();
+	mouse = inputSystem->getMice();
+	joystick = inputSystem->getJoysticks();
 	
-	numberOfJoysticks = inputSystem.getNumberOfJoysticks();
-	
-	if( numberOfJoysticks > MAX_NUM_OF_JOYSTICKS )
-		numberOfJoysticks = MAX_NUM_OF_JOYSTICKS;
-	
-	for( index = 0; index < numberOfJoysticks; index++ )
-		inputSystem.registerJoystick( joystick[index].initialize() );
-	
-	return( 0 );
+	return 0;
 }
 
 
 // ===============================================================================
-int GameShell::initializeAudio( void )
+int GameShell::initializeAudio()
 {
-	return( 0 );
+	audioSystem = new AudioSystem();
+	if( audioSystem->initialize( 44100, 2, 4096 ) < 0 )
+	{
+		cout << "GameShell::initializeInput(): Failed to initialize input system." << endl;
+		delete audioSystem;
+		return -1;
+	}
+	
+	return 0;
 }
 
 
@@ -220,41 +247,63 @@ int GameShell::shutdown()
 }
 
 // ===============================================================================
-int GameShell::shutdownInput( void )
+int GameShell::shutdownInput()
 {
-	int index;
-	
-	for( index = 0; index < numberOfJoysticks; index++ )
-		joystick[index].shutdown();
-	
-	return( 0 );
+	if( inputSystem->shutdown() < 0 )
+	{
+		cout << "GameShell::shutdownInput(): Failed to shut down input system." << endl;
+		delete inputSystem;
+		return -1;
+	}
+	else
+	{
+		delete inputSystem;
+		return 0;
+	}
 }
 
 
 // ===============================================================================
-int GameShell::shutdownAudio( void )
+int GameShell::shutdownAudio()
 {
-	return( 0 );
+	if( audioSystem->shutdown() < 0 )
+	{
+		cout << "GameShell::shutdownInput(): Failed to shut down audio system." << endl;
+		delete audioSystem;
+		return -1;
+	}
+	else
+	{
+		delete audioSystem;
+		return 0;
+	}
 }
 
 
 // ===============================================================================
-int GameShell::shutdownVideo( void )
+int GameShell::shutdownVideo()
 {
 	//cout << "GameShell::shutdownVideo" << endl;
-	// Shut down our display
-	display.shutdown();
-	
-	return( 0 );
+	if( videoSystem->shutdown() < 0 )
+	{
+		cout << "GameShell::shutdownInput(): Failed to shut down video system." << endl;
+		delete videoSystem;
+		return -1;
+	}
+	else
+	{
+		delete videoSystem;
+		return 0;
+	}
 }
 
 
 // ===============================================================================
-int GameShell::updateSystem( void )
+int GameShell::updateSystem()
 {
-	inputSystem.age();			// Process state aging.
+	inputSystem->age();			// Process state aging.
 	
-	SDL_Event	event;			// Event variable
+	SDL_Event event;			// Event variable
 	
 	// More SDL bullshit I need to eliminate
 	// Look for a SDL event
@@ -284,12 +333,12 @@ int GameShell::updateSystem( void )
 				//SDL_Delay( 125 );
 				// NOTE: Destroy/shutdown all video memory here?
 				//while( display.initialize( event.resize.w, event.resize.h, DISPLAY_ATTRIBUTE_RESIZABLE ) == -1 )
-				{
+				//{
 					// Keep Trying.
-				}
+				//}
 				//SDL_Delay( 125 );
 				
-				display.setRealDimensions( event.resize.w, event.resize.h );
+				display->setRealDimensions( event.resize.w, event.resize.h );
 				//cout << display.getRealWidth() << "," << display.getRealHeight() << ":";
 				//cout << display.getWidth() << "," << display.getHeight() << endl;
 				
@@ -332,7 +381,7 @@ int GameShell::updateSystem( void )
 			case SDL_JOYBUTTONUP:
 			{
 				// Put it through the input device handler
-				inputSystem.update( &event );
+				inputSystem->update( &event );
 			} break;
 		}
 	}
@@ -344,7 +393,7 @@ int GameShell::updateSystem( void )
 
 
 // ===============================================================================
-int GameShell::getDeviceInput( void )
+int GameShell::getDeviceInput()
 {
 	//int index;
 	
@@ -357,7 +406,7 @@ int GameShell::getDeviceInput( void )
 	//for( index = 0; index < numberOfJoysticks; index++ )
 	//	Joystick[index].Read();
 
-	return( 0 );
+	return 0;
 }
 
 

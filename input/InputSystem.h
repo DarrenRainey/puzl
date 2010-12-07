@@ -62,23 +62,30 @@ public:
 	InputSystem();
 	~InputSystem();
 
-	int getNumberOfJoysticks( void );	// Returns number of connected joysticks
-
-	int registerKeyboard( InputKeyboard *keyboard_ptr );
-	int registerMouse( InputMouse *mouse_ptr );
-	int registerJoystick( InputJoystick *joystick_ptr );
-
+	int initialize();
+	int shutdown();
+	
+	InputKeyboard** getKeyboards();
+	InputMouse** getMice();
+	InputJoystick** getJoysticks();
+	
 	void update( SDL_Event *event );
 	void age();
 	
-private:
-	InputKeyboard	**keyboard;
-	InputMouse	**mouse;
-	InputJoystick	**joystick;
+	int getNumberOfKeyboards();
+	int getNumberOfMice();
+	int getNumberOfJoysticks();
+
+protected:
+	InputKeyboard** keyboard;	// Keyboard object
+	InputMouse** mouse;		// Mouse object
+	InputJoystick** joystick;	// Joystick objects (maximum)
 	
-	int numberOfKeyboards;
-	int numberOfMice;
-	int numberOfJoysticks;
+	int numberOfKeyboards;		// NOTE: Assuming only one keyboard
+	int numberOfMice;		// NOTE: Assuming only one mouse
+	int numberOfJoysticks;		// Actual number of joysticks found
+private:
+
 };
 
 // PROTOTYPES ====================================================================

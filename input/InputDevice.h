@@ -48,6 +48,9 @@ public:
 	InputDevice();
 	~InputDevice();
 
+	virtual int initialize();
+	virtual int shutdown();
+	
  	bool check( int inputId );			// Check if input is on or off.
 	int getState( int inputId );			// Get current state of an input.
 	virtual int getLastInputId();

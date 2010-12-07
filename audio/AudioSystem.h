@@ -71,6 +71,9 @@ public:
 	AudioSystem();
 	~AudioSystem();
 
+	int initialize( int bitRate, int numberOfChannels, int numberOfBuffers );
+	int shutdown();
+	
 	//int Play( int id );			// Plays a sound from the pool with a certain ID
 
 private:
