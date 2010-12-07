@@ -86,14 +86,14 @@ public:
 
 	int initialize( int width, int height,		// Initializes the display
 			int attributes = 0 );
-	int shutdown( void );				// Closes the display
+	int shutdown();					// Closes the display
 	int reset( int width, int height,		// Resets the display to another style
 		   int bitdepth, int attributes );
 		   
 	void setDimensions( int width, int height );
 	int setRealDimensions( int width, int height );
 
-	bool isFullscreen( void );			// Check if this display is fullscreen
+	bool isFullscreen();				// Check if this display is fullscreen
 	
 	void drawRectangle( int x0, int y0,		// Draw a basic rectangle (2D, no alpha)
 			   int x1, int y1,
@@ -104,8 +104,8 @@ public:
 			   int x1, int y1,
 			   int color[] );
 
-	void clear();				// Clears the primary buffer with a color
-	void present();				// Draws out the primary buffer
+	void clear();					// Clears the primary buffer with a color
+	void present();					// Draws out the primary buffer
 
 protected:
 	bool fullScreen;				// Indicates if display is fullscreen

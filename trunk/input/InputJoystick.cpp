@@ -60,7 +60,7 @@ InputJoystick::InputJoystick()
 	int index;
 	
 	// Make this joystick object invalid initially.
-	Id = -1;
+	id = -1;
 
 	// Clear the button states.
 	for( index = 0; index < NUM_JOYSTICK_BUTTONS; index++ )
@@ -84,9 +84,9 @@ InputJoystick::InputJoystick()
 InputJoystick::~InputJoystick()
 {
 	#ifdef DEBUG
-	if( Id != -1 )
+	if( id != -1 )
 	{
-		cout << "Joystick(" << Id << ") was not shutdown!" << endl; 
+		cout << "Joystick(" << id << ") was not shutdown!" << endl; 
 	}
 	#endif
 }
@@ -97,14 +97,14 @@ InputJoystick::~InputJoystick()
 // Description:
 // 
 //--------------------------------------------------------------------------------
-InputJoystick* InputJoystick::initialize( void )
+int InputJoystick::initialize()
 {
 	// Increase the reference counter for a 'new' joystick.
 	// Get the unique system-level ID of this joystick.
-	Id = count++;
+	id = count++;
 
 	#ifdef DEBUG
-	cout << "Id# " << Id;
+	cout << "id " << id;
 	#endif
 
 	// Switch on the joystick event system.
@@ -114,14 +114,14 @@ InputJoystick* InputJoystick::initialize( void )
 	}
 
 	// Open this joystick device for SDL.
-	joystick = SDL_JoystickOpen( Id );
+	joystick = SDL_JoystickOpen( id );
 
 	// Check if this is a valid joystick; else fill default values.
 	if( joystick == NULL )
 	{
 		#ifdef DEBUG
 		cout << "Invalid Joystick(" <<
-			Id <<
+			id <<
 			")" << endl;
 		#endif
 		
@@ -130,19 +130,19 @@ InputJoystick* InputJoystick::initialize( void )
 			SDL_JoystickEventState( SDL_IGNORE );
 		}
 
-		return NULL;
+		return -1;
 	}
 	else
 	{
 		// Get name of this joystick.
-		name = SDL_JoystickName( Id );
+		name = SDL_JoystickName( id );
 
 		#ifdef DEBUG
 		cout << name << endl;
 		#endif
 	}
 
-	return this;
+	return 0;
 }
 
 
@@ -151,7 +151,7 @@ InputJoystick* InputJoystick::initialize( void )
 // Description:
 // 
 //--------------------------------------------------------------------------------
-int InputJoystick::shutdown( void )
+int InputJoystick::shutdown()
 {
 	SDL_JoystickClose( joystick );
 
@@ -162,7 +162,7 @@ int InputJoystick::shutdown( void )
 	}
 
 	// Make this joystick object invalid.
-	Id = -1;
+	id = -1;
 	
 	return 0;
 }
@@ -183,7 +183,7 @@ int InputJoystick::getAxis( int axis )
 // Description:
 // 
 //--------------------------------------------------------------------------------
-int InputJoystick::getXAxis( void )
+int InputJoystick::getXAxis()
 {
 	return getAxis( X_AXIS );
 }
@@ -193,7 +193,7 @@ int InputJoystick::getXAxis( void )
 // Description:
 // 
 //--------------------------------------------------------------------------------
-int InputJoystick::getYAxis( void )
+int InputJoystick::getYAxis()
 {
 	return getAxis( Y_AXIS );
 }

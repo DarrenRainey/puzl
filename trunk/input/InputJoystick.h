@@ -87,14 +87,14 @@ public:
 	InputJoystick();
 	~InputJoystick();
 
-	InputJoystick* initialize( void );	// Initialize this object for use
-	int shutdown( void );			// Shut down this object
+	int initialize();			// Initialize this object for use
+	int shutdown();				// Shut down this object
 
-	int read( void );
+	int read();
 
 	int getAxis( int axis );		// Get state of an axis (direction-pad)
-	int getXAxis( void );			// Get state of the X axis
-	int getYAxis( void );			// Get state of the Y axis
+	int getXAxis();				// Get state of the X axis
+	int getYAxis();				// Get state of the Y axis
 
 	int getButton( int button );		// Get state of a button
 	
@@ -103,7 +103,7 @@ public:
 private:
 	void update( SDL_Event *event  );	// Update the state of joystick
 
-	int Id;					// ID number of this joystick device
+	int id;					// ID number of this joystick device
 						// on the current system
 
 	string name;				// Name of this joystick device

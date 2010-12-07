@@ -61,14 +61,6 @@ InputSystem::InputSystem()
 //		SDL_Init( SDL_INIT_VIDEO );		// initialize twice
 
 	SDL_InitSubSystem( SDL_INIT_JOYSTICK );
-
-	numberOfKeyboards	= 1;			// NOTE Assume (just) one
-	numberOfMice		= 1;			// TODO check for this?
-	numberOfJoysticks 	= SDL_NumJoysticks();	// 
-
-	keyboard		= new InputKeyboard* [numberOfKeyboards];
-	mouse			= new InputMouse* [numberOfMice];
-	joystick		= new InputJoystick* [numberOfJoysticks];
 }
 
 
@@ -88,57 +80,145 @@ InputSystem::~InputSystem()
 								// video system
 }
 
-//--------------------------------------------------------------------------------
-// Name: getNumberOfJoysticks()
-// Description:
-// 
-//--------------------------------------------------------------------------------
-int InputSystem::getNumberOfJoysticks( void )
-{
-	return( numberOfJoysticks );
-}
 
 //--------------------------------------------------------------------------------
-// Name: registerKeyboard()
+// Name: InputSystem::initialize()
 // Description:
 // 
 //--------------------------------------------------------------------------------
-int InputSystem::registerKeyboard( InputKeyboard *keyboard_ptr )
+int InputSystem::initialize()
 {
-	keyboard[0] = keyboard_ptr;			// NOTE Assuming just one keyboard
-							// TODO Make reference counter
+	numberOfKeyboards	= 1;			// NOTE Assume (just) one
+	numberOfMice		= 1;			// TODO check for this?
+	numberOfJoysticks 	= SDL_NumJoysticks();	// 
+
+	int index;
 	
-	return( 0 );
-}
-
-//--------------------------------------------------------------------------------
-// Name: registerMouse()
-// Description:
-// 
-//--------------------------------------------------------------------------------
-int InputSystem::registerMouse( InputMouse *mouse_ptr )
-{
-	mouse[0] = mouse_ptr;				// NOTE Assuming just one mouse
-							// TODO Make reference counter
+	keyboard = new InputKeyboard* [numberOfKeyboards];
+	for( index = 0; index < numberOfKeyboards; index++ )
+	{
+		keyboard[index] = new InputKeyboard();
+		keyboard[index]->initialize();
+	}
 	
-	return( 0 );
+	mouse = new InputMouse* [numberOfMice];
+	for( index = 0; index < numberOfMice; index++ )
+	{
+		mouse[index] = new InputMouse();
+		mouse[index]->initialize();
+	}
+	
+	joystick = new InputJoystick* [numberOfJoysticks];
+	for( index = 0; index < numberOfJoysticks; index++ )
+	{
+		joystick[index] = new InputJoystick();
+		joystick[index]->initialize();
+	}
 }
 
+
 //--------------------------------------------------------------------------------
-// Name: registerJoystick()
+// Name: InputSystem::shutdown()
 // Description:
 // 
 //--------------------------------------------------------------------------------
-int InputSystem::registerJoystick( InputJoystick *joystick_ptr )
+int InputSystem::shutdown()
 {
-	joystick[joystick_ptr->Id] = joystick_ptr;	// TODO Move ID/Count referencing from
-							// InputJoystick to InputSystem?
-
-	return( 0 );
+	int index;
+	
+	for( index = 0; index < numberOfKeyboards; index++ )
+	{
+		keyboard[index]->shutdown();
+		delete keyboard[index];
+	}
+	delete [] keyboard;
+	
+	for( index = 0; index < numberOfMice; index++ )
+	{
+		mouse[index]->shutdown();
+		delete mouse[index];
+	}
+	delete [] mouse;
+	
+	for( index = 0; index < numberOfJoysticks; index++ )
+	{
+		joystick[index]->shutdown();
+		delete joystick[index];
+	}
+	delete [] joystick;
+	
+	return 0;
 }
 
+
 //--------------------------------------------------------------------------------
-// Name: update()
+// Name: InputSystem::getKeyboards()
+// Description:
+// 
+//--------------------------------------------------------------------------------
+InputKeyboard** InputSystem::getKeyboards()
+{
+	return keyboard;
+}
+
+
+//--------------------------------------------------------------------------------
+// Name: InputSystem::getMice()
+// Description:
+// 
+//--------------------------------------------------------------------------------
+InputMouse** InputSystem::getMice()
+{
+	return mouse;
+}
+
+
+//--------------------------------------------------------------------------------
+// Name: InputSystem::getJoysticks()
+// Description:
+// 
+//--------------------------------------------------------------------------------
+InputJoystick** InputSystem::getJoysticks()
+{
+	return joystick;
+}
+
+
+//--------------------------------------------------------------------------------
+// Name: InputSystem::getNumberOfKeyboards()
+// Description:
+// 
+//--------------------------------------------------------------------------------
+int InputSystem::getNumberOfKeyboards()
+{
+	return numberOfKeyboards;
+}
+
+
+//--------------------------------------------------------------------------------
+// Name: InputSystem::getNumberOfMice()
+// Description:
+// 
+//--------------------------------------------------------------------------------
+int InputSystem::getNumberOfMice()
+{
+	return numberOfMice;
+}
+
+
+//--------------------------------------------------------------------------------
+// Name: InputSystem::getNumberOfJoysticks()
+// Description:
+// 
+//--------------------------------------------------------------------------------
+int InputSystem::getNumberOfJoysticks()
+{
+	return numberOfJoysticks;
+}
+
+
+//--------------------------------------------------------------------------------
+// Name: InputSystem::update()
 // Description:
 // 
 //--------------------------------------------------------------------------------
@@ -186,7 +266,7 @@ void InputSystem::update( SDL_Event *event )
 }
 
 //--------------------------------------------------------------------------------
-// Name: age()
+// Name: InputSystem::age()
 // Description:
 // 
 //--------------------------------------------------------------------------------

@@ -60,6 +60,8 @@ VideoSystem::VideoSystem()
 	{
 		atexit( SDL_Quit );			// INVESTIGATE
 	}
+	
+	display = NULL;
 }
 
 
@@ -73,4 +75,39 @@ VideoSystem::~VideoSystem()
 	SDL_Quit();					// THIS A GOOD IDEA?
 }
 
+
+//--------------------------------------------------------------------------------
+// Name: VideoSystem::initialize()
+// Description:
+// 
+//--------------------------------------------------------------------------------
+int VideoSystem::initialize( int displayWidth, int displayHeight, int displayAttributes )
+{
+	display = new VideoDisplay();
+	return display->initialize( displayWidth, displayHeight, displayAttributes );
+}
+
+
+//--------------------------------------------------------------------------------
+// Name: VideoSystem::shutdown()
+// Description:
+// 
+//--------------------------------------------------------------------------------
+int VideoSystem::shutdown()
+{
+	// Shut down the display.
+	delete display;
+	return display->shutdown();
+}
+
+
+//--------------------------------------------------------------------------------
+// Name: VideoSystem::getDisplay()
+// Description:
+// 
+//--------------------------------------------------------------------------------
+VideoDisplay* VideoSystem::getDisplay()
+{
+	return display;
+}
 

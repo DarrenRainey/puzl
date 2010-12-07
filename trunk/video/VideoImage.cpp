@@ -166,7 +166,7 @@ VideoImage::VideoImage( VideoImage &videoImage )
 //--------------------------------------------------------------------------------
 VideoImage::~VideoImage()
 {
-	destroy();
+	//destroy();
 }
 
 /*
