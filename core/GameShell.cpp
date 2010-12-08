@@ -180,6 +180,7 @@ int GameShell::initialize()
 	return 0;
 }
 
+
 // ===============================================================================
 int GameShell::initializeVideo()
 {
@@ -201,6 +202,20 @@ int GameShell::initializeVideo()
 	}
 	
 	return 0;
+}
+
+
+// ===============================================================================
+int GameShell::releaseVideo()
+{
+	
+}
+
+
+// ===============================================================================
+int GameShell::reloadVideo()
+{
+	
 }
 
 
@@ -337,8 +352,9 @@ int GameShell::updateSystem()
 					// Keep Trying.
 				//}
 				//SDL_Delay( 125 );
-				
+				releaseVideo();
 				display->setRealDimensions( event.resize.w, event.resize.h );
+				reloadVideo();
 				//cout << display.getRealWidth() << "," << display.getRealHeight() << ":";
 				//cout << display.getWidth() << "," << display.getHeight() << endl;
 				

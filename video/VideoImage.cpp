@@ -78,6 +78,8 @@ VideoImage::VideoImage()
 	setColorBlend( false );
 	//setColor( defaultColor );
 	
+	attributes = IMAGE_ATTRIBUTE_SIMPLE;
+	
 	transparency = true;
 	
 	colorKey = NULL;
@@ -88,6 +90,7 @@ VideoImage::VideoImage()
 	surface = NULL;
 	texture = NULL;
 	
+	fileName = "";
 	clone = NULL;
 	cloneReferenceCounter = 0;
 }
@@ -138,12 +141,16 @@ VideoImage::VideoImage( VideoImage &videoImage )
 		setColor( videoImage.getColor( index ), index );
 	}
 	
+	this->attributes = videoImage.attributes;
+	
 	transparency = videoImage.hasTransparency();
 	
 	setAlphaLevel( videoImage.getAlphaLevel() );
 	
 	surface = videoImage.surface;
 	texture = videoImage.texture;
+	
+	fileName = "";
 	
 	// Check if the source VideoImage is also a clone.
 	if( videoImage.clone )
@@ -387,6 +394,7 @@ int VideoImage::create( int width, int height, int attributes, int numberOfColor
 	}
 	else
 	{
+		this->attributes = attributes;
 		this->numberOfColorKeys = numberOfColorKeys;
 		
 		int index;
@@ -498,6 +506,26 @@ int VideoImage::destroy()
 	return 0;
 }
 
+
+//--------------------------------------------------------------------------------
+// Name: VideoImage::release()
+// Description:
+// 
+//--------------------------------------------------------------------------------
+int VideoImage::release()
+{
+	if( texture == NULL )
+	{
+		return -1;
+	}
+	else
+	{
+		texture = NULL;
+		return 0;
+	}
+}
+
+
 //--------------------------------------------------------------------------------
 // Name: VideoImage::load()
 // Description:
@@ -512,14 +540,14 @@ int VideoImage::load( string fileName, int numberOfColorKeys, int** colorKey )
 		destroy();
 	}
 	
-	// Load the image from file
+	// Load the image from file.
 	temporarySurface = IMG_Load( fileName.c_str() );
 	
-	// Convert the surface format to that of the passed 'ExampleBuffer'
+	// Convert the surface format to that of the passed 'ExampleBuffer'.
 	surface = SDL_DisplayFormatAlpha( temporarySurface );
 	SDL_FreeSurface( temporarySurface );
 
-	// Exit if the surface buffer was created unsuccessfully
+	// Exit if the surface buffer was created unsuccessfully.
 	if( surface == NULL )
 	{
 		cout << "Failed to load VideoImage" << endl;
@@ -527,6 +555,7 @@ int VideoImage::load( string fileName, int numberOfColorKeys, int** colorKey )
 	}
 	else
 	{
+		this->fileName = fileName;
 		this->numberOfColorKeys = numberOfColorKeys;
 		this->colorKey = colorKey;
 		
@@ -548,6 +577,47 @@ int VideoImage::load( string fileName, int numberOfColorKeys, int** colorKey )
 
 
 //--------------------------------------------------------------------------------
+// Name: VideoImage::reload()
+// Description:
+// 
+//--------------------------------------------------------------------------------
+int VideoImage::reload()
+{
+	if( texture != NULL )
+	{
+		cout << "Attempting to reload VideoImage that has not been released." << endl;
+		return -1;
+	}
+	
+	if( clone != NULL )
+	{
+		// This VideoImage is a clone. So, just adjust the texture pointer.
+		if( clone->texture == NULL )
+		{
+			cout << "Attempting to reload VideoImage clone of a VideoImage that does not have a valid texture/surface." << endl;
+			return -1;
+		}
+		else
+		{
+			texture = clone->texture;
+			return 0;
+		}
+	}
+	else
+	if( fileName != "" )
+	{
+		// This VideoImage is not a clone and was originally loaded from a graphic file.
+		return load( fileName, numberOfColorKeys, colorKey );
+	}
+	else
+	{
+		// This VideoImage is not a clone and is one that was created without loading a graphic file.
+		return create( *width, *height, attributes, numberOfColorKeys );
+	}
+}
+
+
+//--------------------------------------------------------------------------------
 // Name: VideoImage::createTexture()
 // Description:
 // 
@@ -557,7 +627,7 @@ int VideoImage::createTexture()
 	int index;
 	
 	// Set our VideoImage's dimensions
-	if( surface )
+	if( surface != NULL )
 	{
 		*realWidth  = surface->w;
 		*realHeight = surface->h;
@@ -586,6 +656,7 @@ int VideoImage::createTexture()
 	const SDL_VideoInfo* videoInfo = SDL_GetVideoInfo();
 	if( !videoInfo )
 	{
+		SDL_FreeSurface( surface );
 		cout << "createTexture failure" << endl;
 		return( -1 );
 	}
@@ -709,6 +780,7 @@ int VideoImage::createTexture()
 
 	// Now we need to free the bitmap data that we loaded since openGL stored it as a texture
 	delete [] newData;
+	SDL_FreeSurface( surface );
 	
 	if( colorKeyNeedsDestroy )
 	{

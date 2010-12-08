@@ -105,6 +105,8 @@ protected:
 	
 	virtual int initializeVideo();
 	virtual int shutdownVideo();
+	virtual int releaseVideo();
+	virtual int reloadVideo();
 
 	virtual int initializeInput();
 	virtual int shutdownInput();
