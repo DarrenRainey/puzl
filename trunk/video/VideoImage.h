@@ -141,7 +141,9 @@ public:
 	
 	int create( int width, int height, int attributes = IMAGE_ATTRIBUTE_SIMPLE, int numberOfColorKeys = 1 );
 	int destroy();
+	int release();
 	int load( string fileName, int numberOfColorKeys = 1, int** colorKey = NULL );
+	int reload();
 	
 	int colorKeyIndex;
 
@@ -159,6 +161,8 @@ protected:
 	float yScale;
 	int scaleType;
 	
+	int attributes;
+	
 	bool transparency;
 	
 	int** colorKey;					// 
@@ -173,6 +177,7 @@ protected:
 	SDL_Surface* surface;
 	GLuint* texture;					// OpenGL texture ID
 	
+	string fileName;
 	VideoImage* clone;
 	int cloneReferenceCounter;
 	
