@@ -49,6 +49,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // Description:
 // Constructor
 //--------------------------------------------------------------------------------
+// TODO: Set default attributes and always bitwise OR it with MULTI_FRAME, as
+// block graphics are always multiframe?
 BlockGraphic::BlockGraphic( VideoImage &videoImage, int width, int height, int attributes ) :
 VideoSprite( videoImage,
 	     width, height,

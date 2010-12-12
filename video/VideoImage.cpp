@@ -82,6 +82,7 @@ VideoImage::VideoImage()
 	
 	transparency = true;
 	
+	numberOfColorKeys = 0;
 	colorKey = NULL;
 	colorKeyIndex = 0;
 	
@@ -129,17 +130,32 @@ VideoImage::VideoImage( VideoImage &videoImage )
 	
 	// Create and copy colors.
 	numberOfColorKeys = videoImage.numberOfColorKeys;
-	int index;
-	color = new int* [numberOfColorKeys];
-	for( index = 0; index < numberOfColorKeys; index++ )
+	
+	if( numberOfColorKeys > 0 )
 	{
-		color[index] = new int[3];
-		color[index][0] = 255; // Default white.
-		color[index][1] = 255;
-		color[index][2] = 255;
-		
-		setColor( videoImage.getColor( index ), index );
+		color = new int* [numberOfColorKeys];
+		for( int index = 0; index < numberOfColorKeys; index++ )
+		{
+			color[index] = new int[3];
+			color[index][0] = 255; // Default white.
+			color[index][1] = 255;
+			color[index][2] = 255;
+			
+			setColor( videoImage.getColor( index ), index );
+		}
 	}
+	else
+	{
+		color = new int* [1];
+		color[0] = new int[3];
+		color[0][0] = 255; // Default white.
+		color[0][1] = 255;
+		color[0][2] = 255;
+		
+		setColor( videoImage.getColor( 0 ), 0 );
+	}
+	
+	this->colorKey = videoImage.colorKey;
 	
 	this->attributes = videoImage.attributes;
 	
@@ -397,14 +413,24 @@ int VideoImage::create( int width, int height, int attributes, int numberOfColor
 		this->attributes = attributes;
 		this->numberOfColorKeys = numberOfColorKeys;
 		
-		int index;
-		color = new int* [numberOfColorKeys];
-		for( index = 0; index < numberOfColorKeys; index++ )
+		if( numberOfColorKeys > 0 )
 		{
-			color[index] = new int[3];
-			color[index][0] = 255; // Default white.
-			color[index][1] = 255;
-			color[index][2] = 255;
+			color = new int* [numberOfColorKeys];
+			for( int index = 0; index < numberOfColorKeys; index++ )
+			{
+				color[index] = new int[3];
+				color[index][0] = 255; // Default white.
+				color[index][1] = 255;
+				color[index][2] = 255;
+			}
+		}
+		else
+		{
+			color = new int* [0];
+			color[0] = new int[3];
+			color[0][0] = 255; // Default white.
+			color[0][1] = 255;
+			color[0][2] = 255;
 		}
 		
 		*( this->width ) = surface->w;
@@ -559,14 +585,25 @@ int VideoImage::load( string fileName, int numberOfColorKeys, int** colorKey )
 		this->numberOfColorKeys = numberOfColorKeys;
 		this->colorKey = colorKey;
 		
-		int index;
-		color = new int* [numberOfColorKeys];
-		for( index = 0; index < numberOfColorKeys; index++ )
+		if( numberOfColorKeys > 0 )
 		{
-			color[index] = new int[3];
-			color[index][0] = 255; // Default white.
-			color[index][1] = 255;
-			color[index][2] = 255;
+			color = new int* [numberOfColorKeys];
+			for( int index = 0; index < numberOfColorKeys; index++ )
+			{
+				color[index] = new int[3];
+				color[index][0] = 255; // Default white.
+				color[index][1] = 255;
+				color[index][2] = 255;
+			}
+		}
+		else
+		{
+			// Just set up one color for a VideoImage with no color keys.
+			color = new int* [1];
+			color[0] = new int[3];
+			color[0][0] = 255; // Default white.
+			color[0][1] = 255;
+			color[0][2] = 255;
 		}
 		
 		*width = surface->w;
@@ -678,24 +715,45 @@ int VideoImage::createTexture()
 	}
 	
 	int textureIndex;
-	texture = new GLuint [numberOfColorKeys];
-	glGenTextures( numberOfColorKeys, texture );
-	
-	bool colorKeyNeedsDestroy = false;
-	if( colorKey == NULL )
+	bool colorKeyNeedsDestroy;
+	if( numberOfColorKeys > 0 )
 	{
-		colorKey = new int* [numberOfColorKeys];
+		texture = new GLuint [numberOfColorKeys];
+		glGenTextures( numberOfColorKeys, texture );
 		
-		static int defaultColorKey[] = {0xFF, 0xFF, 0xFF};
-		for( int colorKeyIndex = 0; colorKeyIndex < numberOfColorKeys; colorKeyIndex++ )
+		colorKeyNeedsDestroy = false;
+		if( colorKey == NULL )
 		{
-			colorKey[colorKeyIndex] = defaultColorKey;
+			colorKey = new int* [numberOfColorKeys];
+			
+			static int defaultColorKey[] = {0xFF, 0xFF, 0xFF};
+			for( int colorKeyIndex = 0; colorKeyIndex < numberOfColorKeys; colorKeyIndex++ )
+			{
+				colorKey[colorKeyIndex] = defaultColorKey;
+			}
+			
+			colorKeyNeedsDestroy = true;
 		}
-		
-		colorKeyNeedsDestroy = true;
+	}
+	else
+	{
+		texture = new GLuint [0];
+		glGenTextures( 1, texture );
+		colorKeyNeedsDestroy = false;
 	}
 	
-	for( textureIndex = 0; textureIndex < numberOfColorKeys; textureIndex++ )
+	// NOTE: Temporary fix for VideoImages with no color keys.
+	int numberOfTextures;
+	if( numberOfColorKeys > 0 )
+	{
+		numberOfTextures = numberOfColorKeys;
+	}
+	else
+	{
+		numberOfTextures = 1;
+	}
+	
+	for( textureIndex = 0; textureIndex < numberOfTextures; textureIndex++ )
 	{
 		// The following lines extract R,G and B values from any bitmap
 		Uint32 pixelValue = 0;			// 32 bit unsigned int (as dictated by SDL)
@@ -730,20 +788,29 @@ int VideoImage::createTexture()
 			// TODO Try to adjust these series of if statements to accommodate alphablending too
 			
 			// Sort out color key for this texture.
-			if(	( ( int )( r & 0xFF ) == colorKey[textureIndex][0] ) &&
-				( ( int )( g & 0xFF ) == colorKey[textureIndex][1] ) &&
-				( ( int )( b & 0xFF ) == colorKey[textureIndex][2] ) )
+			if( numberOfColorKeys > 0 )
 			{
-				newData[( index * channels ) + 0] = r = 255;
-				newData[( index * channels ) + 1] = g = 255;
-				newData[( index * channels ) + 2] = b = 255;
+				if(	( ( int )( r & 0xFF ) == colorKey[textureIndex][0] ) &&
+					( ( int )( g & 0xFF ) == colorKey[textureIndex][1] ) &&
+					( ( int )( b & 0xFF ) == colorKey[textureIndex][2] ) )
+				{
+					newData[( index * channels ) + 0] = r = 255;
+					newData[( index * channels ) + 1] = g = 255;
+					newData[( index * channels ) + 2] = b = 255;
+				}
+				else
+				{
+					newData[( index * channels ) + 0] = r = 0;
+					newData[( index * channels ) + 1] = g = 0;
+					newData[( index * channels ) + 2] = b = 0;
+					newData[( index * channels ) + 2] = a = 0;
+				}
 			}
 			else
 			{
-				newData[( index * channels ) + 0] = r = 0;
-				newData[( index * channels ) + 1] = g = 0;
-				newData[( index * channels ) + 2] = b = 0;
-				newData[( index * channels ) + 2] = a = 0;
+				newData[( index * channels ) + 0] = r;
+				newData[( index * channels ) + 1] = g;
+				newData[( index * channels ) + 2] = b;
 			}
 			
 			// TODO: If alphaBlend?
@@ -1033,6 +1100,7 @@ void VideoImage::draw( VideoImage *destinationBitmap, int* sourceRect, int* dest
 	}
 	else
 	{
+		// TODO: Add case for VideoImages with no color keys.
 		// Draw all layers on to first texture only.
 		colorKeyIndex = 0;
 		while( colorKeyIndex < numberOfColorKeys )
@@ -1103,11 +1171,11 @@ inline void VideoImage::drawPrimary( int* sourceRect, int* destinationRect )
 	// TODO: Is this (more) effecient?
 	//static GLuint lastTextureUsed = 0;
 	//if( lastTextureUsed != texture[colorKeyIndex] )
-	{
+	//{
 		//glBindTexture( GL_TEXTURE_2D, texture[0] );
 		glBindTexture( GL_TEXTURE_2D, texture[colorKeyIndex] );
 	//	lastTextureUsed = texture[colorKeyIndex];
-	}
+	//}
 
 	// If this bitmap has color blend,
 	// set the color to this VideoImage's Color
