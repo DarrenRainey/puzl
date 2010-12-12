@@ -72,8 +72,6 @@ using namespace std;
 	#define FAILURE	       -1
 #endif
 
-#define MAX_NUM_OF_JOYSTICKS		4
-
 // TYPES =========================================================================
 class GameShell
 {
@@ -129,7 +127,6 @@ private:
 	virtual void draw() = 0;
 	
 	int updateSystem();
-	int getDeviceInput();
 };
 
 // PROTOTYPES ====================================================================
