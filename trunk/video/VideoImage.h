@@ -139,10 +139,10 @@ public:
 	int* getColor( int colorIndex = 0 );				// Gets the color for color blending
 	void setColor( int color[], int colorIndex = 0 );			// Sets the color for color blending
 	
-	int create( int width, int height, int attributes = IMAGE_ATTRIBUTE_SIMPLE, int numberOfColorKeys = 1 );
+	int create( int width, int height, int attributes = IMAGE_ATTRIBUTE_SIMPLE, int numberOfColorKeys = 0 );
 	int destroy();
 	int release();
-	int load( string fileName, int numberOfColorKeys = 1, int** colorKey = NULL );
+	int load( string fileName, int numberOfColorKeys = 0, int** colorKey = NULL );
 	int reload();
 	
 	int colorKeyIndex;
