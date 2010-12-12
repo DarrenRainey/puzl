@@ -60,9 +60,9 @@ GameShell::GameShell()
 	mouse = NULL;
 	joystick = NULL;
 	
-	// TODO: Just get/set these with a VideoDisplay.
 	screenWidth = 0;
 	screenHeight = 0;
+	
 	quit = false;
 }
 
@@ -72,7 +72,7 @@ GameShell::GameShell( int width, int height )
 {
 	// TODO: Just get/set these with a VideoDisplay.
 	screenWidth = width;
-	screenHeight = height;	
+	screenHeight = height;
 	
 	quit = false;;
 }
@@ -86,44 +86,6 @@ GameShell::~GameShell()
 
 
 // ===============================================================================
-/*
-int GameShell::run()
-{
-	initialize();
-	
-	const unsigned int TICKS_PER_SECOND = 60;
-	const unsigned int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
-	const unsigned int MAX_FRAMESKIP = 10;
-	
-	nextTime = SDL_GetTicks();
-	unsigned int loops;
-	
-	// Main loop
-	while( !quit )
-	{
-		draw();
-		display.present();
-		display.clear();
-			
-		loops = 0;
-		while( SDL_GetTicks() > nextTime && loops < MAX_FRAMESKIP )
-		{
-			// Update engine (maintenance work mostly)
-			updateSystem();
-			loop();
-			
-			nextTime += SKIP_TICKS;
-			loops++;
-			
-			
-		}
-	}
-	
-	shutdown();
-
-	return( 0 );
-}
-*/
 int GameShell::run()
 {
 	initialize();
@@ -133,11 +95,10 @@ int GameShell::run()
 	const unsigned int MAX_FRAMESKIP = 10;
 	
 	unsigned int nowTime;
-	unsigned int checkTime;
 	nextTime = SDL_GetTicks();
 	unsigned int loops;
 	
-	// Main loop
+	// Main loop.
 	while( !quit )
 	{
 		loops = 0;
@@ -158,7 +119,7 @@ int GameShell::run()
 	
 	shutdown();
 
-	return( 0 );
+	return 0;
 }
 
 
@@ -169,11 +130,11 @@ int GameShell::initialize()
 	initializeAudio();
 	initializeInput();
 	
-	SDL_WarpMouse( screenWidth / 2, screenHeight / 2 );
-	SDL_ShowCursor( 1 );
-	SDL_WM_GrabInput( SDL_GRAB_OFF );
+	//SDL_WarpMouse( screenWidth / 2, screenHeight / 2 );
+	//SDL_ShowCursor( 1 );
+	//SDL_WM_GrabInput( SDL_GRAB_OFF );
 	
-#ifdef WIN32
+#ifdef WINDOWS
 	SDL_EventState( SDL_SYSWMEVENT, SDL_ENABLE );
 #endif
 	
@@ -318,21 +279,20 @@ int GameShell::updateSystem()
 {
 	inputSystem->age();			// Process state aging.
 	
-	SDL_Event event;			// Event variable
+	SDL_Event event;			// Event variable.
 	
-	// More SDL bullshit I need to eliminate
 	// Look for a SDL event
 	while( SDL_PollEvent( &event ) )
 	{
+#ifdef DEBUG
+		cout << "EVENT(" << ( int )( event.type ) << ")";
 		
-// 		cout << "EVENT("
-// 		     << ( int )( event.type )
-// 		     << ")";
-// 		
-// 		if( event.type == 1 )
-// 			cout << ":" << (int)event.active.gain << ":" << (int)event.active.state;
-// 		
-// 		cout << endl;
+		if( event.type == 1 )
+		{
+			cout << ":" << ( int )event.active.gain << ":" << ( int )event.active.state;
+		}
+		cout << endl;
+#endif
 		
 		
 		switch( event.type )
@@ -342,27 +302,15 @@ int GameShell::updateSystem()
 				quit = true;
 			} break;
 			
-			// Some of the resizing code TODO (needs more work)
+			// Some of the resizing code TODO (needs more work).
 			case SDL_VIDEORESIZE:
 			{
-				//SDL_Delay( 125 );
-				// NOTE: Destroy/shutdown all video memory here?
-				//while( display.initialize( event.resize.w, event.resize.h, DISPLAY_ATTRIBUTE_RESIZABLE ) == -1 )
-				//{
-					// Keep Trying.
-				//}
-				//SDL_Delay( 125 );
 				releaseVideo();
 				display->setRealDimensions( event.resize.w, event.resize.h );
 				reloadVideo();
-				//cout << display.getRealWidth() << "," << display.getRealHeight() << ":";
-				//cout << display.getWidth() << "," << display.getHeight() << endl;
-				
-				//screenWidth  = event.resize.w;
-				//screenHeight = event.resize.h;
 			} break;
-#ifdef WIN32
-			// Fixes for resizing in Windows
+#ifdef WINDOWS
+			// Fixes for resizing in Windows.
 			case SDL_SYSWMEVENT:
 			{
 				switch( event.syswm.msg->msg )
@@ -396,32 +344,12 @@ int GameShell::updateSystem()
 			case SDL_JOYBUTTONDOWN:
 			case SDL_JOYBUTTONUP:
 			{
-				// Put it through the input device handler
+				// Put it through the input device handler.
 				inputSystem->update( &event );
 			} break;
 		}
 	}
-
-	getDeviceInput();
 	
-	return( 0 );
-}
-
-
-// ===============================================================================
-int GameShell::getDeviceInput()
-{
-	//int index;
-	
-	//int keyboardInput;			// Tracks most recent keyboard input
-	
-	// Get device input
-	//keyboardInput = keyboard.Read();
-	//mouse.Read();
-	
-	//for( index = 0; index < numberOfJoysticks; index++ )
-	//	Joystick[index].Read();
-
 	return 0;
 }
 
