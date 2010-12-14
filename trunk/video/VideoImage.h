@@ -80,6 +80,7 @@ using namespace std;
 #define IMAGE_ATTRIBUTE_TRANSPARENCY	1
 #define IMAGE_ATTRIBUTE_ALPHABLEND	2
 #define IMAGE_ATTRIBUTE_COLOR		4
+#define IMAGE_ATTRIBUTE_ROTATABLE	8
 
 #define RECT_INDEX_SOURCE_X_START	0
 #define RECT_INDEX_SOURCE_Y_START	1
@@ -123,6 +124,9 @@ public:
 	float getYScale();
 	int getScaleType();
 	void setScaleType( int scaleType );
+	
+	float getAngle();
+	void setAngle( float angle );
 	
 	bool hasTransparency();
 	
@@ -173,6 +177,8 @@ protected:
 
 	bool colorBlend;				// Indicates if bitmap has color modulation
 	int** color;					// Color for color blend/modulation (RGBA)
+	
+	float angle;
 
 	SDL_Surface* surface;
 	GLuint* texture;					// OpenGL texture ID
