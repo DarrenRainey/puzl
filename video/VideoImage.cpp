@@ -74,6 +74,8 @@ VideoImage::VideoImage()
 	setScale( false );
 	scaleType = SCALE_TYPE_EXACT;
 	
+	angle = 0.0f;
+	
 	//static int defaultColor[] = { 255, 255, 255, 255 };	// Default color for color blending
 	setColorBlend( false );
 	//setColor( defaultColor );
@@ -369,6 +371,39 @@ void VideoImage::setScaleType( int scaleType )
 	this->scaleType = scaleType;
 }
 
+
+//--------------------------------------------------------------------------------
+// Name: VideoImage::getAngle()
+// Description:
+// 
+//--------------------------------------------------------------------------------
+float VideoImage::getAngle()
+{
+	return angle;
+}
+
+
+//--------------------------------------------------------------------------------
+// Name: VideoImage::setAngle()
+// Description:
+// 
+//--------------------------------------------------------------------------------
+void VideoImage::setAngle( float angle )
+{
+	if( angle > 360.0f )
+	{
+		this->angle = 360.0f - angle;
+	}
+	else
+	if( angle < 0.0f )
+	{
+		this->angle = 360.0f + angle;
+	}
+	else
+	{
+		this->angle = angle;
+	}
+}
 
 
 //--------------------------------------------------------------------------------
@@ -1163,10 +1198,33 @@ inline void VideoImage::drawPrimary( int* sourceRect, int* destinationRect )
 	glMatrixMode( GL_MODELVIEW );
 	glLoadIdentity();	// Reset The matrix
 	
-	// Set the position where the image is to drawn on the display
-	// TODO: Preprocess this?
-	glTranslatef( ( float )destinationRect[RECT_INDEX_X_POSITION], ( float )destinationRect[RECT_INDEX_Y_POSITION], 0 );
-
+	// TODO: Make this work with "attributes & IMAGE_ATTRIBUTE_ROTATABLE"?
+	if( angle != 0.0f )
+	{
+		// NOTE: These operations happen in reverse order.
+		
+		// TODO: Preprocess this?
+		float rotationXPosition = ( float )( destinationRect[RECT_INDEX_WIDTH] >> 1 );
+		float rotationYPosition = ( float )( destinationRect[RECT_INDEX_HEIGHT] >> 1 );
+		
+		// TODO: Preprocess this?
+		// Set the position where the image is to be drawn on the display (with rotate position included.
+		glTranslatef( ( float )destinationRect[RECT_INDEX_X_POSITION] + rotationXPosition,
+			      ( float )destinationRect[RECT_INDEX_Y_POSITION] + rotationYPosition, 0 );
+		
+		// Rotate the image.
+		glRotatef( angle, 0.0f, 0.0f, 1.0f );
+		
+		// Translate to position which image is to be rotated about.
+		glTranslatef( -rotationXPosition, -rotationYPosition, 0 );
+	}
+	else
+	{
+		// Set the position where the image is to drawn on the display
+		// TODO: Preprocess this?
+		glTranslatef( ( float )destinationRect[RECT_INDEX_X_POSITION], ( float )destinationRect[RECT_INDEX_Y_POSITION], 0 );
+	}
+	
 	// Bind the texture stored as the Texture ID for use
 	// TODO: Is this (more) effecient?
 	//static GLuint lastTextureUsed = 0;

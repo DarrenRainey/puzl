@@ -91,11 +91,15 @@ VideoSprite::VideoSprite( VideoImage &videoImage, int width, int height, int num
 	*( this->height ) = this->realHeight = height;
 	
 	// Clear data members
-	*xPosition  = 0;
-	*yPosition  = 0;
+	*xPosition = 0;
+	*yPosition = 0;
 
 	xVelocity  = 0;
 	yVelocity  = 0;
+	
+	angle = 0.0f;
+	
+	angularVelocity = 0.0f;
 	
 	// Set the number of frames available to the Animation script
 	animation.setNumberOfFrames( numberOfFrames );
@@ -533,6 +537,39 @@ void VideoSprite::move()
 
 
 //--------------------------------------------------------------------------------
+// Name: VideoSprite::getAngularVelocity()
+// Description:
+// 
+//--------------------------------------------------------------------------------
+int VideoSprite::getAngularVelocity()
+{
+	return angularVelocity;
+}
+
+
+//--------------------------------------------------------------------------------
+// Name: VideoSprite::setAngularVelocity()
+// Description:
+// 
+//--------------------------------------------------------------------------------
+void VideoSprite::setAngularVelocity( float angularVelocity )
+{
+	this->angularVelocity = angularVelocity;
+}
+
+
+//--------------------------------------------------------------------------------
+// Name: VideoSprite::rotate()
+// Description:
+// 
+//--------------------------------------------------------------------------------
+void VideoSprite::rotate()
+{
+	angle += angularVelocity;
+}
+
+
+//--------------------------------------------------------------------------------
 // Name: VideoSprite::getState()
 // Description:
 // 
@@ -777,6 +814,17 @@ int VideoSprite::getNumberOfFrames()
 void VideoSprite::setDisplay( VideoDisplay* display )
 {
 	this->display = display;
+}
+
+
+//--------------------------------------------------------------------------------
+// Name: VideoSprite::getDisplay()
+// Description:
+// 
+//--------------------------------------------------------------------------------
+VideoDisplay* VideoSprite::getDisplay()
+{
+	return display;
 }
 
 

@@ -129,8 +129,8 @@ public:
 	void setPosition( int xPosition,	// Set virtual X/Y coordinates
 			  int yPosition );	// 
 	
-	int getXVelocity( void );		// Get horizontal velocity/speed/delta
-	int getYVelocity( void );		// Get vertical velocity/speed/delta
+	int getXVelocity();			// Get horizontal velocity/speed/delta
+	int getYVelocity();			// Get vertical velocity/speed/delta
 	
 	void setXVelocity( int xVelocity );	// Set horizontal velocity
 	void setYVelocity( int yVelocity );	// Set vertical velocity
@@ -139,6 +139,11 @@ public:
 			  int yVelocity );	// 
 	
 	void move();				// Moves sprite based on position/velocity
+	
+	int getAngularVelocity();
+	void setAngularVelocity( float angularVelocity );
+	
+	void rotate();
 	
 	int getState();				// Get state of sprite
 	void setState( int state );		// Set state of sprite
@@ -175,6 +180,7 @@ public:
 	int getNumberOfFrames();
 	
 	void setDisplay( VideoDisplay* display );
+	VideoDisplay* getDisplay();
 	
 	void draw();
 	
@@ -196,6 +202,8 @@ protected:
 	
 	int xVelocity;				// Horizontal speed/delta
 	int yVelocity;				// Vertical speed/delta
+	
+	float angularVelocity;
 	
 	int state;				// General state of sprite
 	int attributes;				// Attributes concerning sprite
