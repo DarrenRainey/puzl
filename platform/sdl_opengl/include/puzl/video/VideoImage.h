@@ -59,12 +59,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <iostream>
 #include <string>
 
-#include "puzl/video/VideoObject.h"
+//#include "puzl/video/VideoObject.h"
 
 
 using namespace std;
 
-// DEFINES =======================================================================
+// DEFINES ="."======================================================================
 
 // Define return values
 #ifndef SUCCESS
