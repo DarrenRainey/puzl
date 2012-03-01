@@ -94,7 +94,10 @@ public:
 	int setRealDimensions( int width, int height );
 
 	bool isFullscreen();				// Check if this display is fullscreen
-	
+  
+  void setBackgroundColor( int r, int g, int b );
+	void setForegroundColor( int r, int g, int b );
+  
 	void drawRectangle( int x0, int y0,		// Draw a basic rectangle (2D, no alpha)
 			   int x1, int y1,
 			   int r, int g, int b,
@@ -103,6 +106,9 @@ public:
 	void drawRectangle( int x0, int y0,
 			   int x1, int y1,
 			   int color[] );
+  
+  void drawRectangle( int xPosition, int yPosition,
+                      int width, int height );
 
 	void clear();					// Clears the primary buffer with a color
 	void present();					// Draws out the primary buffer
@@ -110,6 +116,9 @@ public:
 protected:
 	bool fullScreen;				// Indicates if display is fullscreen
 
+  int backgroundColor[3];
+  int foregroundColor[3];
+  
 private:
 	int attributes;
 	

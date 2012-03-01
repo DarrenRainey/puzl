@@ -326,12 +326,38 @@ bool VideoDisplay::isFullscreen()
 
 
 //--------------------------------------------------------------------------------
+// Name: VideoDisplay::setBackgroundColor()
+// Description:
+// 
+//--------------------------------------------------------------------------------
+void VideoDisplay::setBackgroundColor( int r, int g, int b )
+{
+  backgroundColor[0] = r;
+  backgroundColor[1] = g;
+  backgroundColor[2] = b;
+}
+
+
+//--------------------------------------------------------------------------------
+// Name: VideoDisplay::setForegroundColor()
+// Description:
+// 
+//--------------------------------------------------------------------------------
+void VideoDisplay::setForegroundColor( int r, int g, int b )
+{
+  foregroundColor[0] = r;
+  foregroundColor[1] = g;
+  foregroundColor[2] = b;
+}
+
+
+//--------------------------------------------------------------------------------
 // Name: VideoDisplay::drawRectangle()
 // Description:
 // 
 //--------------------------------------------------------------------------------
-void VideoDisplay::drawRectangle( int x0, int y0,
-				 int x1, int y1,
+void VideoDisplay::drawRectangle( int xPosition, int yPosition,
+				 int width, int height,
 				 int r, int g, int b, int a )
 {	
 	glMatrixMode( GL_MODELVIEW );
@@ -343,7 +369,7 @@ void VideoDisplay::drawRectangle( int x0, int y0,
 	glColor4ub( r, g, b, a ); // NOTE This is where we utilize alphablending!!!
 	
 	// Set the position where the rectangle is to drawn on the display
-	glTranslatef( ( float )x0, ( float )y0, 0.0f );
+	glTranslatef( ( float )xPosition, ( float )yPosition, 0.0f );
 
 	// Draw the 'tile' to the screen
 	glBegin( GL_QUADS );
@@ -352,13 +378,13 @@ void VideoDisplay::drawRectangle( int x0, int y0,
 		glVertex2i( 0, 0 );
 		
 		// Display the bottom left vertice
-		glVertex2i( 0, y1 );
+		glVertex2i( 0, height );
 		
 		// Display the bottom right vertice
-		glVertex2i( x1, y1 );
+		glVertex2i( width, height );
 		
 		// Display the top right vertice
-		glVertex2i( x1, 0 );
+		glVertex2i( width, 0 );
 	
 	glEnd();
 	
@@ -370,13 +396,25 @@ void VideoDisplay::drawRectangle( int x0, int y0,
 // Description:
 // 
 //--------------------------------------------------------------------------------
-void VideoDisplay::drawRectangle( int x0, int y0,
-				 int x1, int y1,
-				 int color[] )
+void VideoDisplay::drawRectangle( int xPosition, int yPosition,
+                                  int width, int height,
+                                  int color[] )
 {
-	drawRectangle( x0, y0,
-			x1, y1,
-			color[0], color[1], color[2] );
+  drawRectangle( xPosition, yPosition,
+                 width, height,
+                 color[0], color[1], color[2] );
+}
+
+//--------------------------------------------------------------------------------
+// Name: VideoDisplay::drawRectangle()
+// Description:
+// 
+//--------------------------------------------------------------------------------
+void VideoDisplay::drawRectangle( int xPosition, int yPosition,
+                                  int width, int height )
+{
+  drawRectangle( xPosition, yPosition, width, height,
+                 foregroundColor[0], foregroundColor[1], foregroundColor[2] );
 }
 
 //--------------------------------------------------------------------------------
@@ -400,5 +438,3 @@ void VideoDisplay::present()
 {
 	SDL_GL_SwapBuffers();
 }
-
-

@@ -51,14 +51,16 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 GameShell::GameShell()
 {
 	videoSystem = NULL;
-	audioSystem = NULL;
+	//audioSystem = NULL;
 	inputSystem = NULL;
 
 	display = NULL;
 
-	keyboard = NULL;
-	mouse = NULL;
-	joystick = NULL;
+	keyboards = NULL;
+  keyboard  = NULL;
+  
+	//mouse = NULL;
+	//joystick = NULL;
 	
 	screenWidth = 0;
 	screenHeight = 0;
@@ -68,20 +70,9 @@ GameShell::GameShell()
 
 
 // ===============================================================================
-GameShell::GameShell( int width, int height )
-{
-	// TODO: Just get/set these with a VideoDisplay.
-	screenWidth = width;
-	screenHeight = height;
-	
-	quit = false;;
-}
-
-
-// ===============================================================================
 GameShell::~GameShell()
 {
-	
+	quit = false;
 }
 
 
@@ -191,9 +182,11 @@ int GameShell::initializeInput()
 		return -1;
 	}
 	
-	keyboard = inputSystem->getKeyboards();
-	mouse = inputSystem->getMice();
-	joystick = inputSystem->getJoysticks();
+	keyboards = inputSystem->getKeyboards();
+	keyboard = keyboards[0]; // TODO: Check if exists.
+  
+  //mice = inputSystem->getMice();
+	//joysticks = inputSystem->getJoysticks();
 	
 	return 0;
 }
@@ -202,13 +195,13 @@ int GameShell::initializeInput()
 // ===============================================================================
 int GameShell::initializeAudio()
 {
-	audioSystem = new AudioSystem();
+	/*audioSystem = new AudioSystem();
 	if( audioSystem->initialize( 44100, 2, 4096 ) < 0 )
 	{
 		cout << "GameShell::initializeInput(): Failed to initialize input system." << endl;
 		delete audioSystem;
 		return -1;
-	}
+	}*/
 	
 	return 0;
 }
@@ -218,7 +211,7 @@ int GameShell::initializeAudio()
 int GameShell::shutdown()
 {
 	shutdownInput();
-	shutdownAudio();
+	//shutdownAudio();
 	shutdownVideo();
 }
 
@@ -242,7 +235,7 @@ int GameShell::shutdownInput()
 // ===============================================================================
 int GameShell::shutdownAudio()
 {
-	if( audioSystem->shutdown() < 0 )
+	/*if( audioSystem->shutdown() < 0 )
 	{
 		cout << "GameShell::shutdownInput(): Failed to shut down audio system." << endl;
 		delete audioSystem;
@@ -252,7 +245,7 @@ int GameShell::shutdownAudio()
 	{
 		delete audioSystem;
 		return 0;
-	}
+	}*/return 0;
 }
 
 
