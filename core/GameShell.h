@@ -53,7 +53,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #endif
 
 #include "puzl/video/VideoSystem.h"		// VideoSystem header file
-#include "puzl/audio/AudioSystem.h"		// AudioSystem header file
+//#include "puzl/audio/AudioSystem.h"		// AudioSystem header file
 #include "puzl/input/InputSystem.h"		// InputSystem header file
 
 #include <string>		// Standard string class
@@ -78,21 +78,22 @@ class GameShell
 	
 public:
 	GameShell();
-	GameShell( int width, int height );
 	~GameShell();
 	
 	int run();
 	
 protected:
 	VideoSystem* videoSystem;		// Video system object
-	AudioSystem* audioSystem;		// Audio system object
+	//AudioSystem* audioSystem;		// Audio system object
 	InputSystem* inputSystem;		// Input system object
 
 	VideoDisplay* display;			// Main video display
 
-	InputKeyboard** keyboard;		// Keyboard object
-	InputMouse** mouse;			// Mouse object
-	InputJoystick** joystick;		// Joystick objects (maximum)
+	InputKeyboard** keyboards;		// Keyboard object
+	InputKeyboard* keyboard;
+	
+	//InputMouse** mice;			// Mouse object
+	//InputJoystick** joysticks;		// Joystick objects (maximum)
 
 	//int numberOfNetwork;			// Number of network client/players
 

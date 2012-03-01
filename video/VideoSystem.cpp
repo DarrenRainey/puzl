@@ -96,8 +96,9 @@ int VideoSystem::initialize( int displayWidth, int displayHeight, int displayAtt
 int VideoSystem::shutdown()
 {
 	// Shut down the display.
-	delete display;
-	return display->shutdown();
+	display->shutdown();
+  delete display;
+	return 0;
 }
 
 

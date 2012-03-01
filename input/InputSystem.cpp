@@ -60,7 +60,7 @@ InputSystem::InputSystem()
 //	if( !SDL_WasInit( SDL_INIT_VIDEO ) )		// Make sure not to
 //		SDL_Init( SDL_INIT_VIDEO );		// initialize twice
 
-	SDL_InitSubSystem( SDL_INIT_JOYSTICK );
+	//SDL_InitSubSystem( SDL_INIT_JOYSTICK );
 }
 
 
@@ -71,7 +71,7 @@ InputSystem::InputSystem()
 //--------------------------------------------------------------------------------
 InputSystem::~InputSystem()
 {
-	SDL_QuitSubSystem( SDL_INIT_JOYSTICK );
+	//SDL_QuitSubSystem( SDL_INIT_JOYSTICK );
 
 //	if( !SDL_WasInit( SDL_INIT_VIDEO ) )
 //		SDL_Quit();					// THIS A GOOD IDEA?
@@ -90,7 +90,7 @@ int InputSystem::initialize()
 {
 	numberOfKeyboards	= 1;			// NOTE Assume (just) one
 	numberOfMice		= 1;			// TODO check for this?
-	numberOfJoysticks 	= SDL_NumJoysticks();	// 
+	//numberOfJoysticks 	= SDL_NumJoysticks();	// 
 
 	int index;
 	
@@ -101,7 +101,7 @@ int InputSystem::initialize()
 		keyboard[index]->initialize();
 	}
 	
-	mouse = new InputMouse* [numberOfMice];
+	/*mouse = new InputMouse* [numberOfMice];
 	for( index = 0; index < numberOfMice; index++ )
 	{
 		mouse[index] = new InputMouse();
@@ -113,7 +113,7 @@ int InputSystem::initialize()
 	{
 		joystick[index] = new InputJoystick();
 		joystick[index]->initialize();
-	}
+	}*/
 }
 
 
@@ -133,7 +133,7 @@ int InputSystem::shutdown()
 	}
 	delete [] keyboard;
 	
-	for( index = 0; index < numberOfMice; index++ )
+	/*for( index = 0; index < numberOfMice; index++ )
 	{
 		mouse[index]->shutdown();
 		delete mouse[index];
@@ -146,7 +146,7 @@ int InputSystem::shutdown()
 		delete joystick[index];
 	}
 	delete [] joystick;
-	
+	*/
 	return 0;
 }
 
@@ -167,7 +167,7 @@ InputKeyboard** InputSystem::getKeyboards()
 // Description:
 // 
 //--------------------------------------------------------------------------------
-InputMouse** InputSystem::getMice()
+/*InputMouse** InputSystem::getMice()
 {
 	return mouse;
 }
@@ -182,7 +182,7 @@ InputJoystick** InputSystem::getJoysticks()
 {
 	return joystick;
 }
-
+*/
 
 //--------------------------------------------------------------------------------
 // Name: InputSystem::getNumberOfKeyboards()
@@ -194,7 +194,7 @@ int InputSystem::getNumberOfKeyboards()
 	return numberOfKeyboards;
 }
 
-
+/*
 //--------------------------------------------------------------------------------
 // Name: InputSystem::getNumberOfMice()
 // Description:
@@ -215,7 +215,7 @@ int InputSystem::getNumberOfJoysticks()
 {
 	return numberOfJoysticks;
 }
-
+*/
 
 //--------------------------------------------------------------------------------
 // Name: InputSystem::update()
@@ -232,7 +232,7 @@ void InputSystem::update( SDL_Event *event )
 		{
 			keyboard[0]->update( event );	// NOTE Assuming just one keyboard
 		} break;
-
+/*
 		// Mouse
 		case SDL_MOUSEMOTION:
 		case SDL_MOUSEBUTTONDOWN:
@@ -261,7 +261,7 @@ void InputSystem::update( SDL_Event *event )
 		case SDL_JOYBUTTONUP:
 		{
 			joystick[event->jbutton.which]->update( event );
-		} break;
+		} break;*/
 	}
 }
 
@@ -279,7 +279,7 @@ void InputSystem::age()
 		keyboard[index]->age();
 	}
 	
-	for( index = 0; index < numberOfMice; index++ )
+	/*for( index = 0; index < numberOfMice; index++ )
 	{
 		mouse[index]->age();
 	}
@@ -287,7 +287,5 @@ void InputSystem::age()
 	for( index = 0; index < numberOfJoysticks; index++ )
 	{
 		joystick[index]->age();
-	}
+	}*/
 }
-
-

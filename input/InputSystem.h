@@ -66,20 +66,20 @@ public:
 	int shutdown();
 	
 	InputKeyboard** getKeyboards();
-	InputMouse** getMice();
-	InputJoystick** getJoysticks();
+	//InputMouse** getMice();
+	//InputJoystick** getJoysticks();
 	
 	void update( SDL_Event *event );
 	void age();
 	
 	int getNumberOfKeyboards();
-	int getNumberOfMice();
-	int getNumberOfJoysticks();
+	//int getNumberOfMice();
+	//int getNumberOfJoysticks();
 
 protected:
 	InputKeyboard** keyboard;	// Keyboard object
-	InputMouse** mouse;		// Mouse object
-	InputJoystick** joystick;	// Joystick objects (maximum)
+	//InputMouse** mouse;		// Mouse object
+	//InputJoystick** joystick;	// Joystick objects (maximum)
 	
 	int numberOfKeyboards;		// NOTE: Assuming only one keyboard
 	int numberOfMice;		// NOTE: Assuming only one mouse
