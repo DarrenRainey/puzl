@@ -1,0 +1,127 @@
+# puzl: sdl_opengl (C++ implementation using SDL and OpenGL for Linux, Mac, and Windows)
+
+OBJ  =  AudioSample.o      \
+	AudioSystem.o      \
+	InputDevice.o      \
+	InputJoystick.o    \
+	InputKeyboard.o    \
+	InputMouse.o       \
+	InputSystem.o      \
+	VideoImage.o       \
+	BlockGraphic.o     \
+	CharacterGraphic.o \
+	VideoDisplay.o     \
+	VideoSprite.o      \
+	VideoSystem.o      \
+	GameShell.o
+
+LINKOBJ      = $(OBJ)
+
+PUZL_ROOT    = ..
+
+PLATFORM     = sdl_opengl
+
+PUZL_INCLUDE = $(PUZL_ROOT)/platform/$(PLATFORM)/include
+PUZL_SRC     = $(PUZL_ROOT)/platform/$(PLATFORM)/src
+PUZL_LIB     = $(PUZL_ROOT)/platform/$(PLATFORM)/lib
+
+PUZL_UTILITY = $(PUZL_SRC)/utility
+PUZL_CORE    = $(PUZL_SRC)/core
+PUZL_VIDEO   = $(PUZL_SRC)/video
+PUZL_INPUT   = $(PUZL_SRC)/input
+PUZL_AUDIO   = $(PUZL_SRC)/audio
+PUZL_NETWORK = $(PUZL_SRC)/network
+CXXINCS      = $(INCS)
+
+ifeq ($(OS),LINUX)
+	CCC	 = g++
+	INCS	 = -I $(PUZL_INCLUDE)
+	LIBS	 = `sdl-config --cflags --libs` -lSDL_image -lGL -lGLU -lSDL_mixer -s
+	OTHER	 =
+	PLATFORM_OS_POSTFIX = $(PLATFORM)\_lin
+	BIN	 = libpuzl_$(PLATFORM_OS_POSTFIX).a
+else
+ifeq ($(OS),MACOSX)
+	CCC	 = g++
+
+	INCS	 = -I $(PUZL_INCLUDE) \
+		   -I /Library/Frameworks/SDL.framework/Headers \
+		   -I /Library/Frameworks/SDL_image.framework/Headers \
+		   -I /System/Library/Frameworks/OpenGL.framework/Headers \
+		   -I /Library/Frameworks/SDL_mixer.framework/Headers
+
+	LIBS	 = -framework SDL \
+		   -framework SDL_image \
+		   -framework OpenGL \
+		   -framework SDL_mixer \
+		   -framework Cocoa
+
+	OTHER	 = SDLMain.m
+	PLATFORM_OS_POSTFIX = $(PLATFORM)\_mac
+	BIN	 = libpuzl_$(PLATFORM_OS_POSTFIX).a
+else
+ifeq ($(OS),MINGW32)
+	CCC 	 = /usr/bin/i586-mingw32msvc-g++
+	INCS	 = -I "/usr/i586-mingw32msvc/include" -I $(PUZL_INCLUDE)
+	LIBS	 = -L "/usr/i586-mingw32msvc/lib/" -mwindows -lmingw32 -lSDLmain -lSDL -lSDL_image -lopengl32 -lglu32 -lSDL_mixer -s
+	OTHER	 =
+	PLATFORM_OS_POSTFIX = $(PLATFORM)\_win
+	BIN	 = libpuzl_$(PLATFORM_OS_POSTFIX).a
+endif
+endif
+endif
+
+CXXFLAGS = $(CXXINCS)   -fexpensive-optimizations -O3 -D$(OS)
+RM = rm -f
+
+#.PHONY: all all-before all-after clean clean-custom mac windows linux
+
+default: $(BIN)
+
+clean:
+	${RM} $(OBJ)
+
+$(BIN): $(OBJ)
+	ar rcs $(PUZL_LIB)/$(BIN) $(OBJ)
+
+AudioSample.o: $(PUZL_AUDIO)/AudioSample.cpp
+	$(CCC) -c $(PUZL_AUDIO)/AudioSample.cpp -o AudioSample.o $(CXXFLAGS)
+
+AudioSystem.o: $(PUZL_AUDIO)/AudioSystem.cpp
+	$(CCC) -c $(PUZL_AUDIO)/AudioSystem.cpp -o AudioSystem.o $(CXXFLAGS)
+
+InputDevice.o: $(PUZL_INPUT)/InputDevice.cpp
+	$(CCC) -c $(PUZL_INPUT)/InputDevice.cpp -o InputDevice.o $(CXXFLAGS)
+
+InputJoystick.o: $(PUZL_INPUT)/InputJoystick.cpp
+	$(CCC) -c $(PUZL_INPUT)/InputJoystick.cpp -o InputJoystick.o $(CXXFLAGS)
+
+InputKeyboard.o: $(PUZL_INPUT)/InputKeyboard.cpp
+	$(CCC) -c $(PUZL_INPUT)/InputKeyboard.cpp -o InputKeyboard.o $(CXXFLAGS)
+
+InputMouse.o: $(PUZL_INPUT)/InputMouse.cpp
+	$(CCC) -c $(PUZL_INPUT)/InputMouse.cpp -o InputMouse.o $(CXXFLAGS)
+
+InputSystem.o: $(PUZL_INPUT)/InputSystem.cpp
+	$(CCC) -c $(PUZL_INPUT)/InputSystem.cpp -o InputSystem.o $(CXXFLAGS)
+
+VideoImage.o: $(PUZL_VIDEO)/VideoImage.cpp
+	$(CCC) -c $(PUZL_VIDEO)/VideoImage.cpp -o VideoImage.o $(CXXFLAGS)
+
+BlockGraphic.o: $(PUZL_VIDEO)/BlockGraphic.cpp
+	$(CCC) -c $(PUZL_VIDEO)/BlockGraphic.cpp -o BlockGraphic.o $(CXXFLAGS)
+
+CharacterGraphic.o: $(PUZL_VIDEO)/CharacterGraphic.cpp
+	$(CCC) -c $(PUZL_VIDEO)/CharacterGraphic.cpp -o CharacterGraphic.o $(CXXFLAGS)
+
+VideoDisplay.o: $(PUZL_VIDEO)/VideoDisplay.cpp
+	$(CCC) -c $(PUZL_VIDEO)/VideoDisplay.cpp -o VideoDisplay.o $(CXXFLAGS)
+
+VideoSprite.o: $(PUZL_VIDEO)/VideoSprite.cpp
+	$(CCC) -c $(PUZL_VIDEO)/VideoSprite.cpp -o VideoSprite.o $(CXXFLAGS)
+
+VideoSystem.o: $(PUZL_VIDEO)/VideoSystem.cpp
+	$(CCC) -c $(PUZL_VIDEO)/VideoSystem.cpp -o VideoSystem.o $(CXXFLAGS)
+
+GameShell.o: $(PUZL_CORE)/GameShell.cpp
+	$(CCC) -c $(PUZL_CORE)/GameShell.cpp -o GameShell.o $(CXXFLAGS)
