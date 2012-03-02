@@ -1,56 +1,82 @@
-window.addEventListener( "load", main(), false );
-
-function main()
+function GameShellSettings()
 {
-        //alert( "GameShell::main()" );
-        var gameShell = new GameShell( 320, 240 );
-        gameShell.run();
+  this.width   = 0;
+  this.height  = 0;
 }
 
-function GameShell( width, height )
+var GlobalGameShell;
+
+function GameShell( gameShellSettings )
 {
-        var screenWidth = width;
-        var screenHeight = height;
-        var quit = false;
-        
-        this.run = function()
-        {
-                var canvas = document.getElementById( "canvas" );
-                if( !canvas || !canvas.getContext )
-                {
-                        alert( "Failed to get canvas from element id." );
-                        return;
-                }
+  this.inputSystem;
+  this.videoSystem;
+  this.soundSystem;
+  
+  this.gameShellSettings;
+  
+  this.quit;
+  
+  this.keyboard;
+  this.display;
+  
+  this.loop;
+  
+  this.constructor = function()
+  {
+    GlobalGameShell = this;
+    this.gameShellSettings = gameShellSettings;
+    this.quit = false;
+  };
+  
+  this.run = function()
+  {
+    this.initialize();
+    this.mainLoop();
+  };
+  
+  this.initialize = function()
+  {
+    //console.log( "GameShell::initialize()" );
+    this.inputSystem = new InputSystem();
+    this.keyboard    = this.inputSystem.getKeyboard( 0 );
+    
+    this.videoSystem = new VideoSystem( this.gameShellSettings.width, this.gameShellSettings.height );
+    this.display     = this.videoSystem.getDisplay();
+    
+    this.audioSystem = new AudioSystem();
+  };
 
-                // Get the canvas 2d context.
-                var context = canvas.getContext( "2d" );
-                if( !context || !context.drawImage )
-                {
-                        alert( "Failed to load 2D context from canvas." );
-                        return;
-                }
-                
-                context.fillStyle = "rgb(127,0,0)";
-                context.fillRect( 0, 0, canvas.width, canvas.height );
-        }
-        
-        this.initialize = function()
-        {
-                
-        }
-        
-        this.shutdown = function()
-        {
-                
-        }
+  this.shutdown = function()
+  {
+    //console.log( "GameShell::shtudown()" );
+  };
+  
+  this.mainLoop = function()
+  {
+    if( !this.quit )
+    {
+      this.loop();
+      this.inputSystem.update();
+      
+      this.videoSystem.getRequestAnimFrame( VBlank );
+      this.draw();
+    }
+    else
+    {
+      this.shutdown();
+    }
+  };
+  
+  this.draw = function()
+  {
+    this.videoSystem.draw();
+  };
+  
+  this.constructor( gameShellSettings );
+  return this;
+}
 
-        this.loop = function()
-        {
-                
-        }
-        
-        this.draw() = function()
-        {
-                
-        }
+function VBlank()
+{
+  GlobalGameShell.mainLoop();
 }
