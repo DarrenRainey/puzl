@@ -13,6 +13,7 @@ OBJ  =  AudioSample.o      \
 	VideoDisplay.o     \
 	VideoSprite.o      \
 	VideoSystem.o      \
+	Script.o           \
 	GameShell.o
 
 LINKOBJ      = $(OBJ)
@@ -38,8 +39,10 @@ ifeq ($(OS),LINUX)
 	INCS	 = -I $(PUZL_INCLUDE)
 	LIBS	 = `sdl-config --cflags --libs` -lSDL_image -lGL -lGLU -lSDL_mixer -s
 	OTHER	 =
-	PLATFORM_OS_POSTFIX = $(PLATFORM)\_lin
-	BIN	 = libpuzl_$(PLATFORM_OS_POSTFIX).a
+	PLATFORM_OS_POSTFIX = $(PLATFORM)_lin
+	STATIC_LIB = libpuzl_$(PLATFORM_OS_POSTFIX).a
+	SHARED_LIB_OBJ = libpuzl_$(PLATFORM_OS_POSTFIX).so.1
+	SHARED_DYNAMIC_LIB = libpuzl_$(PLATFORM_OS_POSTFIX).so.1.0
 else
 ifeq ($(OS),MACOSX)
 	CCC	 = g++
@@ -57,32 +60,50 @@ ifeq ($(OS),MACOSX)
 		   -framework Cocoa
 
 	OTHER	 = SDLMain.m
-	PLATFORM_OS_POSTFIX = $(PLATFORM)\_mac
-	BIN	 = libpuzl_$(PLATFORM_OS_POSTFIX).a
+	PLATFORM_OS_POSTFIX = $(PLATFORM)_mac
+	STATIC_LIB = libpuzl_$(PLATFORM_OS_POSTFIX).a
+	SHARED_LIB_OBJ = libpuzl_$(PLATFORM_OS_POSTFIX).dylib.1
+	SHARED_DYNAMIC_LIB = libpuzl_$(PLATFORM_OS_POSTFIX).dylib.1.0
 else
 ifeq ($(OS),MINGW32)
 	CCC 	 = /usr/bin/i586-mingw32msvc-g++
 	INCS	 = -I "/usr/i586-mingw32msvc/include" -I $(PUZL_INCLUDE)
 	LIBS	 = -L "/usr/i586-mingw32msvc/lib/" -mwindows -lmingw32 -lSDLmain -lSDL -lSDL_image -lopengl32 -lglu32 -lSDL_mixer -s
 	OTHER	 =
-	PLATFORM_OS_POSTFIX = $(PLATFORM)\_win
-	BIN	 = libpuzl_$(PLATFORM_OS_POSTFIX).a
+	PLATFORM_OS_POSTFIX = $(PLATFORM)_win
+	STATIC_LIB = libpuzl_$(PLATFORM_OS_POSTFIX).lib
+	SHARED_LIB_OBJ = libpuzl_$(PLATFORM_OS_POSTFIX).0.dll
+	SHARED_DYNAMIC_LIB = libpuzl_$(PLATFORM_OS_POSTFIX).dll
 endif
 endif
 endif
 
-CXXFLAGS = $(CXXINCS)   -fexpensive-optimizations -O3 -D$(OS)
+CXXFLAGS = $(CXXINCS) -fexpensive-optimizations -O3 -D$(OS) -fPIC
 RM = rm -f
 
 #.PHONY: all all-before all-after clean clean-custom mac windows linux
 
-default: $(BIN)
+all: depend dynamic mvshared static
+
+default: depend dynamic mvshared
 
 clean:
-	${RM} $(OBJ)
+	$(RM) $(OBJ) $(SHARED_LIB_OBJ)
 
-$(BIN): $(OBJ)
-	ar rcs $(PUZL_LIB)/$(BIN) $(OBJ)
+# depend: $(OBJ)
+# 	ld -G $(OBJ) -o $(PUZL_LIB)/libpuzl_$(PLATFORM_OS_POSTFIX).so.1
+
+depend: $(OBJ)
+	$(CCC) -shared $(OBJ) -o $(SHARED_DYNAMIC_LIB)
+
+dynamic:
+	$(CCC) -shared -Wl,-soname ./$(SHARED_DYNAMIC_LIB) -o $(SHARED_LIB_OBJ) $(OBJ)
+
+mvshared:
+	mv $(SHARED_LIB_OBJ) $(PUZL_LIB)
+
+static: $(OBJ)
+	ar rcs $(PUZL_LIB)/$(STATIC_LIB) $(OBJ)
 
 AudioSample.o: $(PUZL_AUDIO)/AudioSample.cpp
 	$(CCC) -c $(PUZL_AUDIO)/AudioSample.cpp -o AudioSample.o $(CXXFLAGS)
@@ -122,6 +143,9 @@ VideoSprite.o: $(PUZL_VIDEO)/VideoSprite.cpp
 
 VideoSystem.o: $(PUZL_VIDEO)/VideoSystem.cpp
 	$(CCC) -c $(PUZL_VIDEO)/VideoSystem.cpp -o VideoSystem.o $(CXXFLAGS)
+
+Script.o: $(PUZL_UTILITY)/Script.cpp
+	$(CCC) -c $(PUZL_UTILITY)/Script.cpp -o Script.o $(CXXFLAGS)
 
 GameShell.o: $(PUZL_CORE)/GameShell.cpp
 	$(CCC) -c $(PUZL_CORE)/GameShell.cpp -o GameShell.o $(CXXFLAGS)
