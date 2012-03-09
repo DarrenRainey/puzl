@@ -1,0 +1,177 @@
+# puzl: sdl_opengl_js (Javascript/C++ implementation using SDL, OpenGL, and V8 for Linux, Mac, and Windows)
+
+OBJ  =  AudioSample.o      \
+	AudioSystem.o      \
+	InputDevice.o      \
+	InputJoystick.o    \
+	InputKeyboard.o    \
+	InputMouse.o       \
+	InputSystem.o      \
+	VideoImage.o       \
+	BlockGraphic.o     \
+	CharacterGraphic.o \
+	VideoDisplay.o     \
+	VideoSprite.o      \
+	VideoSystem.o      \
+	Script.o           \
+	GameShell.o        \
+	v8utils.o          \
+	JsGameShell.o
+
+LINKOBJ      = $(OBJ)
+
+PUZL_ROOT    = ..
+
+PLATFORM     = sdl_opengl
+
+PUZL_INCLUDE = $(PUZL_ROOT)/platform/$(PLATFORM)/include
+
+PUZL_SRC     = $(PUZL_ROOT)/platform/$(PLATFORM)/src
+PUZL_LIB     = $(PUZL_ROOT)/platform/$(PLATFORM)/lib
+
+PUZL_UTILITY = $(PUZL_SRC)/utility
+PUZL_CORE    = $(PUZL_SRC)/core
+PUZL_VIDEO   = $(PUZL_SRC)/video
+PUZL_INPUT   = $(PUZL_SRC)/input
+PUZL_AUDIO   = $(PUZL_SRC)/audio
+PUZL_NETWORK = $(PUZL_SRC)/network
+
+JS_PLATFORM  = sdl_opengl_js
+
+PUZL_JS_INCLUDE = $(PUZL_ROOT)/platform/$(JS_PLATFORM)/include
+
+PUZL_JS_SRC     = $(PUZL_ROOT)/platform/$(JS_PLATFORM)/src
+PUZL_JS_LIB     = $(PUZL_ROOT)/platform/$(JS_PLATFORM)/lib
+
+PUZL_JS_UTILITY = $(PUZL_JS_SRC)/utility
+PUZL_JS_CORE    = $(PUZL_JS_SRC)/core
+PUZL_JS_VIDEO   = $(PUZL_JS_SRC)/video
+PUZL_JS_INPUT   = $(PUZL_JS_SRC)/input
+PUZL_JS_AUDIO   = $(PUZL_JS_SRC)/audio
+PUZL_JS_NETWORK = $(PUZL_JS_SRC)/network
+
+V8_ROOT       = ../../v8
+V8_INCLUDE    = $(V8_ROOT)/include
+V8_STATIC_LIB = $(V8_ROOT)/libv8.a
+
+CXXINCS      = $(INCS)
+
+ifeq ($(OS),LINUX)
+	CCC	 = g++
+	INCS	 = -I $(PUZL_INCLUDE) -I $(PUZL_JS_INCLUDE) -I $(V8_INCLUDE)
+	LIBS	 = $(V8_STATIC_LIB) -lpthread `sdl-config --cflags --libs` -lSDL_image -lGL -lGLU -lSDL_mixer -s
+	OTHER	 =
+	PLATFORM_OS_POSTFIX = $(JS_PLATFORM)_lin
+	STATIC_LIB = libpuzl_$(PLATFORM_OS_POSTFIX).a
+	SHARED_LIB_OBJ = libpuzl_$(PLATFORM_OS_POSTFIX).so.1
+	SHARED_DYNAMIC_LIB = libpuzl_$(PLATFORM_OS_POSTFIX).so.1.0
+else
+ifeq ($(OS),MACOSX)
+	CCC	 = g++
+
+	INCS	 = -I $(PUZL_INCLUDE) -I $(PUZL_JS_INCLUDE) -I $(V8_INCLUDE) \
+		   -I /Library/Frameworks/SDL.framework/Headers \
+		   -I /Library/Frameworks/SDL_image.framework/Headers \
+		   -I /System/Library/Frameworks/OpenGL.framework/Headers \
+		   -I /Library/Frameworks/SDL_mixer.framework/Headers
+
+	LIBS	 = $(V8_STATIC_LIB) -lpthread \
+		   -framework SDL \
+		   -framework SDL_image \
+		   -framework OpenGL \
+		   -framework SDL_mixer \
+		   -framework Cocoa
+
+	OTHER	 = SDLMain.m
+	PLATFORM_OS_POSTFIX = $(JS_PLATFORM)_mac
+	STATIC_LIB = libpuzl_$(PLATFORM_OS_POSTFIX).a
+	SHARED_LIB_OBJ = libpuzl_$(PLATFORM_OS_POSTFIX).dylib.1
+	SHARED_DYNAMIC_LIB = libpuzl_$(PLATFORM_OS_POSTFIX).dylib.1.0
+else
+ifeq ($(OS),MINGW32)
+	CCC 	 = /usr/bin/i586-mingw32msvc-g++
+	INCS	 = -I "/usr/i586-mingw32msvc/include" -I $(PUZL_INCLUDE) -I $(PUZL_JS_INCLUDE) -I $(V8_INCLUDE)
+	LIBS	 = $(V8_STATIC_LIB) -lpthread -L "/usr/i586-mingw32msvc/lib/" -mwindows -lmingw32 -lSDLmain -lSDL -lSDL_image -lopengl32 -lglu32 -lSDL_mixer -s
+	OTHER	 =
+	PLATFORM_OS_POSTFIX = $(JS_PLATFORM)_win
+	STATIC_LIB = libpuzl_$(PLATFORM_OS_POSTFIX).lib
+	SHARED_LIB_OBJ = libpuzl_$(PLATFORM_OS_POSTFIX).0.dll
+	SHARED_DYNAMIC_LIB = libpuzl_$(PLATFORM_OS_POSTFIX).dll
+endif
+endif
+endif
+
+CXXFLAGS = $(CXXINCS) -fexpensive-optimizations -O3 -D$(OS) -fPIC
+RM = rm -f
+
+#.PHONY: all all-before all-after clean clean-custom mac windows linux
+
+all: depend dynamic mvshared static
+
+default: depend dynamic mvshared
+
+clean:
+	$(RM) $(OBJ) $(SHARED_LIB_OBJ)
+
+depend: $(OBJ)
+	$(CCC) -shared $(OBJ) -o $(SHARED_DYNAMIC_LIB)
+
+dynamic:
+	$(CCC) -shared -Wl,-soname ./$(SHARED_DYNAMIC_LIB) -o $(SHARED_LIB_OBJ) $(OBJ) $(V8_STATIC_LIB) -lpthread
+
+mvshared:
+	mv $(SHARED_LIB_OBJ) $(PUZL_JS_LIB)
+
+static: $(OBJ)
+	ar rcs $(PUZL_JS_LIB)/$(STATIC_LIB) $(OBJ) $(V8_STATIC_LIB)
+
+AudioSample.o: $(PUZL_AUDIO)/AudioSample.cpp
+	$(CCC) -c $(PUZL_AUDIO)/AudioSample.cpp -o AudioSample.o $(CXXFLAGS)
+
+AudioSystem.o: $(PUZL_AUDIO)/AudioSystem.cpp
+	$(CCC) -c $(PUZL_AUDIO)/AudioSystem.cpp -o AudioSystem.o $(CXXFLAGS)
+
+InputDevice.o: $(PUZL_INPUT)/InputDevice.cpp
+	$(CCC) -c $(PUZL_INPUT)/InputDevice.cpp -o InputDevice.o $(CXXFLAGS)
+
+InputJoystick.o: $(PUZL_INPUT)/InputJoystick.cpp
+	$(CCC) -c $(PUZL_INPUT)/InputJoystick.cpp -o InputJoystick.o $(CXXFLAGS)
+
+InputKeyboard.o: $(PUZL_INPUT)/InputKeyboard.cpp
+	$(CCC) -c $(PUZL_INPUT)/InputKeyboard.cpp -o InputKeyboard.o $(CXXFLAGS)
+
+InputMouse.o: $(PUZL_INPUT)/InputMouse.cpp
+	$(CCC) -c $(PUZL_INPUT)/InputMouse.cpp -o InputMouse.o $(CXXFLAGS)
+
+InputSystem.o: $(PUZL_INPUT)/InputSystem.cpp
+	$(CCC) -c $(PUZL_INPUT)/InputSystem.cpp -o InputSystem.o $(CXXFLAGS)
+
+VideoImage.o: $(PUZL_VIDEO)/VideoImage.cpp
+	$(CCC) -c $(PUZL_VIDEO)/VideoImage.cpp -o VideoImage.o $(CXXFLAGS)
+
+BlockGraphic.o: $(PUZL_VIDEO)/BlockGraphic.cpp
+	$(CCC) -c $(PUZL_VIDEO)/BlockGraphic.cpp -o BlockGraphic.o $(CXXFLAGS)
+
+CharacterGraphic.o: $(PUZL_VIDEO)/CharacterGraphic.cpp
+	$(CCC) -c $(PUZL_VIDEO)/CharacterGraphic.cpp -o CharacterGraphic.o $(CXXFLAGS)
+
+VideoDisplay.o: $(PUZL_VIDEO)/VideoDisplay.cpp
+	$(CCC) -c $(PUZL_VIDEO)/VideoDisplay.cpp -o VideoDisplay.o $(CXXFLAGS)
+
+VideoSprite.o: $(PUZL_VIDEO)/VideoSprite.cpp
+	$(CCC) -c $(PUZL_VIDEO)/VideoSprite.cpp -o VideoSprite.o $(CXXFLAGS)
+
+VideoSystem.o: $(PUZL_VIDEO)/VideoSystem.cpp
+	$(CCC) -c $(PUZL_VIDEO)/VideoSystem.cpp -o VideoSystem.o $(CXXFLAGS)
+
+Script.o: $(PUZL_UTILITY)/Script.cpp
+	$(CCC) -c $(PUZL_UTILITY)/Script.cpp -o Script.o $(CXXFLAGS)
+
+GameShell.o: $(PUZL_CORE)/GameShell.cpp
+	$(CCC) -c $(PUZL_CORE)/GameShell.cpp -o GameShell.o $(CXXFLAGS)
+
+v8utils.o: $(PUZL_JS_UTILITY)/v8utils.cpp
+	$(CCC) -c $(PUZL_JS_UTILITY)/v8utils.cpp -o v8utils.o $(CXXFLAGS)
+
+JsGameShell.o: $(PUZL_JS_CORE)/JsGameShell.cpp
+	$(CCC) -c $(PUZL_JS_CORE)/JsGameShell.cpp -o JsGameShell.o $(CXXFLAGS)
