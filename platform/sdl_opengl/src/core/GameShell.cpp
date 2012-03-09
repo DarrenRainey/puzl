@@ -48,9 +48,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // FUNCTIONS =====================================================================
 
 // ===============================================================================
-GameShell::GameShell()
+GameShell::GameShell( const GameShellSettings& gameShellSettings )
 {
-	videoSystem = NULL;
+	this->gameShellSettings = gameShellSettings;
+  
+  videoSystem = NULL;
 	//audioSystem = NULL;
 	inputSystem = NULL;
 
@@ -62,9 +64,6 @@ GameShell::GameShell()
 	//mouse = NULL;
 	//joystick = NULL;
 	
-	screenWidth = 0;
-	screenHeight = 0;
-	
 	quit = false;
 }
 
@@ -75,50 +74,69 @@ GameShell::~GameShell()
 	quit = false;
 }
 
+void GameShell::shellLoop( void )
+{
+  const unsigned int TICKS_PER_SECOND = 60;
+  const unsigned int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
+  const unsigned int MAX_FRAMESKIP = 10;
+  
+  unsigned int nowTime;
+  nextTime = SDL_GetTicks();
+  unsigned int loops;
+  
+  // Main loop.
+  while( !quit )
+  {
+    loops = 0;
+    nowTime = SDL_GetTicks();
+    while( nowTime > nextTime && loops < MAX_FRAMESKIP )
+    {
+      display->clear();
+      draw();
+      display->present();
+    
+      updateSystem();
+      loop();
+      
+      nextTime += SKIP_TICKS;
+      loops++;
+    }
+  }
+}
+
+int GameShell::initialize( void )
+{
+  return 0;
+}
+
+int GameShell::shutdown( void )
+{
+  return 0;
+}
+
+void GameShell::loop( void )
+{
+}
+
+void GameShell::draw( void )
+{
+}
 
 // ===============================================================================
 int GameShell::run()
 {
-	initialize();
-	
-	const unsigned int TICKS_PER_SECOND = 60;
-	const unsigned int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
-	const unsigned int MAX_FRAMESKIP = 10;
-	
-	unsigned int nowTime;
-	nextTime = SDL_GetTicks();
-	unsigned int loops;
-	
-	// Main loop.
-	while( !quit )
-	{
-		loops = 0;
-		nowTime = SDL_GetTicks();
-		while( nowTime > nextTime && loops < MAX_FRAMESKIP )
-		{
-			display->clear();
-			draw();
-			display->present();
-		
-			updateSystem();
-			loop();
-			
-			nextTime += SKIP_TICKS;
-			loops++;
-		}
-	}
-	
-	shutdown();
-
-	return 0;
+  shellInitialize();
+  shellLoop();
+  return shellShutdown();
+  return 0;
 }
 
 
 // ===============================================================================
-int GameShell::initialize()
+int GameShell::shellInitialize()
 {
 	initializeVideo();
-	initializeAudio();
+	//initializeAudio();
 	initializeInput();
 	
 	//SDL_WarpMouse( screenWidth / 2, screenHeight / 2 );
@@ -129,7 +147,7 @@ int GameShell::initialize()
 	SDL_EventState( SDL_SYSWMEVENT, SDL_ENABLE );
 #endif
 	
-	return 0;
+	return initialize();
 }
 
 
@@ -137,7 +155,7 @@ int GameShell::initialize()
 int GameShell::initializeVideo()
 {
 	videoSystem = new VideoSystem();
-	if( videoSystem->initialize( screenWidth, screenHeight, DISPLAY_ATTRIBUTE_RESIZABLE ) < 0 )
+	if( videoSystem->initialize( gameShellSettings.screenWidth, gameShellSettings.screenHeight, DISPLAY_ATTRIBUTE_RESIZABLE ) < 0 )
 	{
 		cout << "GameShell::initializeVideo(): Failed to initialize video system." << endl;
 		delete videoSystem;
@@ -198,7 +216,7 @@ int GameShell::initializeAudio()
 	/*audioSystem = new AudioSystem();
 	if( audioSystem->initialize( 44100, 2, 4096 ) < 0 )
 	{
-		cout << "GameShell::initializeInput(): Failed to initialize input system." << endl;
+		cout << "GameShell::initializeAudio(): Failed to initialize audio system." << endl;
 		delete audioSystem;
 		return -1;
 	}*/
@@ -208,11 +226,15 @@ int GameShell::initializeAudio()
 
 
 // ===============================================================================
-int GameShell::shutdown()
+int GameShell::shellShutdown()
 {
+  shutdown();
+  
 	shutdownInput();
 	//shutdownAudio();
 	shutdownVideo();
+
+  return 0;
 }
 
 // ===============================================================================
