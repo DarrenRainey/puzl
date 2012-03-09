@@ -33,8 +33,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 // Add the SDL and OpenGL header files for appropriate OS builds
 
-//#include "puzl/video/VideoBuffer.h"		// VideoBuffer header file
-#include "puzl/video/VideoDisplay.h"		// VideoDisplay header file
+//#include "puzl/video/VideoBuffer.h"   // VideoBuffer header file
+#include "puzl/video/VideoDisplay.h"    // VideoDisplay header file
 
 #include <iostream>
 using namespace std;
@@ -58,10 +58,10 @@ using namespace std;
 //--------------------------------------------------------------------------------
 VideoDisplay::VideoDisplay( void )
 {
-	// Clear data members
-	fullScreen = false;
-	
-	attributes = 0;
+  // Clear data members
+  fullScreen = false;
+  
+  attributes = 0;
 }
 
 
@@ -72,7 +72,7 @@ VideoDisplay::VideoDisplay( void )
 //--------------------------------------------------------------------------------
 VideoDisplay::~VideoDisplay()
 {
-	
+  
 }
 
 
@@ -83,26 +83,26 @@ VideoDisplay::~VideoDisplay()
 //--------------------------------------------------------------------------------
 int VideoDisplay::initialize( int width, int height, int attributes )
 {
-	*realWidth = *( this->width ) = width;
-	*realHeight = *( this->height ) = height;
-	this->attributes = attributes;
-	
-	if( initializeSDLAndOpenGL( attributes ) < 0 )
-	{
-		return -1;
-	}
-	
-	glViewport( 0, 0, width, height );		// Set up viewport
+  *realWidth = *( this->width ) = width;
+  *realHeight = *( this->height ) = height;
+  this->attributes = attributes;
+  
+  if( initializeSDLAndOpenGL( attributes ) < 0 )
+  {
+    return -1;
+  }
+  
+  glViewport( 0, 0, width, height );    // Set up viewport
 
-	glMatrixMode( GL_PROJECTION );			// Set up projection matrix
-	glLoadIdentity();				// and
-	glOrtho( 0, width,
-		 height, 0,
-		 -1, 1 );
-	
-	glEnable( GL_TEXTURE_2D );			// Enable texture mapping
-	
-	return 0;
+  glMatrixMode( GL_PROJECTION );      // Set up projection matrix
+  glLoadIdentity();       // and
+  glOrtho( 0, width,
+     height, 0,
+     -1, 1 );
+  
+  glEnable( GL_TEXTURE_2D );      // Enable texture mapping
+  
+  return 0;
 }
 
 
@@ -113,106 +113,106 @@ int VideoDisplay::initialize( int width, int height, int attributes )
 //--------------------------------------------------------------------------------
 int VideoDisplay::initializeSDLAndOpenGL( int attributes )
 {
-	int bitdepth;
-	// Get video information about current video mode
-	const SDL_VideoInfo* videoInfo = SDL_GetVideoInfo();
-	if( !videoInfo )
-	{
-		return -1;
-	}
-	
-	if( attributes != 0 )
-	{
-		// Indicate SDL to use OpenGL.
-		attributes |= SDL_OPENGL;// | DISPLAY_ATTRIBUTE_DOUBLE_BUFFER;
-		
-		// If bitdepth was not specified, use the current video state
-		bitdepth = videoInfo->vfmt->BitsPerPixel;
+  int bitdepth;
+  // Get video information about current video mode
+  const SDL_VideoInfo* videoInfo = SDL_GetVideoInfo();
+  if( !videoInfo )
+  {
+    return -1;
+  }
+  
+  if( attributes != 0 )
+  {
+    // Indicate SDL to use OpenGL.
+    attributes |= SDL_OPENGL;// | DISPLAY_ATTRIBUTE_DOUBLE_BUFFER;
+    
+    // If bitdepth was not specified, use the current video state
+    bitdepth = videoInfo->vfmt->BitsPerPixel;
 
-		// Check if the system can use hardware surfaces
-		if( videoInfo->hw_available )
-		{
-			attributes |= SDL_HWSURFACE;
-		}
-		else
-		{
-			attributes |= SDL_SWSURFACE;
-		}
-		
-		// Check for hardware blitting
-		if( videoInfo->blit_hw )
-		{
-			attributes |= SDL_HWACCEL;
-		}
-		
-		if( attributes & DISPLAY_ATTRIBUTE_FULLSCREEN )
-		{
-			fullScreen = true;
-		}
-		else
-		{
-			fullScreen = false;
-		}
-		
-		this->attributes = attributes;
-	}
-	else
-	{
-		attributes = this->attributes;
-	}
-	
-	// Set OpenGL attributes accordingly
-	SDL_GL_SetAttribute( SDL_GL_RED_SIZE, 5 );	// 5 bits of red
-	SDL_GL_SetAttribute( SDL_GL_GREEN_SIZE, 5 );	// 5 bits of green
-	SDL_GL_SetAttribute( SDL_GL_BLUE_SIZE, 5 );	// 5 bits of blue
-	SDL_GL_SetAttribute( SDL_GL_ALPHA_SIZE, 5 );	// 5 bits of alpha
-	//SDL_GL_SetAttribute( SDL_GL_BUFFER_SIZE, 32 );
-	
-	//SDL_GL_SetAttribute( SDL_GL_ACCELERATED_VISUAL, 1 );
-	
-	/*
-	if( bitdepth > 16 )
-	{
-		SDL_GL_SetAttribute( SDL_GL_ALPHA_SIZE, 1 );	// 5 bits of alpha
-	}
-	else
-	{
-		SDL_GL_SetAttribute( SDL_GL_ALPHA_SIZE, 0 );
-	}*/
-	
-	//SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, 16 );	// 16 bit depth (3D)
-	
-	
-	SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );	// Turn on double buffer (MUST?)
-	SDL_GL_SetAttribute( SDL_GL_SWAP_CONTROL, 1 );
+    // Check if the system can use hardware surfaces
+    if( videoInfo->hw_available )
+    {
+      attributes |= SDL_HWSURFACE;
+    }
+    else
+    {
+      attributes |= SDL_SWSURFACE;
+    }
+    
+    // Check for hardware blitting
+    if( videoInfo->blit_hw )
+    {
+      attributes |= SDL_HWACCEL;
+    }
+    
+    if( attributes & DISPLAY_ATTRIBUTE_FULLSCREEN )
+    {
+      fullScreen = true;
+    }
+    else
+    {
+      fullScreen = false;
+    }
+    
+    this->attributes = attributes;
+  }
+  else
+  {
+    attributes = this->attributes;
+  }
+  
+  // Set OpenGL attributes accordingly
+  SDL_GL_SetAttribute( SDL_GL_RED_SIZE, 5 );  // 5 bits of red
+  SDL_GL_SetAttribute( SDL_GL_GREEN_SIZE, 5 );  // 5 bits of green
+  SDL_GL_SetAttribute( SDL_GL_BLUE_SIZE, 5 ); // 5 bits of blue
+  SDL_GL_SetAttribute( SDL_GL_ALPHA_SIZE, 5 );  // 5 bits of alpha
+  //SDL_GL_SetAttribute( SDL_GL_BUFFER_SIZE, 32 );
+  
+  //SDL_GL_SetAttribute( SDL_GL_ACCELERATED_VISUAL, 1 );
+  
+  /*
+  if( bitdepth > 16 )
+  {
+    SDL_GL_SetAttribute( SDL_GL_ALPHA_SIZE, 1 );  // 5 bits of alpha
+  }
+  else
+  {
+    SDL_GL_SetAttribute( SDL_GL_ALPHA_SIZE, 0 );
+  }*/
+  
+  //SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, 16 ); // 16 bit depth (3D)
+  
+  
+  SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );  // Turn on double buffer (MUST?)
+  SDL_GL_SetAttribute( SDL_GL_SWAP_CONTROL, 1 );
 
-	// Initialize SDL video
-	surface = SDL_SetVideoMode( *realWidth, *realHeight, bitdepth, attributes );
-	if( surface == NULL )
-	{
-		return -1;
-	}
-	
-	//int alpha_size;
-	//SDL_GL_GetAttribute( SDL_GL_ALPHA_SIZE, &alpha_size );
-	
-	// Set up OpenGL video
-	glShadeModel( GL_SMOOTH );			// Shading model = Gouraud
+  // Initialize SDL video
+  surface = SDL_SetVideoMode( *realWidth, *realHeight, bitdepth, attributes );
+  if( surface == NULL )
+  {
+    return -1;
+  }
+  
+  //int alpha_size;
+  //SDL_GL_GetAttribute( SDL_GL_ALPHA_SIZE, &alpha_size );
+  
+  // Set up OpenGL video
+  glShadeModel( GL_SMOOTH );      // Shading model = Gouraud
 
-	glCullFace( GL_BACK );				// Standard culling
-	glFrontFace( GL_CCW );				// 
-	glEnable( GL_CULL_FACE );			// 
-	
-	//glEnable( GL_BLEND );
-	//glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-	
-	//glHint( GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST );
-	
-	//glEdgeFlag( false );
+  glCullFace( GL_BACK );        // Standard culling
+  glFrontFace( GL_CCW );        // 
+  glEnable( GL_CULL_FACE );     // 
+  
+  //glEnable( GL_BLEND );
+  //glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+  
+  //glHint( GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST );
+  
+  //glEdgeFlag( false );
 
-	glClearColor( 0, 0, 0, 0 );			// Clear color = black
-	
-	return 0;
+  //glClearColor( 0, 0, 0, 0 );     // Clear color = black
+  
+  return 0;
 }
 
 
@@ -223,18 +223,18 @@ int VideoDisplay::initializeSDLAndOpenGL( int attributes )
 //--------------------------------------------------------------------------------
 void VideoDisplay::setDimensions( int width, int height )
 {
-	*( this->width ) = width;
-	*( this->height ) = height;
-	
-	glViewport( 0, 0, width, height );		// Set up viewport
+  *( this->width ) = width;
+  *( this->height ) = height;
+  
+  glViewport( 0, 0, width, height );    // Set up viewport
 
-	glMatrixMode( GL_PROJECTION );			// Set up projection matrix
-	glLoadIdentity();				// and
-	glOrtho( 0, width,
-		 height, 0,
-		 -1, 1 );
+  glMatrixMode( GL_PROJECTION );      // Set up projection matrix
+  glLoadIdentity();       // and
+  glOrtho( 0, width,
+     height, 0,
+     -1, 1 );
 
-	glEnable( GL_TEXTURE_2D );			// Enable texture mapping
+  glEnable( GL_TEXTURE_2D );      // Enable texture mapping
 }
 
 
@@ -245,24 +245,24 @@ void VideoDisplay::setDimensions( int width, int height )
 //--------------------------------------------------------------------------------
 int VideoDisplay::setRealDimensions( int width, int height )
 {
-	VideoImage::setRealDimensions( width, height );
-	
-	if( initializeSDLAndOpenGL( attributes ) < 0 )
-	{
-		return -1;
-	}
-	
-	glViewport( 0, 0, width, height );		// Set up viewport
+  VideoImage::setRealDimensions( width, height );
+  
+  if( initializeSDLAndOpenGL( attributes ) < 0 )
+  {
+    return -1;
+  }
+  
+  glViewport( 0, 0, width, height );    // Set up viewport
 
-	glMatrixMode( GL_PROJECTION );			// Set up projection matrix
-	glLoadIdentity();				// and
-	glOrtho( 0, *( this->width ),
-		 *( this->height ), 0,
-		 -1, 1 );
+  glMatrixMode( GL_PROJECTION );      // Set up projection matrix
+  glLoadIdentity();       // and
+  glOrtho( 0, *( this->width ),
+     *( this->height ), 0,
+     -1, 1 );
 
-	glEnable( GL_TEXTURE_2D );			// Enable texture mapping
-	
-	return 0;
+  glEnable( GL_TEXTURE_2D );      // Enable texture mapping
+  
+  return 0;
 }
 
 
@@ -273,8 +273,8 @@ int VideoDisplay::setRealDimensions( int width, int height )
 //--------------------------------------------------------------------------------
 int VideoDisplay::shutdown()
 {
-	fullScreen = false;
-	return SUCCESS;
+  fullScreen = false;
+  return SUCCESS;
 }
 
 
@@ -284,33 +284,33 @@ int VideoDisplay::shutdown()
 // 
 //--------------------------------------------------------------------------------
 int VideoDisplay::reset( int width, int height,
-			 int bitdepth, int attributes )
+       int bitdepth, int attributes )
 {
-	/*
-	if( attributes == 0 )
-	{
-		//attributes = SDL_OPENGL | SDL_HWPALETTE | SDL_RLEACCEL | SDL_RESIZABLE | SDL_ANYFORMAT;
-		attributes = SDL_OPENGL | SDL_HWSURFACE | SDL_HWACCEL | SDL_RESIZABLE;
-	}
-	
-	surface = SDL_SetVideoMode( width, height, bitdepth, attributes );
-	if( surface == NULL )
-	{
-		return -1;
-	}
-	
-	glViewport( 0, 0, width, height );
-	
-	glMatrixMode( GL_PROJECTION );
-	glLoadIdentity();
-	
-	glMatrixMode( GL_MODELVIEW );
-	glLoadIdentity();
-	
-	glEnable( GL_TEXTURE_2D );
-	*/
-	
-	return 0;
+  /*
+  if( attributes == 0 )
+  {
+    //attributes = SDL_OPENGL | SDL_HWPALETTE | SDL_RLEACCEL | SDL_RESIZABLE | SDL_ANYFORMAT;
+    attributes = SDL_OPENGL | SDL_HWSURFACE | SDL_HWACCEL | SDL_RESIZABLE;
+  }
+  
+  surface = SDL_SetVideoMode( width, height, bitdepth, attributes );
+  if( surface == NULL )
+  {
+    return -1;
+  }
+  
+  glViewport( 0, 0, width, height );
+  
+  glMatrixMode( GL_PROJECTION );
+  glLoadIdentity();
+  
+  glMatrixMode( GL_MODELVIEW );
+  glLoadIdentity();
+  
+  glEnable( GL_TEXTURE_2D );
+  */
+  
+  return 0;
 }
 
 
@@ -321,7 +321,7 @@ int VideoDisplay::reset( int width, int height,
 //--------------------------------------------------------------------------------
 bool VideoDisplay::isFullscreen()
 {
-	return fullScreen;
+  return fullScreen;
 }
 
 
@@ -335,6 +335,8 @@ void VideoDisplay::setBackgroundColor( int r, int g, int b )
   backgroundColor[0] = r;
   backgroundColor[1] = g;
   backgroundColor[2] = b;
+  
+  glClearColor( ( float )r / 255.0f, ( float )g / 255.0f, ( float )b / 255.0f, 1.0f );
 }
 
 
@@ -357,38 +359,38 @@ void VideoDisplay::setForegroundColor( int r, int g, int b )
 // 
 //--------------------------------------------------------------------------------
 void VideoDisplay::drawRectangle( int xPosition, int yPosition,
-				 int width, int height,
-				 int r, int g, int b, int a )
-{	
-	glMatrixMode( GL_MODELVIEW );
-	glLoadIdentity();	// Reset The matrix
-	
-	glDisable( GL_TEXTURE_2D );
-	
-	// Get current OpenGL color and back it up temporarily	
-	glColor4ub( r, g, b, a ); // NOTE This is where we utilize alphablending!!!
-	
-	// Set the position where the rectangle is to drawn on the display
-	glTranslatef( ( float )xPosition, ( float )yPosition, 0.0f );
+         int width, int height,
+         int r, int g, int b, int a )
+{ 
+  glMatrixMode( GL_MODELVIEW );
+  glLoadIdentity(); // Reset The matrix
+  
+  glDisable( GL_TEXTURE_2D );
+  
+  // Get current OpenGL color and back it up temporarily  
+  glColor4ub( r, g, b, a ); // NOTE This is where we utilize alphablending!!!
+  
+  // Set the position where the rectangle is to drawn on the display
+  glTranslatef( ( float )xPosition, ( float )yPosition, 0.0f );
 
-	// Draw the 'tile' to the screen
-	glBegin( GL_QUADS );
-		
-		// Display the top left vertice
-		glVertex2i( 0, 0 );
-		
-		// Display the bottom left vertice
-		glVertex2i( 0, height );
-		
-		// Display the bottom right vertice
-		glVertex2i( width, height );
-		
-		// Display the top right vertice
-		glVertex2i( width, 0 );
-	
-	glEnd();
-	
-	glEnable( GL_TEXTURE_2D );
+  // Draw the 'tile' to the screen
+  glBegin( GL_QUADS );
+    
+    // Display the top left vertice
+    glVertex2i( 0, 0 );
+    
+    // Display the bottom left vertice
+    glVertex2i( 0, height );
+    
+    // Display the bottom right vertice
+    glVertex2i( width, height );
+    
+    // Display the top right vertice
+    glVertex2i( width, 0 );
+  
+  glEnd();
+  
+  glEnable( GL_TEXTURE_2D );
 }
 
 //--------------------------------------------------------------------------------
@@ -424,8 +426,8 @@ void VideoDisplay::drawRectangle( int xPosition, int yPosition,
 //--------------------------------------------------------------------------------
 void VideoDisplay::clear()
 {
-	//glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );  // Just clears the screen!
-	glClear( GL_COLOR_BUFFER_BIT );  // Just clears the screen!
+  //glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );  // Just clears the screen!
+  glClear( GL_COLOR_BUFFER_BIT );  // Just clears the screen!
 }
 
 
@@ -436,5 +438,5 @@ void VideoDisplay::clear()
 //--------------------------------------------------------------------------------
 void VideoDisplay::present()
 {
-	SDL_GL_SwapBuffers();
+  SDL_GL_SwapBuffers();
 }

@@ -39,27 +39,27 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <SDL/SDL.h>
 
 #ifdef WINDOWS
-	#include <windows.h>
-	#include <GL/gl.h>
-	#include <GL/glu.h>
+  #include <windows.h>
+  #include <GL/gl.h>
+  #include <GL/glu.h>
 #endif
 #ifdef MACOSX
-	#include <OpenGL/gl.h>
-	#include <OpenGL/glu.h>
+  #include <OpenGL/gl.h>
+  #include <OpenGL/glu.h>
 #endif
 #ifdef LINUX
-	#include <GL/gl.h>
-	#include <GL/glu.h>
+  #include <GL/gl.h>
+  #include <GL/glu.h>
 #endif
 
-#include "puzl/video/VideoSystem.h"		// VideoSystem header file
-//#include "puzl/audio/AudioSystem.h"		// AudioSystem header file
-#include "puzl/input/InputSystem.h"		// InputSystem header file
+#include "puzl/video/VideoSystem.h"   // VideoSystem header file
+//#include "puzl/audio/AudioSystem.h"   // AudioSystem header file
+#include "puzl/input/InputSystem.h"   // InputSystem header file
 
-#include <string>		// Standard string class
-#include <iostream>		// Standard stream class
-#include <sstream>		// Standard string stream class
-//#include <vector>		// Standard vector class
+#include <string>   // Standard string class
+#include <iostream>   // Standard stream class
+#include <sstream>    // Standard string stream class
+//#include <vector>   // Standard vector class
 #include <time.h>
 
 // DEFINES =======================================================================
@@ -68,66 +68,76 @@ using namespace std;
 
 // Define return values
 #ifndef SUCCESS
-	#define SUCCESS		0
-	#define FAILURE	       -1
+  #define SUCCESS   0
+  #define FAILURE        -1
 #endif
 
 // TYPES =========================================================================
+
+struct GameShellSettings
+{
+  int screenWidth;
+  int screenHeight;
+};
+
 class GameShell
 {
-	
+  
 public:
-	GameShell();
-	~GameShell();
-	
-	int run();
-	
+  GameShell( const GameShellSettings& gameShellSettings );
+  ~GameShell();
+  
+  virtual int shellInitialize( void );
+  virtual int shellShutdown( void );
+  virtual void shellLoop( void );
+  
+  virtual int initialize();
+  virtual int shutdown();
+  
+  virtual void loop();
+  virtual void draw();
+  
+  int run();
+  
 protected:
-	VideoSystem* videoSystem;		// Video system object
-	//AudioSystem* audioSystem;		// Audio system object
-	InputSystem* inputSystem;		// Input system object
+  VideoSystem* videoSystem;   // Video system object
+  //AudioSystem* audioSystem;   // Audio system object
+  InputSystem* inputSystem;   // Input system object
 
-	VideoDisplay* display;			// Main video display
+  VideoDisplay* display;      // Main video display
 
-	InputKeyboard** keyboards;		// Keyboard object
-	InputKeyboard* keyboard;
-	
-	//InputMouse** mice;			// Mouse object
-	//InputJoystick** joysticks;		// Joystick objects (maximum)
+  InputKeyboard** keyboards;    // Keyboard object
+  InputKeyboard* keyboard;
+  
+  //InputMouse** mice;      // Mouse object
+  //InputJoystick** joysticks;    // Joystick objects (maximum)
 
-	//int numberOfNetwork;			// Number of network client/players
+  //int numberOfNetwork;      // Number of network client/players
 
-	int screenWidth;
-	int screenHeight;
-	
-	bool quit;				// Program terminator flag
-	
-	virtual int initializeVideo();
-	virtual int shutdownVideo();
-	virtual int releaseVideo();
-	virtual int reloadVideo();
+  GameShellSettings gameShellSettings;
+  
+  bool quit;        // Program terminator flag
+  
+  virtual int initializeVideo();
+  virtual int shutdownVideo();
+  virtual int releaseVideo();
+  virtual int reloadVideo();
 
-	virtual int initializeInput();
-	virtual int shutdownInput();
-	
-	virtual int initializeAudio();
-	virtual int shutdownAudio();
-	
-	void setCaption( string caption );
-	void setIcon( string filePath );
-	
+  virtual int initializeInput();
+  virtual int shutdownInput();
+  
+  virtual int initializeAudio();
+  virtual int shutdownAudio();
+  
+  void setCaption( string caption );
+  void setIcon( string filePath );
+  
 private:
-	unsigned int nowTime;
-	unsigned int lastTime;
-	unsigned int nextTime;
-	
-	int initialize();
-	int shutdown();
-	
-	virtual void loop() = 0;
-	virtual void draw() = 0;
-	
-	int updateSystem();
+  unsigned int nowTime;
+  unsigned int lastTime;
+  unsigned int nextTime;
+  
+  int updateSystem();
 };
 
 // PROTOTYPES ====================================================================
