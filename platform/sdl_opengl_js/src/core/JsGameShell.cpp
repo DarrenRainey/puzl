@@ -88,25 +88,25 @@ JsGameShell::~JsGameShell()
 
 int JsGameShell::initialize( void )
 {
-  std::cout << "JsGameShell::initialize" << std::endl;
+  //std::cout << "JsGameShell::initialize" << std::endl;
   ExecuteScript( initializeScript );
 }
 
 int JsGameShell::shutdown( void )
 {
-  std::cout << "JsGameShell::shutdown" << std::endl;
+  //std::cout << "JsGameShell::shutdown" << std::endl;
   ExecuteScript( shutdownScript );
 }
 
 void JsGameShell::loop( void )
 {
-  std::cout << "JsGameShell::loop" << std::endl;
+  //std::cout << "JsGameShell::loop" << std::endl;
   ExecuteScript( loopScript );
 }
 
 void JsGameShell::draw( void )
 {
-  std::cout << "JsGameShell::draw" << std::endl;
+  //std::cout << "JsGameShell::draw" << std::endl;
   ExecuteScript( drawScript );
 }
 
