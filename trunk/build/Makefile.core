@@ -1,0 +1,149 @@
+# puzl: core
+
+OBJ  =  CoreAudioSample.o      \
+		CoreAudioSystem.o      \
+		CoreInputDevice.o      \
+		CoreInputJoystick.o    \
+		CoreInputKeyboard.o    \
+		CoreInputMouse.o       \
+		CoreInputSystem.o      \
+		CoreVideoImage.o       \
+		BlockGraphic.o     	   \
+		CharacterGraphic.o 	   \
+		CoreVideoDisplay.o     \
+		CoreVideoSprite.o      \
+		CoreVideoSystem.o      \
+		Operation.o            \
+		CoreGameShell.o
+
+LINKOBJ      = $(OBJ)
+
+PUZL_ROOT    = ..
+
+PLATFORM     = core
+
+PUZL_INCLUDE = $(PUZL_ROOT)/language/cpp/platform/$(PLATFORM)/include
+PUZL_SRC     = $(PUZL_ROOT)/language/cpp/platform/$(PLATFORM)/src
+PUZL_LIB     = $(PUZL_ROOT)/language/cpp/platform/$(PLATFORM)/lib
+
+PUZL_UTILITY = $(PUZL_SRC)/utility
+PUZL_VIDEO   = $(PUZL_SRC)/video
+PUZL_INPUT   = $(PUZL_SRC)/input
+PUZL_AUDIO   = $(PUZL_SRC)/audio
+PUZL_NETWORK = $(PUZL_SRC)/network
+CXXINCS      = $(INCS)
+
+ifeq ($(OS),LINUX)
+	CCC	 = g++
+	INCS	 = -I $(PUZL_INCLUDE)
+	LIBS	 = `sdl-config --cflags --libs` -lSDL_image -lGL -lGLU -lSDL_mixer -s
+	OTHER	 =
+	PLATFORM_OS_POSTFIX = $(PLATFORM)_lin
+	STATIC_LIB = libpuzl_$(PLATFORM_OS_POSTFIX).a
+	SHARED_LIB_OBJ = libpuzl_$(PLATFORM_OS_POSTFIX).so.1
+	SHARED_DYNAMIC_LIB = libpuzl_$(PLATFORM_OS_POSTFIX).so.1.0
+else
+ifeq ($(OS),MACOSX)
+	CCC	 = g++
+
+	INCS	 = -I $(PUZL_INCLUDE) \
+		   -I /Library/Frameworks/SDL.framework/Headers \
+		   -I /Library/Frameworks/SDL_image.framework/Headers \
+		   -I /System/Library/Frameworks/OpenGL.framework/Headers \
+		   -I /Library/Frameworks/SDL_mixer.framework/Headers
+
+	LIBS	 = -framework SDL \
+		   -framework SDL_image \
+		   -framework OpenGL \
+		   -framework SDL_mixer \
+		   -framework Cocoa
+
+	OTHER	 = SDLMain.m
+	PLATFORM_OS_POSTFIX = $(PLATFORM)_mac
+	STATIC_LIB = libpuzl_$(PLATFORM_OS_POSTFIX).a
+	SHARED_LIB_OBJ = libpuzl_$(PLATFORM_OS_POSTFIX).dylib.1
+	SHARED_DYNAMIC_LIB = libpuzl_$(PLATFORM_OS_POSTFIX).dylib.1.0
+else
+ifeq ($(OS),MINGW32)
+	CCC 	 = /usr/bin/i586-mingw32msvc-g++
+	INCS	 = -I "/usr/i586-mingw32msvc/include" -I $(PUZL_INCLUDE)
+	LIBS	 = -L "/usr/i586-mingw32msvc/lib/" -mwindows -lmingw32 -lSDLmain -lSDL -lSDL_image -lopengl32 -lglu32 -lSDL_mixer -s
+	OTHER	 =
+	PLATFORM_OS_POSTFIX = $(PLATFORM)_win
+	STATIC_LIB = libpuzl_$(PLATFORM_OS_POSTFIX).lib
+	SHARED_LIB_OBJ = libpuzl_$(PLATFORM_OS_POSTFIX).0.dll
+	SHARED_DYNAMIC_LIB = libpuzl_$(PLATFORM_OS_POSTFIX).dll
+endif
+endif
+endif
+
+CXXFLAGS = $(CXXINCS) -fexpensive-optimizations -O3 -D$(OS) -fPIC
+RM = rm -f
+
+#.PHONY: all all-before all-after clean clean-custom mac windows linux
+
+all: depend dynamic mvshared static
+
+default: shared
+
+clean:
+	$(RM) $(OBJ) $(SHARED_LIB_OBJ)
+
+shared: depend dynamic mvshared
+
+depend: $(OBJ)
+	$(CCC) -shared $(OBJ) -o $(SHARED_DYNAMIC_LIB)
+
+dynamic:
+	$(CCC) -shared -Wl,-soname ./$(SHARED_DYNAMIC_LIB) -o $(SHARED_LIB_OBJ) $(OBJ)
+
+mvshared:
+	mv $(SHARED_LIB_OBJ) $(PUZL_LIB)
+
+static: $(OBJ)
+	ar rcs $(PUZL_LIB)/$(STATIC_LIB) $(OBJ)
+
+CoreAudioSample.o: $(PUZL_AUDIO)/CoreAudioSample.cpp
+	$(CCC) -c $(PUZL_AUDIO)/CoreAudioSample.cpp -o CoreAudioSample.o $(CXXFLAGS)
+
+CoreAudioSystem.o: $(PUZL_AUDIO)/CoreAudioSystem.cpp
+	$(CCC) -c $(PUZL_AUDIO)/CoreAudioSystem.cpp -o CoreAudioSystem.o $(CXXFLAGS)
+
+CoreInputDevice.o: $(PUZL_INPUT)/CoreInputDevice.cpp
+	$(CCC) -c $(PUZL_INPUT)/CoreInputDevice.cpp -o CoreInputDevice.o $(CXXFLAGS)
+
+CoreInputJoystick.o: $(PUZL_INPUT)/CoreInputJoystick.cpp
+	$(CCC) -c $(PUZL_INPUT)/CoreInputJoystick.cpp -o CoreInputJoystick.o $(CXXFLAGS)
+
+CoreInputKeyboard.o: $(PUZL_INPUT)/CoreInputKeyboard.cpp
+	$(CCC) -c $(PUZL_INPUT)/CoreInputKeyboard.cpp -o CoreInputKeyboard.o $(CXXFLAGS)
+
+CoreInputMouse.o: $(PUZL_INPUT)/CoreInputMouse.cpp
+	$(CCC) -c $(PUZL_INPUT)/CoreInputMouse.cpp -o CoreInputMouse.o $(CXXFLAGS)
+
+CoreInputSystem.o: $(PUZL_INPUT)/CoreInputSystem.cpp
+	$(CCC) -c $(PUZL_INPUT)/CoreInputSystem.cpp -o CoreInputSystem.o $(CXXFLAGS)
+
+CoreVideoImage.o: $(PUZL_VIDEO)/CoreVideoImage.cpp
+	$(CCC) -c $(PUZL_VIDEO)/CoreVideoImage.cpp -o CoreVideoImage.o $(CXXFLAGS)
+
+BlockGraphic.o: $(PUZL_VIDEO)/BlockGraphic.cpp
+	$(CCC) -c $(PUZL_VIDEO)/BlockGraphic.cpp -o BlockGraphic.o $(CXXFLAGS)
+
+CharacterGraphic.o: $(PUZL_VIDEO)/CharacterGraphic.cpp
+	$(CCC) -c $(PUZL_VIDEO)/CharacterGraphic.cpp -o CharacterGraphic.o $(CXXFLAGS)
+
+CoreVideoDisplay.o: $(PUZL_VIDEO)/CoreVideoDisplay.cpp
+	$(CCC) -c $(PUZL_VIDEO)/CoreVideoDisplay.cpp -o CoreVideoDisplay.o $(CXXFLAGS)
+
+CoreVideoSprite.o: $(PUZL_VIDEO)/CoreVideoSprite.cpp
+	$(CCC) -c $(PUZL_VIDEO)/CoreVideoSprite.cpp -o CoreVideoSprite.o $(CXXFLAGS)
+
+CoreVideoSystem.o: $(PUZL_VIDEO)/CoreVideoSystem.cpp
+	$(CCC) -c $(PUZL_VIDEO)/CoreVideoSystem.cpp -o CoreVideoSystem.o $(CXXFLAGS)
+
+Operation.o: $(PUZL_UTILITY)/Operation.cpp
+	$(CCC) -c $(PUZL_UTILITY)/Operation.cpp -o Operation.o $(CXXFLAGS)
+
+CoreGameShell.o: $(PUZL_UTILITY)/CoreGameShell.cpp
+	$(CCC) -c $(PUZL_UTILITY)/CoreGameShell.cpp -o CoreGameShell.o $(CXXFLAGS)
