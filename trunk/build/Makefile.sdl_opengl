@@ -22,9 +22,9 @@ PUZL_ROOT    = ..
 
 PLATFORM     = sdl_opengl
 
-PUZL_INCLUDE = $(PUZL_ROOT)/platform/$(PLATFORM)/include
-PUZL_SRC     = $(PUZL_ROOT)/platform/$(PLATFORM)/src
-PUZL_LIB     = $(PUZL_ROOT)/platform/$(PLATFORM)/lib
+PUZL_INCLUDE = $(PUZL_ROOT)/language/cpp/platform/$(PLATFORM)/include
+PUZL_SRC     = $(PUZL_ROOT)/language/cpp/platform/$(PLATFORM)/src
+PUZL_LIB     = $(PUZL_ROOT)/language/cpp/platform/$(PLATFORM)/lib
 
 PUZL_UTILITY = $(PUZL_SRC)/utility
 PUZL_CORE    = $(PUZL_SRC)/core
