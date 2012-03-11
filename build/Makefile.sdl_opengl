@@ -85,13 +85,12 @@ RM = rm -f
 
 all: depend dynamic mvshared static
 
-default: depend dynamic mvshared
+default: shared
 
 clean:
 	$(RM) $(OBJ) $(SHARED_LIB_OBJ)
 
-# depend: $(OBJ)
-# 	ld -G $(OBJ) -o $(PUZL_LIB)/libpuzl_$(PLATFORM_OS_POSTFIX).so.1
+shared: depend dynamic mvshared
 
 depend: $(OBJ)
 	$(CCC) -shared $(OBJ) -o $(SHARED_DYNAMIC_LIB)
