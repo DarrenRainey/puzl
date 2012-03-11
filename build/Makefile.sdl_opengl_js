@@ -24,10 +24,10 @@ PUZL_ROOT    = ..
 
 PLATFORM     = sdl_opengl
 
-PUZL_INCLUDE = $(PUZL_ROOT)/platform/$(PLATFORM)/include
+PUZL_INCLUDE = $(PUZL_ROOT)/language/cpp/platform/$(PLATFORM)/include
 
-PUZL_SRC     = $(PUZL_ROOT)/platform/$(PLATFORM)/src
-PUZL_LIB     = $(PUZL_ROOT)/platform/$(PLATFORM)/lib
+PUZL_SRC     = $(PUZL_ROOT)/language/cpp/platform/$(PLATFORM)/src
+PUZL_LIB     = $(PUZL_ROOT)/language/cpp/platform/$(PLATFORM)/lib
 
 PUZL_UTILITY = $(PUZL_SRC)/utility
 PUZL_CORE    = $(PUZL_SRC)/core
@@ -38,10 +38,10 @@ PUZL_NETWORK = $(PUZL_SRC)/network
 
 JS_PLATFORM  = sdl_opengl_js
 
-PUZL_JS_INCLUDE = $(PUZL_ROOT)/platform/$(JS_PLATFORM)/include
+PUZL_JS_INCLUDE = $(PUZL_ROOT)/language/cpp/platform/$(JS_PLATFORM)/include
 
-PUZL_JS_SRC     = $(PUZL_ROOT)/platform/$(JS_PLATFORM)/src
-PUZL_JS_LIB     = $(PUZL_ROOT)/platform/$(JS_PLATFORM)/lib
+PUZL_JS_SRC     = $(PUZL_ROOT)/language/cpp/platform/$(JS_PLATFORM)/src
+PUZL_JS_LIB     = $(PUZL_ROOT)/language/cpp/platform/$(JS_PLATFORM)/lib
 
 PUZL_JS_UTILITY = $(PUZL_JS_SRC)/utility
 PUZL_JS_CORE    = $(PUZL_JS_SRC)/core
