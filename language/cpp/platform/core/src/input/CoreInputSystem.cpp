@@ -36,7 +36,13 @@ MA 02110-1301  USA
 //--------------------------------------------------------------------------------
 CoreInputSystem::CoreInputSystem( void )
 {
+  numberOfKeyboards  = 0;
+  numberOfMice       = 0;
+  numberOfJoysticks  = 0;
 
+  keyboards = NULL;
+  mice      = NULL;
+  joysticks = NULL;
 }
 
 //--------------------------------------------------------------------------------
@@ -48,60 +54,12 @@ CoreInputSystem::~CoreInputSystem( void )
 //--------------------------------------------------------------------------------
 int CoreInputSystem::initialize( void )
 {
-	numberOfKeyboards	= 1;			// NOTE Assume (just) one
-	numberOfMice		  = 1;			// TODO check for this?
-	numberOfJoysticks = 0;
-	
-	int index;
-
-	keyboards = new CoreInputKeyboard*[numberOfKeyboards];
-	for( index = 0; index < numberOfKeyboards; index++ )
-	{
-		keyboards[index] = new CoreInputKeyboard();
-		keyboards[index]->initialize();
-	}
-	
-	mice = new CoreInputMouse*[numberOfMice];
-	for( index = 0; index < numberOfMice; index++ )
-	{
-		mice[index] = new CoreInputMouse();
-		mice[index]->initialize();
-	}
-	
-	joysticks = new CoreInputJoystick*[numberOfJoysticks];
-	for( index = 0; index < numberOfJoysticks; index++ )
-	{
-		joysticks[index] = new CoreInputJoystick();
-		joysticks[index]->initialize();
-	}
+  return 0;
 }
 
 //--------------------------------------------------------------------------------
 int CoreInputSystem::shutdown( void )
 {
-	int index;
-
-	for( index = 0; index < numberOfKeyboards; index++ )
-	{
-		keyboards[index]->shutdown();
-		delete keyboards[index];
-	}
-	delete [] keyboards;
-	
-	for( index = 0; index < numberOfMice; index++ )
-	{
-	  mice[index]->shutdown();
-		delete mice[index];
-	}
-	delete [] mice;
-	
-	for( index = 0; index < numberOfJoysticks; index++ )
-	{
-		joysticks[index]->shutdown();
-		delete joysticks[index];
-	}
-	delete [] joysticks;
-
 	return 0;
 }
 

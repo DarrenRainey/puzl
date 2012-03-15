@@ -19,27 +19,43 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301  USA
 */
 
-#ifndef CORE_AUDIO_SYSTEM
-#define CORE_AUDIO_SYSTEM
+#ifndef SDL_OGL_INPUT_JOYSTICK
+#define SDL_OGL_INPUT_JOYSTICK
 
 // INCLUDES ======================================================================
-#include <puzl/audio/CoreAudioSample.h>
+#include <puzl/input/CoreInputJoystick.h>
+
+#include <SDL/SDL.h>
+
+#include <string>
+
+using namespace std;
 
 // DEFINES =======================================================================
-#define MAX_AUDIO_SAMPLES   100
+// Buffer defines
+#define NUM_JOYSTICK_BUTTONS			255		// Hardcoded! (within SDL)
+#define NUM_JOYSTICK_AXES			    5		  // ???
+#define JOYSTICK_BUFFER_SIZE			10		// Ten fingers?
 
 // TYPES =========================================================================
-class CoreAudioSystem
+class SdlOglInputJoystick: public CoreInputJoystick
 {
 public:
-  CoreAudioSystem( void );
-	~CoreAudioSystem( void );
+  SdlOglInputJoystick( void );
+	~SdlOglInputJoystick( void );
 
-	virtual int initialize( int bitRate, int numberOfChannels, int numberOfBuffers );
-	virtual int shutdown( void );
+	int initialize( void );
+	int shutdown( void );
 
-protected:
-  CoreAudioSample audioSamplePool[MAX_AUDIO_SAMPLES];
+	int read( void );
+	
+private:
+	void update( SDL_Event* event );
+
+	SDL_Event eventBuffer[JOYSTICK_BUFFER_SIZE];
+	SDL_Joystick* joystick;
+
+	friend class SdlOglInputSystem;
 };
 
 #endif

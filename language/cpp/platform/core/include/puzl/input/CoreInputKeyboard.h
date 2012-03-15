@@ -154,9 +154,6 @@ MA 02110-1301  USA
 
 #define INPUT_TYPE_KEYBOARD_KEY		0
 
-// Buffer defines
-#define NUM_KEY_CODES			322
-
 // TYPES =========================================================================
 class CoreInputKeyboard: public CoreInputDevice
 {
@@ -173,7 +170,7 @@ public:
 	virtual int getNumberOfCurrentKeyEvents( void );
 		
 protected:
-	Input keyState[NUM_KEY_CODES];
+	Input* keyState;
 };
 
 #endif

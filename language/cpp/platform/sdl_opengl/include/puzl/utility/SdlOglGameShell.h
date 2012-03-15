@@ -19,13 +19,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301  USA
 */
 
-#ifndef CORE_GAME_SHELL_H
-#define CORE_GAME_SHELL_H
+#ifndef SDL_OGL_GAME_SHELL_H
+#define SDL_OGL_GAME_SHELL_H
 
 // INCLUDES ======================================================================
-#include <puzl/input/CoreInputSystem.h>
-#include <puzl/video/CoreVideoSystem.h>
-#include <puzl/audio/CoreAudioSystem.h>
+#include <puzl/utility/CoreGameShell.h>
+#include <puzl/video/SdlOglVideoSystem.h>
+#include <puzl/video/SdlOglVideoDisplay.h>
+#include <puzl/audio/SdlOglAudioSystem.h>
+#include <puzl/input/SdlOglInputSystem.h>
 
 #include <string>
 
@@ -34,17 +36,12 @@ using namespace std;
 // DEFINES =======================================================================
 
 // TYPES =========================================================================
-struct GameShellSettings
+class SdlOglGameShell: public CoreGameShell
 {
-  int screenWidth;
-  int screenHeight;
-};
-
-class CoreGameShell
-{
+  
 public:
-  CoreGameShell( const GameShellSettings& gameShellSettings );
-  ~CoreGameShell( void );
+  SdlOglGameShell( const GameShellSettings& gameShellSettings );
+  ~SdlOglGameShell( void );
   
   virtual int shellInitialize( void );
   virtual int shellShutdown( void );
@@ -56,35 +53,42 @@ public:
   virtual void loop( void );
   virtual void draw( void );
   
-  int run( void );
-  
 protected:
+  SdlOglVideoSystem* videoSystem;
+  SdlOglAudioSystem* audioSystem;
+  SdlOglInputSystem* inputSystem;
+
+  SdlOglVideoDisplay* display;
+
+  SdlOglInputKeyboard** keyboards;
+  SdlOglInputKeyboard* keyboard;
+  
+  SdlOglInputMouse** mice;
+  SdlOglInputJoystick** joysticks;
+
+  //int numberOfNetwork;
+  
+  int initializeVideo( void );
+  int shutdownVideo( void );
+
   virtual int releaseVideo( void );
   virtual int reloadVideo( void );
 
-  virtual void setCaption( string caption );
-  virtual void setIcon( string iconFilename );
-
-  CoreInputSystem* inputSystem;     // Input system object
-  CoreVideoSystem* videoSystem;     // Video system object
-  CoreAudioSystem* audioSystem;     // Audio system object
-
-  CoreInputKeyboard** keyboards;    // Keyboard object
-  CoreInputKeyboard* keyboard;
+  int initializeInput( void );
+  int shutdownInput( void );
   
-  CoreInputMouse** mice;            // Mouse objects
-  CoreInputJoystick** joysticks;    // Joystick objects
-
-  //int numberOfNetwork;            // Number of network client/players
-
-  CoreVideoDisplay* display;        // Main video display
-
-  GameShellSettings gameShellSettings;
+  int initializeAudio( void );
+  int shutdownAudio( void );
   
-  bool quit;                        // Program terminator flag
-
-  string caption;
-  string iconFilename;
+  void setCaption( string caption );
+  void setIcon( string filePath );
+  
+private:
+  unsigned int nowTime;
+  unsigned int lastTime;
+  unsigned int nextTime;
+  
+  int updateSystem( void );
 };
 
 #endif

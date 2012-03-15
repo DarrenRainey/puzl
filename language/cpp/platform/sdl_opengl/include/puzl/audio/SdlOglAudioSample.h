@@ -19,27 +19,49 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301  USA
 */
 
-#ifndef CORE_AUDIO_SYSTEM
-#define CORE_AUDIO_SYSTEM
+#ifndef SDL_OGL_AUDIO_SAMPLE
+#define SDL_OGL_AUDIO_SAMPLE
 
 // INCLUDES ======================================================================
 #include <puzl/audio/CoreAudioSample.h>
 
+#include "SDL/SDL.h"
+
+#if defined(_WIN64) || defined(_WIN32)
+  #include "SDL/SDL_mixer.h"
+#elif defined(__APPLE__) || defined(__MACH__)
+  #include <SDL_mixer/SDL_mixer.h>
+#elif defined(__linux) || defined(__unix) || defined(__posix)
+  #include <SDL/SDL_mixer.h>
+#else
+  #include <SDL/SDL_mixer.h>
+#endif
+
+#include <string>
+
+using namespace std;
+
 // DEFINES =======================================================================
-#define MAX_AUDIO_SAMPLES   100
 
 // TYPES =========================================================================
-class CoreAudioSystem
+class SdlOglAudioSample: public CoreAudioSample
 {
 public:
-  CoreAudioSystem( void );
-	~CoreAudioSystem( void );
+  SdlOglAudioSample( void );
+	~SdlOglAudioSample( void );
+	
+	int load( string fileName );
+	int play( void );
+	int pause( void );
+	int stop( void );
+	//int setLoop( bool loop );
+	//bool getLoop( void );
+	//int setNumberOfLoops( int numberOfLoops );
+	int getStatus( void );
 
-	virtual int initialize( int bitRate, int numberOfChannels, int numberOfBuffers );
-	virtual int shutdown( void );
-
-protected:
-  CoreAudioSample audioSamplePool[MAX_AUDIO_SAMPLES];
+private:
+	Mix_Chunk* sample;
+	int channel;
 };
 
 #endif

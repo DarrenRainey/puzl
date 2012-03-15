@@ -54,6 +54,7 @@ CoreVideoDisplay::~CoreVideoDisplay( void )
 //--------------------------------------------------------------------------------
 int CoreVideoDisplay::initialize( int width, int height, int attributes )
 {
+  cout << "CoreVideoDisplay::initialize()" << endl;
   *realWidth = *( this->width ) = width;
   *realHeight = *( this->height ) = height;
   this->attributes = attributes;

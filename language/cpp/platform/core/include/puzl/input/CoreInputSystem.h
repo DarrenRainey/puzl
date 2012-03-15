@@ -48,9 +48,9 @@ public:
 	virtual int getNumberOfMice( void );
 	virtual int getNumberOfJoysticks( void );
 
+protected:
 	virtual void age( void );
 
-protected:
 	CoreInputKeyboard** keyboards;
 	CoreInputMouse** mice;
 	CoreInputJoystick** joysticks;
@@ -58,6 +58,8 @@ protected:
 	int numberOfKeyboards;
 	int numberOfMice;
 	int numberOfJoysticks;
+
+	friend class CoreGameShell;
 };
 
 #endif

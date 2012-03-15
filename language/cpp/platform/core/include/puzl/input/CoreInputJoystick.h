@@ -32,11 +32,23 @@ using namespace std;
 // DEFINES =======================================================================
 // Button state defines
 #ifndef BUTTON_STATE
-	#define BUTTON_STATE_UP			   0
-	#define BUTTON_STATE_DOWN		   1
+  #define BUTTON_STATE_UP        INPUT_STATE_UP
+  #define BUTTON_STATE_RELEASED  INPUT_STATE_RELEASED
+  #define BUTTON_STATE_DOWN      INPUT_STATE_DOWN
+  #define BUTTON_STATE_PRESSED   INPUT_STATE_PRESSED
 #endif
 
+#define INPUT_TYPE_JOYSTICK_BUTTON   2
+#define INPUT_TYPE_JOYSTICK_AXIS     3
+
 // Axis state defines
+#ifndef AXIS_STATE
+  #define AXIS_STATE_UP        INPUT_STATE_UP
+  #define AXIS_STATE_RELEASED  INPUT_STATE_RELEASED
+  #define AXIS_STATE_DOWN      INPUT_STATE_DOWN
+  #define AXIS_STATE_PRESSED   INPUT_STATE_PRESSED
+#endif
+
 #define AXIS_STATE_MIN			    -32768
 #define AXIS_STATE_MAX				   32768
 
@@ -48,11 +60,6 @@ using namespace std;
 #define X_AXIS					         0
 #define Y_AXIS					         1
 
-// Buffer defines
-#define NUM_JOYSTICK_BUTTONS			255
-#define NUM_JOYSTICK_AXES			    5
-#define JOYSTICK_BUFFER_SIZE			10
-
 // TYPES =========================================================================
 class CoreInputJoystick: public CoreInputDevice
 {
@@ -63,21 +70,17 @@ public:
 	virtual int initialize( void );       // Initialize this object for use
 	virtual int shutdown( void );         // Shut down this object
 
-	virtual int read( void );
-
 	virtual int getAxis( int axis );	    // Get state of an axis (direction-pad)
 	virtual int getXAxis( void );         // Get state of the X axis
 	virtual int getYAxis( void );	        // Get state of the Y axis
 
 	virtual int getButton( int button );	// Get state of a button
 	
-	virtual int getLastInputId( void );
-	
 protected:
 	string name;				                  // Name of this joystick device
 
-	int buttonState[NUM_JOYSTICK_BUTTONS];	     // States of joystick buttons
-	int axisState[NUM_JOYSTICK_AXES];	           // States of joystick axes
+	Input* buttonState;
+	Input* axisState;
 
 	static int count;
 };

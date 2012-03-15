@@ -20,7 +20,7 @@ MA 02110-1301  USA
 */
 
 // INCLUDES ======================================================================
-#include <puzl/input/CoreInputJoystick.h>
+#include <puzl/audio/SdlOglAudioSystem.h>
 
 #include <iostream>
 
@@ -35,69 +35,47 @@ using namespace std;
 // EXTERNALS =====================================================================
 
 // GLOBALS =======================================================================
-int CoreInputJoystick::count = 0;
 
 // FUNCTIONS =====================================================================
-//--------------------------------------------------------------------------------
-CoreInputJoystick::CoreInputJoystick( void )
-{
-
-}
 
 //--------------------------------------------------------------------------------
-CoreInputJoystick::~CoreInputJoystick( void )
+SdlOglAudioSystem::SdlOglAudioSystem( void ): CoreAudioSystem()
 {
-	#ifdef DEBUG
-	if( id != -1 )
+	if( SDL_InitSubSystem( SDL_INIT_AUDIO ) != 0 )
 	{
-		cout << "Joystick(" << id << ") was not shutdown!" << endl; 
+		cout << "Error: Unable to set up sound system." << endl;
+		
+		SDL_QuitSubSystem( SDL_INIT_AUDIO ); // TODO: Needed?
+		Mix_CloseAudio();
 	}
-	#endif
 }
 
 //--------------------------------------------------------------------------------
-int CoreInputJoystick::initialize( void )
+SdlOglAudioSystem::~SdlOglAudioSystem( void )
 {
-	// Increase the reference counter for a 'new' joystick.
-	// TODO: Get the unique system-level ID of this joystick.
-	id = count++;
-
-	#ifdef DEBUG
-	cout << "id " << id;
-	#endif
-
-	return 0;
+	SDL_QuitSubSystem( SDL_INIT_AUDIO );
+	Mix_CloseAudio();
 }
 
 //--------------------------------------------------------------------------------
-int CoreInputJoystick::shutdown( void )
+int SdlOglAudioSystem::initialize( int bitRate, int numberOfChannels, int numberOfBuffers )
 {
-	--count;
-	id = -1;
+  if( CoreAudioSystem::initialize( bitRate, numberOfChannels, numberOfBuffers ) < 0 )
+  {
+    return -1;
+  }
+
+	if( Mix_OpenAudio( bitRate, AUDIO_S16SYS, numberOfChannels, numberOfBuffers ) != 0 )
+	{
+		cout << "Error: Unable to set up sound system mixer." << endl;
+		return -1;
+	}
 	
 	return 0;
 }
 
 //--------------------------------------------------------------------------------
-int CoreInputJoystick::getAxis( int axis )
+int SdlOglAudioSystem::shutdown( void )
 {
-	return axisState[axis].state;
-}
-
-//--------------------------------------------------------------------------------
-int CoreInputJoystick::getXAxis( void )
-{
-	return getAxis( X_AXIS );
-}
-
-//--------------------------------------------------------------------------------
-int CoreInputJoystick::getYAxis( void )
-{
-	return getAxis( Y_AXIS );
-}
-
-//--------------------------------------------------------------------------------
-int CoreInputJoystick::getButton( int button )
-{
-	return getState( button );
+	return CoreAudioSystem::shutdown();
 }
