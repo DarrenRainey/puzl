@@ -19,27 +19,41 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301  USA
 */
 
-#ifndef CORE_AUDIO_SYSTEM
-#define CORE_AUDIO_SYSTEM
+#ifndef SDL_OGL_INPUT_MOUSE
+#define SDL_OGL_INPUT_MOUSE
 
 // INCLUDES ======================================================================
-#include <puzl/audio/CoreAudioSample.h>
+#include <puzl/input/CoreInputMouse.h>
+
+#include <SDL/SDL.h>
+
+#ifdef DEBUG
+#include <iostream>
+using namespace std;
+#endif
 
 // DEFINES =======================================================================
-#define MAX_AUDIO_SAMPLES   100
+// Buffer defines
+#define NUM_MOUSE_BUTTONS			255		 // Hardcoded! (within SDL)
+#define MOUSE_BUFFER_SIZE			7		   // Five fingers and two directions?
 
 // TYPES =========================================================================
-class CoreAudioSystem
+class SdlOglInputMouse: public CoreInputMouse
 {
 public:
-  CoreAudioSystem( void );
-	~CoreAudioSystem( void );
+  SdlOglInputMouse( void );
+	~SdlOglInputMouse( void );
+	
+	void setLock( bool lock );
+	
+	void warp( int x, int y );
+	
+private:
+	void update( SDL_Event* event );
 
-	virtual int initialize( int bitRate, int numberOfChannels, int numberOfBuffers );
-	virtual int shutdown( void );
+	SDL_Event eventBuffer[MOUSE_BUFFER_SIZE];
 
-protected:
-  CoreAudioSample audioSamplePool[MAX_AUDIO_SAMPLES];
+	friend class SdlOglInputSystem;
 };
 
 #endif

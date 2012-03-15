@@ -19,27 +19,37 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301  USA
 */
 
-#ifndef CORE_AUDIO_SYSTEM
-#define CORE_AUDIO_SYSTEM
+#ifndef SDL_OGL_INPUT_SYS
+#define SDL_OGL_INPUT_SYS
 
 // INCLUDES ======================================================================
-#include <puzl/audio/CoreAudioSample.h>
+#include <puzl/input/CoreInputSystem.h>
+#include <puzl/input/SdlOglInputKeyboard.h>
+#include <puzl/input/SdlOglInputMouse.h>
+#include <puzl/input/SdlOglInputJoystick.h>
+
+#include <SDL/SDL.h>
 
 // DEFINES =======================================================================
-#define MAX_AUDIO_SAMPLES   100
 
 // TYPES =========================================================================
-class CoreAudioSystem
+class SdlOglInputSystem: public CoreInputSystem
 {
 public:
-  CoreAudioSystem( void );
-	~CoreAudioSystem( void );
+  SdlOglInputSystem( void );
+	~SdlOglInputSystem( void );
 
-	virtual int initialize( int bitRate, int numberOfChannels, int numberOfBuffers );
-	virtual int shutdown( void );
+	int initialize( void );
+	int shutdown( void );
 
-protected:
-  CoreAudioSample audioSamplePool[MAX_AUDIO_SAMPLES];
+private:
+	void update( SDL_Event* event );
+
+	//SdlOglInputKeyboard** sdlOglkeyboards;
+	//SdlOglInputMouse** sdlOglmice;
+	//SdlOglInputJoystick** sdlOgljoysticks;
+
+	friend class SdlOglGameShell;
 };
 
 #endif

@@ -42,13 +42,7 @@ CoreInputMouse::CoreInputMouse( void )
 	xDelta	  = 0;
 	yDelta	  = 0;
 
-	int index;
-	for( index = 0; index < NUM_MOUSE_BUTTONS; index++ )
-	{
-		buttonState[index] = BUTTON_STATE_UP;
-	}
-
-	lock = LOCK_STATE_OFF;
+	lock   = LOCK_STATE_OFF;
 	doWarp = false;
 }
 
@@ -61,25 +55,25 @@ CoreInputMouse::~CoreInputMouse( void )
 //--------------------------------------------------------------------------------
 int CoreInputMouse::getXPosition( void )
 {
-	return( xPosition );
+	return xPosition;
 }
 
 //--------------------------------------------------------------------------------
 int CoreInputMouse::getYPosition( void )
 {
-	return( yPosition );
+	return yPosition;
 }
 
 //--------------------------------------------------------------------------------
 int CoreInputMouse::getXDelta( void )
 {
-	return( xDelta );
+	return xDelta;
 }
 
 //--------------------------------------------------------------------------------
 int CoreInputMouse::getYDelta( void )
 {
-	return( yDelta );
+	return yDelta;
 }
 
 //--------------------------------------------------------------------------------
@@ -91,7 +85,7 @@ int CoreInputMouse::clearDeltas( void )
 //--------------------------------------------------------------------------------
 int CoreInputMouse::getButton( int button )
 {
-	return buttonState[button];
+	return getState( button );
 }
 
 //--------------------------------------------------------------------------------

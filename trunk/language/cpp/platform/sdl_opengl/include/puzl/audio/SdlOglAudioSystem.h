@@ -19,27 +19,36 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301  USA
 */
 
-#ifndef CORE_AUDIO_SYSTEM
-#define CORE_AUDIO_SYSTEM
+#ifndef SDL_OGL_AUDIO_SYSTEM
+#define SDL_OGL_AUDIO_SYSTEM
 
 // INCLUDES ======================================================================
-#include <puzl/audio/CoreAudioSample.h>
+#include <puzl/audio/CoreAudioSystem.h>
+#include <puzl/audio/SdlOglAudioSample.h>
+
+#include "SDL/SDL.h"
+
+#if defined(_WIN64) || defined(_WIN32)
+  #include "SDL/SDL_mixer.h"
+#elif defined(__APPLE__) || defined(__MACH__)
+  #include <SDL_mixer/SDL_mixer.h>
+#elif defined(__linux) || defined(__unix) || defined(__posix)
+  #include <SDL/SDL_mixer.h>
+#else
+  #include <SDL/SDL_mixer.h>
+#endif
 
 // DEFINES =======================================================================
-#define MAX_AUDIO_SAMPLES   100
 
 // TYPES =========================================================================
-class CoreAudioSystem
+class SdlOglAudioSystem: public CoreAudioSystem
 {
 public:
-  CoreAudioSystem( void );
-	~CoreAudioSystem( void );
+  SdlOglAudioSystem( void );
+	~SdlOglAudioSystem( void );
 
-	virtual int initialize( int bitRate, int numberOfChannels, int numberOfBuffers );
-	virtual int shutdown( void );
-
-protected:
-  CoreAudioSample audioSamplePool[MAX_AUDIO_SAMPLES];
+	int initialize( int bitRate, int numberOfChannels, int numberOfBuffers );
+	int shutdown( void );
 };
 
 #endif

@@ -24,6 +24,8 @@ MA 02110-1301  USA
 
 #include <iostream>
 
+using namespace std;
+
 // DEFINES =======================================================================
 
 // TYPES =========================================================================
@@ -88,10 +90,12 @@ int CoreInputDevice::getLastInputId( void )
 //--------------------------------------------------------------------------------
 void CoreInputDevice::age( void )
 {
+  Input* tempStateChange;
+
 	int index;
 	for( index = 0; index < numberOfStateChanges; index++ )
 	{
-		Input* tempStateChange = stateChange[index];
+		tempStateChange = stateChange[index];
 		if( tempStateChange->state == INPUT_STATE_RELEASED )
 		{
 			tempStateChange->state = INPUT_STATE_UP;

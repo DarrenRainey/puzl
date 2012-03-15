@@ -36,7 +36,7 @@ CXXINCS      = $(INCS)
 ifeq ($(OS),LINUX)
 	CCC	 = g++
 	INCS	 = -I $(PUZL_INCLUDE)
-	LIBS	 = `sdl-config --cflags --libs` -lSDL_image -lGL -lGLU -lSDL_mixer -s
+	LIBS	 = -s
 	OTHER	 =
 	PLATFORM_OS_POSTFIX = $(PLATFORM)_lin
 	STATIC_LIB = libpuzl_$(PLATFORM_OS_POSTFIX).a
@@ -46,17 +46,9 @@ else
 ifeq ($(OS),MACOSX)
 	CCC	 = g++
 
-	INCS	 = -I $(PUZL_INCLUDE) \
-		   -I /Library/Frameworks/SDL.framework/Headers \
-		   -I /Library/Frameworks/SDL_image.framework/Headers \
-		   -I /System/Library/Frameworks/OpenGL.framework/Headers \
-		   -I /Library/Frameworks/SDL_mixer.framework/Headers
+	INCS	 = -I $(PUZL_INCLUDE)
 
-	LIBS	 = -framework SDL \
-		   -framework SDL_image \
-		   -framework OpenGL \
-		   -framework SDL_mixer \
-		   -framework Cocoa
+	LIBS	 = 
 
 	OTHER	 = SDLMain.m
 	PLATFORM_OS_POSTFIX = $(PLATFORM)_mac
@@ -67,7 +59,7 @@ else
 ifeq ($(OS),MINGW32)
 	CCC 	 = /usr/bin/i586-mingw32msvc-g++
 	INCS	 = -I "/usr/i586-mingw32msvc/include" -I $(PUZL_INCLUDE)
-	LIBS	 = -L "/usr/i586-mingw32msvc/lib/" -mwindows -lmingw32 -lSDLmain -lSDL -lSDL_image -lopengl32 -lglu32 -lSDL_mixer -s
+	LIBS	 = -L "/usr/i586-mingw32msvc/lib/" -mwindows -lmingw32 -s
 	OTHER	 =
 	PLATFORM_OS_POSTFIX = $(PLATFORM)_win
 	STATIC_LIB = libpuzl_$(PLATFORM_OS_POSTFIX).lib

@@ -19,27 +19,21 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301  USA
 */
 
-#ifndef CORE_AUDIO_SYSTEM
-#define CORE_AUDIO_SYSTEM
+#ifndef SDL_OGL_VIDEO_SPRITE
+#define SDL_OGL_VIDEO_SPRITE
 
 // INCLUDES ======================================================================
-#include <puzl/audio/CoreAudioSample.h>
+#include <puzl/video/CoreVideoSprite.h>
+#include <puzl/video/CoreVideoImage.h>
 
 // DEFINES =======================================================================
-#define MAX_AUDIO_SAMPLES   100
 
 // TYPES =========================================================================
-class CoreAudioSystem
+class SdlOglVideoSprite: public CoreVideoSprite
 {
 public:
-  CoreAudioSystem( void );
-	~CoreAudioSystem( void );
-
-	virtual int initialize( int bitRate, int numberOfChannels, int numberOfBuffers );
-	virtual int shutdown( void );
-
-protected:
-  CoreAudioSample audioSamplePool[MAX_AUDIO_SAMPLES];
+  SdlOglVideoSprite( CoreVideoImage& videoImage, int width, int height, int numberOfFrames, int attributes );
+	~SdlOglVideoSprite( void );
 };
 
 #endif

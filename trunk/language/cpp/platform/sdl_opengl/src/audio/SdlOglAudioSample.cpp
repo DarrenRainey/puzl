@@ -20,7 +20,7 @@ MA 02110-1301  USA
 */
 
 // INCLUDES ======================================================================
-#include <puzl/utility/CoreGameShell.h>
+#include <puzl/audio/SdlOglAudioSample.h>
 
 // DEFINES =======================================================================
 
@@ -28,111 +28,94 @@ MA 02110-1301  USA
 
 // PROTOTYPES ====================================================================
 
+// EXTERNALS =====================================================================
+
 // GLOBALS =======================================================================
 
 // FUNCTIONS =====================================================================
 
-// ===============================================================================
 //--------------------------------------------------------------------------------
-CoreGameShell::CoreGameShell( const GameShellSettings& gameShellSettings )
+SdlOglAudioSample::SdlOglAudioSample( void ): CoreAudioSample()
 {
-	this->gameShellSettings = gameShellSettings;
-  
-	inputSystem = NULL;
-  videoSystem = NULL;
-	audioSystem = NULL;
-
-	display   = NULL;
-
-	keyboards = NULL;
-  keyboard  = NULL;
-  
-	mice      = NULL;
-	joysticks = NULL;
-	
-	quit = false;
+	sample  = NULL;
+	channel = -1;
 }
 
 //--------------------------------------------------------------------------------
-CoreGameShell::~CoreGameShell( void )
+SdlOglAudioSample::~SdlOglAudioSample( void )
 {
-
+	Mix_HaltChannel( channel );
+	Mix_FreeChunk( sample );
 }
 
 //--------------------------------------------------------------------------------
-void CoreGameShell::shellLoop( void )
+int SdlOglAudioSample::load( string fileName )
 {
-  
+  CoreAudioSample::load( fileName );
+
+	sample = Mix_LoadWAV( fileName.c_str() );
+	if( sample == NULL )
+	{
+		return -1;
+	}
+	else
+	{
+		return 0;
+	}
 }
 
 //--------------------------------------------------------------------------------
-int CoreGameShell::initialize( void )
+int SdlOglAudioSample::play( void )
 {
-  return 0;
+  CoreAudioSample::play();
+
+	channel = Mix_PlayChannel( -1, sample, numberOfLoops );
+	if( channel == -1 )
+	{
+		return -1;
+	}
+	else
+	{
+		return 0;
+	}
 }
 
 //--------------------------------------------------------------------------------
-int CoreGameShell::shutdown( void )
+int SdlOglAudioSample::pause( void )
 {
-  return 0;
+  // TODO: Needs to be implemented.
+	return CoreAudioSample::pause();
 }
 
 //--------------------------------------------------------------------------------
-void CoreGameShell::loop( void )
+int SdlOglAudioSample::stop( void )
 {
+  CoreAudioSample::stop();
 
+	return Mix_HaltChannel( channel );
 }
 
 //--------------------------------------------------------------------------------
-void CoreGameShell::draw( void )
+/*int SdlOglAudioSample::setLoop( bool loop )
 {
-
-}
+  return CoreAudioSample::setLoop( loop );
+}*/
 
 //--------------------------------------------------------------------------------
-int CoreGameShell::run( void )
+/*bool SdlOglAudioSample::getLoop()
 {
-  cout << "CoreGameShell::run()" << endl;
-  shellInitialize();
-  shellLoop();
-  return shellShutdown();
-}
+  return CoreAudioSample::getLoop();
+}*/
 
 //--------------------------------------------------------------------------------
-int CoreGameShell::shellInitialize( void )
+/*int SdlOglAudioSample::setNumberOfLoops( int numberOfLoops )
 {
-  cout << "CoreGameShell::shellInitialize()" << endl;
-  return initialize();
-}
+  return CoreAudioSample::setNumberOfLoops();
+}*/
 
 //--------------------------------------------------------------------------------
-int CoreGameShell::releaseVideo( void )
+int SdlOglAudioSample::getStatus( void )
 {
-	return 0;
-}
-
-//--------------------------------------------------------------------------------
-int CoreGameShell::reloadVideo( void )
-{
-  return 0;
-}
-
-//--------------------------------------------------------------------------------
-int CoreGameShell::shellShutdown( void )
-{
-  shutdown();
-
-  return 0;
-}
-
-//--------------------------------------------------------------------------------
-void CoreGameShell::setCaption( string caption )
-{
-  this->caption = caption;
-}
-
-//--------------------------------------------------------------------------------
-void CoreGameShell::setIcon( string iconFilename )
-{
-  this->iconFilename = iconFilename;
+  // TODO: Needs to be implemented.
+  return CoreAudioSample::getStatus();
 }

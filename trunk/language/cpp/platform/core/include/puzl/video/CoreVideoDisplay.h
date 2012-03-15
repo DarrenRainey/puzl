@@ -61,13 +61,11 @@ public:
 	virtual void clear( void );
 
 protected:
+	int attributes;
 	bool fullScreen;
 
   int backgroundColor[3];
   int foregroundColor[4];
-  
-private:
-	int attributes;
 };
 
 #endif

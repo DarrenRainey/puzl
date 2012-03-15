@@ -38,18 +38,8 @@ MA 02110-1301  USA
 //--------------------------------------------------------------------------------
 CoreInputKeyboard::CoreInputKeyboard( void )
 {
-	input = new Input*[NUM_KEY_CODES];
+  int index;
 
-	int index;
-	for( index = 0; index < NUM_KEY_CODES; index++ )
-	{
-		keyState[index].id = index;
-		keyState[index].state = KEY_STATE_UP;
-		keyState[index].type = INPUT_TYPE_KEYBOARD_KEY;
-		
-		input[index] = &keyState[index];
-	}
-	
 	stateChangeBufferSize = 10;	// TODO: Determine this somehow (constructor?).
 	stateChange = new Input*[stateChangeBufferSize];
 	for( index = 0; index < stateChangeBufferSize; index++ )
@@ -63,9 +53,6 @@ CoreInputKeyboard::CoreInputKeyboard( void )
 //--------------------------------------------------------------------------------
 CoreInputKeyboard::~CoreInputKeyboard( void )
 {
-	delete [] input;
-	input = NULL;
-	
 	delete [] stateChange;
 	stateChange = NULL;
 }

@@ -28,26 +28,24 @@ MA 02110-1301  USA
 // DEFINES =======================================================================
 // Button state defines
 #ifndef BUTTON_STATE
-	#define BUTTON_STATE_UP			0
-	#define BUTTON_STATE_DOWN		1
+  #define BUTTON_STATE_UP        INPUT_STATE_UP
+  #define BUTTON_STATE_RELEASED  INPUT_STATE_RELEASED
+  #define BUTTON_STATE_DOWN      INPUT_STATE_DOWN
+  #define BUTTON_STATE_PRESSED   INPUT_STATE_PRESSED
 #endif
 
-// Buffer defines
-#define NUM_MOUSE_BUTTONS			255
-#define MOUSE_BUFFER_SIZE			7
+#define INPUT_TYPE_MOUSE_BUTTON   1
 
-#define LOCK_STATE_OFF				0
-#define LOCK_STATE_START			-1
-#define LOCK_STATE_ON				  1
+#define LOCK_STATE_OFF				    0
+#define LOCK_STATE_START			   -1
+#define LOCK_STATE_ON				      1
 
 // TYPES =========================================================================
-class CoreInputMouse : public CoreInputDevice
+class CoreInputMouse: public CoreInputDevice
 {
 public:
 	CoreInputMouse( void );
 	~CoreInputMouse( void );
-
-	virtual int read( void );
 
 	virtual int getXPosition( void );
 	virtual int getYPosition( void );
@@ -74,7 +72,7 @@ protected:
 	int lock;
 	bool doWarp;
 
-	int buttonState[NUM_MOUSE_BUTTONS];
+	Input* buttonState;
 };
 
 #endif

@@ -20,11 +20,10 @@ MA 02110-1301  USA
 */
 
 // INCLUDES ======================================================================
-#include <puzl/input/CoreInputJoystick.h>
+#include <puzl/video/SdlOglVideoSystem.h>
+#include <puzl/video/SdlOglVideoDisplay.h>
 
-#include <iostream>
-
-using namespace std;
+#include <SDL/SDL.h>
 
 // DEFINES =======================================================================
 
@@ -35,69 +34,38 @@ using namespace std;
 // EXTERNALS =====================================================================
 
 // GLOBALS =======================================================================
-int CoreInputJoystick::count = 0;
 
 // FUNCTIONS =====================================================================
 //--------------------------------------------------------------------------------
-CoreInputJoystick::CoreInputJoystick( void )
+SdlOglVideoSystem::SdlOglVideoSystem( void ): CoreVideoSystem()
 {
-
-}
-
-//--------------------------------------------------------------------------------
-CoreInputJoystick::~CoreInputJoystick( void )
-{
-	#ifdef DEBUG
-	if( id != -1 )
+	// Initialize the video system.
+  cout << "SdlOglVideoSystem()" << endl;
+	if( SDL_Init( SDL_INIT_VIDEO ) < 0 )
 	{
-		cout << "Joystick(" << id << ") was not shutdown!" << endl; 
+	  cout << "Failed to initialize video system" << endl;
+		atexit( SDL_Quit );
 	}
-	#endif
 }
 
 //--------------------------------------------------------------------------------
-int CoreInputJoystick::initialize( void )
+SdlOglVideoSystem::~SdlOglVideoSystem( void )
 {
-	// Increase the reference counter for a 'new' joystick.
-	// TODO: Get the unique system-level ID of this joystick.
-	id = count++;
-
-	#ifdef DEBUG
-	cout << "id " << id;
-	#endif
-
-	return 0;
+	SDL_Quit();
 }
 
 //--------------------------------------------------------------------------------
-int CoreInputJoystick::shutdown( void )
+int SdlOglVideoSystem::initialize( int displayWidth, int displayHeight, int displayAttributes )
 {
-	--count;
-	id = -1;
-	
-	return 0;
+  cout << "SdlOglVideoSystem::initialize()" << endl;
+  display = new SdlOglVideoDisplay();
+  return display->initialize( displayWidth, displayHeight, displayAttributes );
 }
 
 //--------------------------------------------------------------------------------
-int CoreInputJoystick::getAxis( int axis )
+int SdlOglVideoSystem::shutdown( void )
 {
-	return axisState[axis].state;
-}
-
-//--------------------------------------------------------------------------------
-int CoreInputJoystick::getXAxis( void )
-{
-	return getAxis( X_AXIS );
-}
-
-//--------------------------------------------------------------------------------
-int CoreInputJoystick::getYAxis( void )
-{
-	return getAxis( Y_AXIS );
-}
-
-//--------------------------------------------------------------------------------
-int CoreInputJoystick::getButton( int button )
-{
-	return getState( button );
+  display->shutdown();
+  delete display;
+  return 0;
 }
