@@ -124,36 +124,57 @@ void SdlOglInputMouse::update( SDL_Event* event )
 				yDelta	  = event->motion.yrel;
 			}
 			
-		} break;
+			break;
+		}
 
 		// A button was just pressed
 		case SDL_MOUSEBUTTONDOWN:
 		{
+		  if( numberOfStateChanges > stateChangeBufferSize )
+      {
+        return;
+      }
+
 			#ifdef DEBUG
 			cout << "Mouse:  "
-				<< "Button(" << ( int )( event->button.button ) << ")"
+				<< "Pressed(" << ( int )( event->button.button ) << ")"
 				<< " Down" << endl;
 			#endif
 
-			buttonState[event->button.button].state = BUTTON_STATE_DOWN;
+			static unsigned char& buttonId = event->button.button;
+			buttonState[buttonId - 1].state = BUTTON_STATE_PRESSED;
 
 			xPosition = event->button.x;
 			yPosition = event->button.y;
-		} break;
+
+			stateChange[numberOfStateChanges++] = input[buttonId - 1];
+
+			break;
+		}
 
 		// A button was just released
 		case SDL_MOUSEBUTTONUP:
 		{
+		  if( numberOfStateChanges > stateChangeBufferSize )
+      {
+        return;
+      }
+
 			#ifdef DEBUG
 			cout << "Mouse:  "
 				<< "Button(" << ( int )( event->button.button ) << ")"
-				<< " Up" << endl;
+				<< " Released" << endl;
 			#endif
 
-			buttonState[event->button.button].state = BUTTON_STATE_UP;
+			static unsigned char& buttonId = event->button.button;
+			buttonState[buttonId - 1].state = BUTTON_STATE_RELEASED;
 
 			xPosition = event->button.x;
 			yPosition = event->button.y;
-		} break;
+
+			stateChange[numberOfStateChanges++] = input[buttonId - 1];
+
+			break;
+		}
 	}
 }

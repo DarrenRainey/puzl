@@ -169,31 +169,52 @@ void SdlOglInputJoystick::update( SDL_Event* event )
 			else
 				axisState[event->jaxis.axis].state = ( int )( event->jaxis.value );
 
-		} break;
+			break;
+		}
 
 		// A button was just pressed
 		case SDL_JOYBUTTONDOWN:
 		{
+      if( numberOfStateChanges > stateChangeBufferSize )
+      {
+        return;
+      }
+
 			#ifdef DEBUG
 			cout << "Joystick(" << ( int )( event->jbutton.which  ) << "):  "
 				<< "Button("   << ( int )( event->jbutton.button )<< ")"
 				<< " Down" << endl;
 			#endif
 
-			buttonState[event->jbutton.button].state = BUTTON_STATE_DOWN;
-		} break;
+			static unsigned char& buttonId = event->jbutton.button;
+			buttonState[buttonId].state = BUTTON_STATE_PRESSED;
+
+      stateChange[numberOfStateChanges++] = input[buttonId];
+
+			break;
+		}
 
 		// A button was just released
 		case SDL_JOYBUTTONUP:
 		{
+      if( numberOfStateChanges > stateChangeBufferSize )
+      {
+        return;
+      }
+
 			#ifdef DEBUG
 			cout << "Joystick(" << ( int )( event->jbutton.which  ) << "):  "
 				<< "Button("   << ( int )( event->jbutton.button )<< ")"
-				<< " Up" << endl;
+				<< " Released" << endl;
 			#endif
 
-			buttonState[event->jbutton.button].state = BUTTON_STATE_UP;
-		} break;
+			static unsigned char& buttonId = event->jbutton.button;
+			buttonState[buttonId].state = BUTTON_STATE_RELEASED;
+
+			stateChange[numberOfStateChanges++] = input[buttonId];
+
+			break;
+		}
 	}
 }
 

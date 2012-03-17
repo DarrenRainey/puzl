@@ -39,7 +39,7 @@ int CoreInputJoystick::count = 0;
 
 // FUNCTIONS =====================================================================
 //--------------------------------------------------------------------------------
-CoreInputJoystick::CoreInputJoystick( void )
+CoreInputJoystick::CoreInputJoystick( void ): CoreInputDevice()
 {
 
 }
