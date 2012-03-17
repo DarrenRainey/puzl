@@ -48,6 +48,17 @@ CoreInputDevice::CoreInputDevice( void )
 	
 	lastInputId           = -1;
 	lastInputType         = 0;
+
+	int index;
+
+  stateChangeBufferSize = 10; // TODO: Determine this somehow (constructor?).
+  stateChange = new Input*[stateChangeBufferSize];
+  for( index = 0; index < stateChangeBufferSize; index++ )
+  {
+    stateChange[index] = NULL;
+  }
+
+  numberOfStateChanges = 0;
 }
 
 //--------------------------------------------------------------------------------
@@ -55,6 +66,9 @@ CoreInputDevice::~CoreInputDevice( void )
 {
   // Make this joystick object invalid initially.
   id = -1;
+
+  delete [] stateChange;
+  stateChange = NULL;
 }
 
 //--------------------------------------------------------------------------------

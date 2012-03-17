@@ -36,25 +36,15 @@ MA 02110-1301  USA
 
 // FUNCTIONS =====================================================================
 //--------------------------------------------------------------------------------
-CoreInputKeyboard::CoreInputKeyboard( void )
+CoreInputKeyboard::CoreInputKeyboard( void ): CoreInputDevice()
 {
-  int index;
 
-	stateChangeBufferSize = 10;	// TODO: Determine this somehow (constructor?).
-	stateChange = new Input*[stateChangeBufferSize];
-	for( index = 0; index < stateChangeBufferSize; index++ )
-	{
-		stateChange[index] = NULL;
-	}
-	
-	numberOfStateChanges = 0;
 }
 
 //--------------------------------------------------------------------------------
 CoreInputKeyboard::~CoreInputKeyboard( void )
 {
-	delete [] stateChange;
-	stateChange = NULL;
+
 }
 
 //--------------------------------------------------------------------------------

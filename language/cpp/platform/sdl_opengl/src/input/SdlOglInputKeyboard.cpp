@@ -75,7 +75,7 @@ void SdlOglInputKeyboard::update( SDL_Event* event )
 		return;
 	}
 	
-	int key = event->key.keysym.sym;
+	static SDLKey& key = event->key.keysym.sym;
 	
 	// Process the keyboard events
 	switch( event->type )
@@ -95,7 +95,9 @@ void SdlOglInputKeyboard::update( SDL_Event* event )
 			}
 		
 			keyState[key].state = KEY_STATE_PRESSED;
-		} break;
+
+			break;
+		}
 
 		// A key was just released
 		case SDL_KEYUP:
@@ -107,7 +109,9 @@ void SdlOglInputKeyboard::update( SDL_Event* event )
 			#endif
 					
 			keyState[key].state = KEY_STATE_RELEASED;
-		} break;
+
+			break;
+		}
 	}
 	
 	stateChange[numberOfStateChanges++] = input[key];

@@ -22,6 +22,10 @@ MA 02110-1301  USA
 // INCLUDES ======================================================================
 #include <puzl/input/CoreInputMouse.h>
 
+#include <iostream>
+
+using namespace std;
+
 // DEFINES =======================================================================
 
 // TYPES =========================================================================
@@ -35,7 +39,7 @@ MA 02110-1301  USA
 // FUNCTIONS =====================================================================
 
 //--------------------------------------------------------------------------------
-CoreInputMouse::CoreInputMouse( void )
+CoreInputMouse::CoreInputMouse( void ): CoreInputDevice()
 {
 	xPosition = 0;
 	yPosition = 0;
@@ -85,6 +89,7 @@ int CoreInputMouse::clearDeltas( void )
 //--------------------------------------------------------------------------------
 int CoreInputMouse::getButton( int button )
 {
+  //cout << "CoreInputMouse::getButton(): " << getState( button ) << endl;
 	return getState( button );
 }
 
