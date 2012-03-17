@@ -43,29 +43,27 @@ using namespace std;
 //--------------------------------------------------------------------------------
 SdlOglInputSystem::SdlOglInputSystem( void ): CoreInputSystem()
 {
-	// Initialize the input system
-	// note that for SDL, the input (keyboard/mouse)
-	// system is fused with the video system
-  // if( !SDL_WasInit( SDL_INIT_VIDEO ) )		// Make sure not to
-  //  SDL_Init( SDL_INIT_VIDEO );		// initialize twice
+  numberOfKeyboards  = 1;
+  numberOfMice       = 1;
 
-	//SDL_InitSubSystem( SDL_INIT_JOYSTICK );
-
-  numberOfKeyboards  = 1; // NOTE Assume (just) one
-  numberOfMice       = 1; // TODO check for this?
-  numberOfJoysticks  = 0;
+  if( SDL_InitSubSystem( SDL_INIT_JOYSTICK ) > -1 )
+  {
+    numberOfJoysticks  = SDL_NumJoysticks();
+    if( numberOfJoysticks < 1 )
+    {
+      SDL_QuitSubSystem( SDL_INIT_JOYSTICK );
+    }
+  }
+  else
+  {
+    numberOfJoysticks = 0;
+  }
 }
 
 //--------------------------------------------------------------------------------
 SdlOglInputSystem::~SdlOglInputSystem( void )
 {
-	//SDL_QuitSubSystem( SDL_INIT_JOYSTICK );
 
-  //if( !SDL_WasInit( SDL_INIT_VIDEO ) )
-  //	SDL_Quit();					// THIS A GOOD IDEA?
-								// For now, No, because
-								// input system requires
-								// video system
 }
 
 //--------------------------------------------------------------------------------
