@@ -36,20 +36,32 @@ MA 02110-1301  USA
 //--------------------------------------------------------------------------------
 SdlOglInputMouse::SdlOglInputMouse( void ): CoreInputMouse()
 {
-  input = new Input*[NUM_MOUSE_BUTTONS];
+  input = new Input*[NUM_MOUSE_BUTTONS + NUM_MOUSE_DELTAS];
 
   int index;
+
   buttonState = new Input[NUM_MOUSE_BUTTONS];
   for( index = 0; index < NUM_MOUSE_BUTTONS; index++ )
   {
     buttonState[index].id    = index;
-    buttonState[index].state = BUTTON_STATE_UP;
     buttonState[index].type  = INPUT_TYPE_MOUSE_BUTTON;
+    buttonState[index].state = BUTTON_STATE_UP;
+    buttonState[index].value = 0;
 
     input[index] = &buttonState[index];
   }
 
-  // TODO: Add states for mouse/touch deltas (similar to joysticks).
+  deltaStateInputOffset = NUM_MOUSE_BUTTONS;
+  deltaState = new Input[NUM_MOUSE_DELTAS];
+  for( index = 0; index < NUM_MOUSE_DELTAS; index++ )
+  {
+    deltaState[index].id    = index;
+    deltaState[index].type  = INPUT_TYPE_MOUSE_DELTA;
+    deltaState[index].state = INPUT_STATE_UP;
+    deltaState[index].value = 0;
+
+    input[deltaStateInputOffset + index] = &deltaState[index];
+  }
 }
 
 //--------------------------------------------------------------------------------
@@ -58,6 +70,9 @@ SdlOglInputMouse::~SdlOglInputMouse( void )
   delete [] buttonState;
   buttonState = NULL;
 
+  delete [] deltaState;
+  deltaState = NULL;
+
   delete [] input;
   input = NULL;
 }
@@ -65,6 +80,7 @@ SdlOglInputMouse::~SdlOglInputMouse( void )
 //--------------------------------------------------------------------------------
 void SdlOglInputMouse::setLock( bool lock )
 {
+  CoreInputMouse::setLock( lock );
 	if( lock )
 	{
 		SDL_ShowCursor( 0 );
@@ -107,23 +123,35 @@ void SdlOglInputMouse::update( SDL_Event* event )
 				<< event->motion.xrel 	       << "]"
 				<< " Motion" << endl;
 			#endif
-		
+			
+			if( numberOfStateChanges + 1 > stateChangeBufferSize )
+      {
+        return;
+      }
+
 			xPosition = event->motion.x;
 			yPosition = event->motion.y;
-			
+
+			if( lock == LOCK_STATE_OFF )
+			{
+			  deltaState[0].value = event->motion.xrel;
+			  deltaState[1].value = event->motion.yrel;
+      }
+			else
 			if( lock != LOCK_STATE_START )
 			{
-				xDelta	  = 0;
-				yDelta	  = 0;
+			  deltaState[0].value = 0;
+			  deltaState[1].value = 0;
 				
 				//lock = LOCK_STATE_ON;
 			}
-			else
-			{
-				xDelta	  = event->motion.xrel;
-				yDelta	  = event->motion.yrel;
-			}
 			
+			deltaState[0].state = INPUT_STATE_PRESSED;
+			deltaState[1].state = INPUT_STATE_PRESSED;
+
+			stateChange[numberOfStateChanges++] = input[deltaStateInputOffset];
+			stateChange[numberOfStateChanges++] = input[deltaStateInputOffset + 1];
+
 			break;
 		}
 

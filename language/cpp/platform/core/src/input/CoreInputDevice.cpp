@@ -104,20 +104,59 @@ int CoreInputDevice::getLastInputId( void )
 //--------------------------------------------------------------------------------
 void CoreInputDevice::age( void )
 {
-  Input* tempStateChange;
+  static Input* tempStateChange;
 
 	int index;
 	for( index = 0; index < numberOfStateChanges; index++ )
 	{
 		tempStateChange = stateChange[index];
-		if( tempStateChange->state == INPUT_STATE_RELEASED )
+		switch( tempStateChange->type )
 		{
-			tempStateChange->state = INPUT_STATE_UP;
-		}
-		else
-		if( tempStateChange->state == INPUT_STATE_PRESSED )
-		{
-			tempStateChange->state = INPUT_STATE_DOWN;
+		  case INPUT_TYPE_BOOLEAN:
+		  {
+        if( tempStateChange->state == INPUT_STATE_RELEASED )
+        {
+          tempStateChange->state = INPUT_STATE_UP;
+        }
+        else
+        if( tempStateChange->state == INPUT_STATE_PRESSED )
+        {
+          tempStateChange->state = INPUT_STATE_DOWN;
+        }
+
+        break;
+		  }
+
+		  case INPUT_TYPE_DELTA:
+      {
+        if( tempStateChange->state == INPUT_STATE_RELEASED )
+        {
+          tempStateChange->state = INPUT_STATE_UP;
+        }
+        else
+        if( tempStateChange->state == INPUT_STATE_PRESSED )
+        {
+          tempStateChange->state = INPUT_STATE_RELEASED;
+          tempStateChange->value = 0;
+        }
+
+        break;
+      }
+
+		  case INPUT_TYPE_AXIS:
+      {
+        if( tempStateChange->state == INPUT_STATE_RELEASED )
+        {
+          tempStateChange->state = INPUT_STATE_UP;
+        }
+        else
+        if( tempStateChange->state == INPUT_STATE_PRESSED )
+        {
+          tempStateChange->state = INPUT_STATE_DOWN;
+        }
+
+        break;
+      }
 		}
 	}
 	

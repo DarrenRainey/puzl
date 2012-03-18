@@ -35,6 +35,7 @@ using namespace std;
 // DEFINES =======================================================================
 // Buffer defines
 #define NUM_MOUSE_BUTTONS			255		 // Hardcoded! (within SDL)
+#define NUM_MOUSE_DELTAS      2      // (X,Y).
 #define MOUSE_BUFFER_SIZE			7		   // Five fingers and two directions?
 
 // TYPES =========================================================================

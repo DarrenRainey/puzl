@@ -50,8 +50,9 @@ SdlOglInputKeyboard::SdlOglInputKeyboard( void ): CoreInputKeyboard()
 	for( index = 0; index < NUM_KEY_CODES; index++ )
 	{
 		keyState[index].id    = index;
-		keyState[index].state = KEY_STATE_UP;
 		keyState[index].type  = INPUT_TYPE_KEYBOARD_KEY;
+		keyState[index].state = KEY_STATE_UP;
+		keyState[index].value = 0;
 		
 		input[index] = &keyState[index];
 	}

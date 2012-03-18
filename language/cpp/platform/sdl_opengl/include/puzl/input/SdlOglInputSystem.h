@@ -45,10 +45,6 @@ public:
 private:
 	void update( SDL_Event* event );
 
-	//SdlOglInputKeyboard** sdlOglkeyboards;
-	//SdlOglInputMouse** sdlOglmice;
-	//SdlOglInputJoystick** sdlOgljoysticks;
-
 	friend class SdlOglGameShell;
 };
 
