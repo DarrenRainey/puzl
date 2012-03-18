@@ -298,6 +298,13 @@ void SdlOglVideoDisplay::drawRectangle( int xPosition, int yPosition,
 }
 
 //--------------------------------------------------------------------------------
+void SdlOglVideoDisplay::drawRectangle( int xPosition, int yPosition,
+                                        int width, int height )
+{
+  CoreVideoDisplay::drawRectangle( xPosition, yPosition, width, height );
+}
+
+//--------------------------------------------------------------------------------
 void SdlOglVideoDisplay::clear( void )
 {
   //glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );

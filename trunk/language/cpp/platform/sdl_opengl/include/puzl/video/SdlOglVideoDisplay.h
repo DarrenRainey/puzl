@@ -68,6 +68,9 @@ public:
                       int red, int green, int blue,
                       int a = 255 );
 
+	void drawRectangle( int xPosition, int yPosition,
+	                    int width, int height );
+
 	void clear( void );
 
 private:
