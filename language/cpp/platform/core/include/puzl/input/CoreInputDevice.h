@@ -31,12 +31,18 @@ MA 02110-1301  USA
 #define INPUT_STATE_DOWN		   1		// 01b
 #define INPUT_STATE_PRESSED		 3		// 11b
 
+#define INPUT_TYPE_BOOLEAN     0
+#define INPUT_TYPE_DELTA       1
+#define INPUT_TYPE_AXIS        2
+
 // TYPES =========================================================================
 struct Input
 {
+  int type;
+
+  int id;
 	int state;
-	int type;
-	int id;
+	int value;
 };
 
 class CoreInputDevice
