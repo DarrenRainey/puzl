@@ -42,17 +42,18 @@ PUZL_CORE_INPUT   = $(PUZL_CORE_SRC)/input
 PUZL_CORE_AUDIO   = $(PUZL_CORE_SRC)/audio
 PUZL_CORE_NETWORK = $(PUZL_CORE_SRC)/network
 
-PLATFORM     = sdl_opengl
+PUZL_PLATFORM     = sdl_opengl
 
-PUZL_INCLUDE = $(PUZL_ROOT)/language/cpp/platform/$(PLATFORM)/include
-PUZL_SRC     = $(PUZL_ROOT)/language/cpp/platform/$(PLATFORM)/src
-PUZL_LIB     = $(PUZL_ROOT)/language/cpp/platform/$(PLATFORM)/lib
+PUZL_INCLUDE = $(PUZL_ROOT)/language/cpp/platform/$(PUZL_PLATFORM)/include
+PUZL_SRC     = $(PUZL_ROOT)/language/cpp/platform/$(PUZL_PLATFORM)/src
 
 PUZL_UTILITY = $(PUZL_SRC)/utility
 PUZL_VIDEO   = $(PUZL_SRC)/video
 PUZL_INPUT   = $(PUZL_SRC)/input
 PUZL_AUDIO   = $(PUZL_SRC)/audio
 PUZL_NETWORK = $(PUZL_SRC)/network
+
+PUZL_LIB     = $(PUZL_ROOT)/language/cpp/platform/$(PUZL_PLATFORM)/lib
 
 CXXINCS      = $(INCS)
 
@@ -61,7 +62,7 @@ ifeq ($(OS),LINUX)
 	INCS	 = -I $(PUZL_CORE_INCLUDE) -I $(PUZL_INCLUDE)
 	LIBS	 = `sdl-config --cflags --libs` -lSDL_image -lGL -lGLU -lSDL_mixer -s
 	OTHER	 =
-	PLATFORM_OS_POSTFIX = $(PLATFORM)_lin
+	PLATFORM_OS_POSTFIX = $(PUZL_PLATFORM)_lin
 	STATIC_LIB = libpuzl_$(PLATFORM_OS_POSTFIX).a
 	SHARED_LIB_OBJ = libpuzl_$(PLATFORM_OS_POSTFIX).so.1
 	SHARED_DYNAMIC_LIB = libpuzl_$(PLATFORM_OS_POSTFIX).so.1.0
@@ -92,7 +93,7 @@ ifeq ($(OS),MINGW32)
 	INCS	 = -I "/usr/i586-mingw32msvc/include" -I $(PUZL_CORE_INCLUDE) -I $(PUZL_INCLUDE)
 	LIBS	 = -L "/usr/i586-mingw32msvc/lib/" -mwindows -lmingw32 -lSDLmain -lSDL -lSDL_image -lopengl32 -lglu32 -lSDL_mixer -s
 	OTHER	 =
-	PLATFORM_OS_POSTFIX = $(PLATFORM)_win
+	PLATFORM_OS_POSTFIX = $(PUZL_PLATFORM)_win
 	STATIC_LIB = libpuzl_$(PLATFORM_OS_POSTFIX).lib
 	SHARED_LIB_OBJ = libpuzl_$(PLATFORM_OS_POSTFIX).0.dll
 	SHARED_DYNAMIC_LIB = libpuzl_$(PLATFORM_OS_POSTFIX).dll
@@ -100,7 +101,7 @@ endif
 endif
 endif
 
-CXXFLAGS = $(CXXINCS) -fexpensive-optimizations -O3 -D$(OS) -fPIC
+CXXFLAGS = $(CXXINCS) -fexpensive-optimizations -O3 -D$(OS) -DPUZL_PLATFORM=$(PUZL_PLATFORM) -fPIC
 RM = rm -f
 
 #.PHONY: all all-before all-after clean clean-custom mac windows linux
