@@ -38,8 +38,8 @@ using namespace std;
   #define BUTTON_STATE_PRESSED   INPUT_STATE_PRESSED
 #endif
 
-#define INPUT_TYPE_JOYSTICK_BUTTON   2
-#define INPUT_TYPE_JOYSTICK_AXIS     3
+#define INPUT_TYPE_JOYSTICK_BUTTON   INPUT_TYPE_BOOLEAN
+#define INPUT_TYPE_JOYSTICK_AXIS     INPUT_TYPE_AXIS
 
 // Axis state defines
 #ifndef AXIS_STATE
@@ -49,12 +49,12 @@ using namespace std;
   #define AXIS_STATE_PRESSED   INPUT_STATE_PRESSED
 #endif
 
-#define AXIS_STATE_MIN			    -32768
-#define AXIS_STATE_MAX				   32768
+#define AXIS_VALUE_MIN			    -32768
+#define AXIS_VALUE_MAX				   32768
 
-#define AXIS_STATE_CENTER_MIN	  -800
-#define AXIS_STATE_CENTER			   0
-#define AXIS_STATE_CENTER_MAX	   800
+#define AXIS_CENTER_VALUE_MIN	  -800
+#define AXIS_CENTER_VALUE_MID    0
+#define AXIS_CENTER_VALUE_MAX	   800
 
 // Axis index 'standards'
 #define X_AXIS					         0
@@ -70,17 +70,24 @@ public:
 	virtual int initialize( void );       // Initialize this object for use
 	virtual int shutdown( void );         // Shut down this object
 
-	virtual int getAxis( int axis );	    // Get state of an axis (direction-pad)
-	virtual int getXAxis( void );         // Get state of the X axis
-	virtual int getYAxis( void );	        // Get state of the Y axis
+	virtual int getAxisState( int axis );	    // Get state of an axis (direction-pad)
+	virtual int getXAxisState( void );         // Get state of the X axis
+	virtual int getYAxisState( void );	        // Get state of the Y axis
 
-	virtual int getButton( int button );	// Get state of a button
+	virtual int getAxisValue( int axis );
+  virtual int getXAxisValue( void );
+  virtual int getYAxisValue( void );
+
+	virtual int getButtonState( int button );	// Get state of a button
+	virtual bool checkButton( int button );
 	
 protected:
 	string name;				                  // Name of this joystick device
 
 	Input* buttonState;
 	Input* axisState;
+
+	int axisStateInputOffset;
 
 	static int count;
 };

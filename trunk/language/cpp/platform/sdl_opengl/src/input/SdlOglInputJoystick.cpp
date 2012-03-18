@@ -42,8 +42,7 @@ using namespace std;
 //--------------------------------------------------------------------------------
 SdlOglInputJoystick::SdlOglInputJoystick( void ): CoreInputJoystick()
 {
-  input = new Input*[NUM_JOYSTICK_BUTTONS];
-  //input = new Input*[NUM_JOYSTICK_BUTTONS + NUM_JOYSTICK_AXES]; // TODO: Redo state system by splitting up/down pressed/released to account for different types of input for aging process.
+  input = new Input*[NUM_JOYSTICK_BUTTONS + NUM_JOYSTICK_AXES];
 
 	int index;
 	
@@ -52,21 +51,24 @@ SdlOglInputJoystick::SdlOglInputJoystick( void ): CoreInputJoystick()
 	for( index = 0; index < NUM_JOYSTICK_BUTTONS; index++ )
 	{
 	  buttonState[index].id    = index;
+	  buttonState[index].type  = INPUT_TYPE_JOYSTICK_BUTTON;
     buttonState[index].state = BUTTON_STATE_UP;
-    buttonState[index].type  = INPUT_TYPE_JOYSTICK_BUTTON;
+    buttonState[index].value = 0;
 
     input[index] = &buttonState[index];
 	}
 
 	// Clear the axis states.
+	axisStateInputOffset = NUM_JOYSTICK_BUTTONS;
 	axisState = new Input[NUM_JOYSTICK_AXES];
 	for( index = 0; index < NUM_JOYSTICK_AXES; index++ )
 	{
 		axisState[index].id    = index;
-		axisState[index].state = AXIS_STATE_CENTER;
-		axisState[index].type  = INPUT_TYPE_JOYSTICK_AXIS;
+    axisState[index].type  = INPUT_TYPE_JOYSTICK_AXIS;
+		axisState[index].state = INPUT_STATE_UP;
+		axisState[index].value = AXIS_CENTER_VALUE_MID;
 
-    //input[NUM_MOUSE_BUTTONS + index] = &buttonState[index];
+    input[axisStateInputOffset + index] = &axisState[index];
 	}
 }
 
@@ -151,6 +153,11 @@ int SdlOglInputJoystick::shutdown( void )
 //--------------------------------------------------------------------------------
 void SdlOglInputJoystick::update( SDL_Event* event )
 {
+  if( numberOfStateChanges > stateChangeBufferSize )
+  {
+    return;
+  }
+
 	switch( event->type )
 	{
 		// A joystick axis was moved
@@ -163,11 +170,22 @@ void SdlOglInputJoystick::update( SDL_Event* event )
 				<< " Motion" << endl;
 			#endif
 
-			if( ( event->jaxis.value >= AXIS_STATE_CENTER_MIN ) &&
-			    ( event->jaxis.value <= AXIS_STATE_CENTER_MAX )	   )
-				axisState[event->jaxis.axis].state = AXIS_STATE_CENTER;
+			static unsigned char& axisId = event->jaxis.axis;
+			static short int& axisValue  = event->jaxis.value;
+
+			if( ( axisValue >= AXIS_CENTER_VALUE_MIN ) &&
+			    ( axisValue <= AXIS_CENTER_VALUE_MAX ) )
+			{
+				axisState[axisId].value = AXIS_CENTER_VALUE_MID;
+				axisState[axisId].state = INPUT_STATE_RELEASED;
+			}
 			else
-				axisState[event->jaxis.axis].state = ( int )( event->jaxis.value );
+			{
+				axisState[axisId].value = ( int )( axisValue );
+				axisState[axisId].state = INPUT_STATE_PRESSED;
+			}
+
+			stateChange[numberOfStateChanges++] = input[axisStateInputOffset + axisId];
 
 			break;
 		}
@@ -175,12 +193,7 @@ void SdlOglInputJoystick::update( SDL_Event* event )
 		// A button was just pressed
 		case SDL_JOYBUTTONDOWN:
 		{
-      if( numberOfStateChanges > stateChangeBufferSize )
-      {
-        return;
-      }
-
-			#ifdef DEBUG
+      #ifdef DEBUG
 			cout << "Joystick(" << ( int )( event->jbutton.which  ) << "):  "
 				<< "Button("   << ( int )( event->jbutton.button )<< ")"
 				<< " Down" << endl;
@@ -197,12 +210,7 @@ void SdlOglInputJoystick::update( SDL_Event* event )
 		// A button was just released
 		case SDL_JOYBUTTONUP:
 		{
-      if( numberOfStateChanges > stateChangeBufferSize )
-      {
-        return;
-      }
-
-			#ifdef DEBUG
+      #ifdef DEBUG
 			cout << "Joystick(" << ( int )( event->jbutton.which  ) << "):  "
 				<< "Button("   << ( int )( event->jbutton.button )<< ")"
 				<< " Released" << endl;

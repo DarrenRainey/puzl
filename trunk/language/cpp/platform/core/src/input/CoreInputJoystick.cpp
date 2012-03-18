@@ -79,25 +79,49 @@ int CoreInputJoystick::shutdown( void )
 }
 
 //--------------------------------------------------------------------------------
-int CoreInputJoystick::getAxis( int axis )
+int CoreInputJoystick::getAxisState( int axis )
 {
 	return axisState[axis].state;
 }
 
 //--------------------------------------------------------------------------------
-int CoreInputJoystick::getXAxis( void )
+int CoreInputJoystick::getXAxisState( void )
 {
-	return getAxis( X_AXIS );
+	return getAxisState( X_AXIS );
 }
 
 //--------------------------------------------------------------------------------
-int CoreInputJoystick::getYAxis( void )
+int CoreInputJoystick::getYAxisState( void )
 {
-	return getAxis( Y_AXIS );
+	return getAxisState( Y_AXIS );
 }
 
 //--------------------------------------------------------------------------------
-int CoreInputJoystick::getButton( int button )
+int CoreInputJoystick::getAxisValue( int axis )
+{
+  return axisState[axis].value;
+}
+
+//--------------------------------------------------------------------------------
+int CoreInputJoystick::getXAxisValue( void )
+{
+  return getAxisValue( X_AXIS );
+}
+
+//--------------------------------------------------------------------------------
+int CoreInputJoystick::getYAxisValue( void )
+{
+  return getAxisValue( Y_AXIS );
+}
+
+//--------------------------------------------------------------------------------
+int CoreInputJoystick::getButtonState( int button )
 {
 	return getState( button );
+}
+
+//--------------------------------------------------------------------------------
+bool CoreInputJoystick::checkButton( int button )
+{
+  return check( button );
 }

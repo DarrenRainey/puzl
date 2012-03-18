@@ -43,8 +43,8 @@ CoreInputMouse::CoreInputMouse( void ): CoreInputDevice()
 {
 	xPosition = 0;
 	yPosition = 0;
-	xDelta	  = 0;
-	yDelta	  = 0;
+
+	deltaStateInputOffset = 0;
 
 	lock   = LOCK_STATE_OFF;
 	doWarp = false;
@@ -71,25 +71,25 @@ int CoreInputMouse::getYPosition( void )
 //--------------------------------------------------------------------------------
 int CoreInputMouse::getXDelta( void )
 {
-	return xDelta;
+  return deltaState[0].value;
 }
 
 //--------------------------------------------------------------------------------
 int CoreInputMouse::getYDelta( void )
 {
-	return yDelta;
+  return deltaState[1].value;
 }
 
 //--------------------------------------------------------------------------------
 int CoreInputMouse::clearDeltas( void )
 {
-	return xDelta = yDelta = 0;
+  return deltaState[1].value = deltaState[0].value = 0;
 }
 
 //--------------------------------------------------------------------------------
-int CoreInputMouse::getButton( int button )
+int CoreInputMouse::getButtonState( int button )
 {
-  //cout << "CoreInputMouse::getButton(): " << getState( button ) << endl;
+  //cout << "CoreInputMouse::getButtonState(): " << getState( button ) << endl;
 	return getState( button );
 }
 

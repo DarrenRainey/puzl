@@ -152,7 +152,7 @@ MA 02110-1301  USA
 #define KEY_STATE_DOWN			INPUT_STATE_DOWN
 #define KEY_STATE_PRESSED		INPUT_STATE_PRESSED
 
-#define INPUT_TYPE_KEYBOARD_KEY		0
+#define INPUT_TYPE_KEYBOARD_KEY		INPUT_TYPE_BOOLEAN
 
 // TYPES =========================================================================
 class CoreInputKeyboard: public CoreInputDevice

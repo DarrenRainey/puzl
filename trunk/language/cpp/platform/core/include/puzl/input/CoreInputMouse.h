@@ -34,7 +34,8 @@ MA 02110-1301  USA
   #define BUTTON_STATE_PRESSED   INPUT_STATE_PRESSED
 #endif
 
-#define INPUT_TYPE_MOUSE_BUTTON   1
+#define INPUT_TYPE_MOUSE_BUTTON  INPUT_TYPE_BOOLEAN
+#define INPUT_TYPE_MOUSE_DELTA   INPUT_TYPE_DELTA
 
 #define LOCK_STATE_OFF				    0
 #define LOCK_STATE_START			   -1
@@ -55,7 +56,7 @@ public:
 	
 	virtual int clearDeltas( void );
 
-	virtual int getButton( int button );
+	virtual int getButtonState( int button );
 	virtual int getLastInputId( void );
 	
 	virtual void setLock( bool state );
@@ -66,13 +67,14 @@ public:
 protected:
 	int xPosition;
 	int yPosition;
-	int xDelta;
-	int yDelta;
 
 	int lock;
 	bool doWarp;
 
 	Input* buttonState;
+	Input* deltaState;
+
+	int deltaStateInputOffset;
 };
 
 #endif
