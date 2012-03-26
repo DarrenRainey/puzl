@@ -20,7 +20,8 @@ MA 02110-1301  USA
 */
 
 // INCLUDES ======================================================================
-#include <puzl/video/CoreVideoDisplay.h>
+#include <puzl/video/AndroidVideoImage.h>
+#include <puzl/video/AndroidVideoDisplay.h>
 
 #include <iostream>
 
@@ -37,110 +38,81 @@ using namespace std;
 // GLOBALS =======================================================================
 
 // FUNCTIONS =====================================================================
-//--------------------------------------------------------------------------------
-CoreVideoDisplay::CoreVideoDisplay( void )
-{
-  fullScreen = false;
-  attributes = 0;
-}
-
 
 //--------------------------------------------------------------------------------
-CoreVideoDisplay::~CoreVideoDisplay( void )
+AndroidVideoImage::AndroidVideoImage( void ): CoreVideoImage()
 {
-
-}
-
-//--------------------------------------------------------------------------------
-int CoreVideoDisplay::initialize( int width, int height, int attributes )
-{
-  cout << "CoreVideoDisplay::initialize()" << endl;
-  *realWidth = *( this->width ) = width;
-  *realHeight = *( this->height ) = height;
-  this->attributes = attributes;
   
-  setBackgroundColor( 0, 0, 0 );
-
-  return 0;
 }
 
 //--------------------------------------------------------------------------------
-void CoreVideoDisplay::setDimensions( int width, int height )
+AndroidVideoImage::AndroidVideoImage( AndroidVideoImage& videoImage ): CoreVideoImage( videoImage )
 {
-  *( this->width ) = width;
-  *( this->height ) = height;
+
 }
 
 //--------------------------------------------------------------------------------
-void CoreVideoDisplay::setRealDimensions( int width, int height )
+AndroidVideoImage::~AndroidVideoImage( void )
+{
+
+}
+
+//--------------------------------------------------------------------------------
+void AndroidVideoImage::setRealDimensions( int width, int height )
 {
   CoreVideoImage::setRealDimensions( width, height );
 }
 
 //--------------------------------------------------------------------------------
-int CoreVideoDisplay::shutdown( void )
-{
-  fullScreen = false;
-  return 0;
-}
-
-//--------------------------------------------------------------------------------
-int CoreVideoDisplay::reset( int width, int height, int bitdepth, int attributes )
+int AndroidVideoImage::create( int width, int height, int attributes, int numberOfColorKeys )
 {
   return 0;
 }
 
 //--------------------------------------------------------------------------------
-bool CoreVideoDisplay::isFullscreen( void )
+int AndroidVideoImage::destroy( void )
 {
-  return fullScreen;
+  return CoreVideoImage::destroy();
 }
 
 //--------------------------------------------------------------------------------
-void CoreVideoDisplay::setBackgroundColor( int red, int green, int blue )
+int AndroidVideoImage::release( void )
 {
-  backgroundColor[0] = red;
-  backgroundColor[1] = green;
-  backgroundColor[2] = blue;
+  return CoreVideoImage::release();
 }
 
 //--------------------------------------------------------------------------------
-void CoreVideoDisplay::setForegroundColor( int red, int green, int blue )
+int AndroidVideoImage::load( string fileName, int numberOfColorKeys, int** colorKey )
 {
-  foregroundColor[0] = red;
-  foregroundColor[1] = green;
-  foregroundColor[2] = blue;
+  return 0;
 }
 
 //--------------------------------------------------------------------------------
-void CoreVideoDisplay::drawRectangle( int xPosition, int yPosition,
-                                      int width, int height,
-                                      int red, int green, int blue, int alpha )
+int AndroidVideoImage::reload( void )
 {
-  
+  return 0;
 }
 
 //--------------------------------------------------------------------------------
-void CoreVideoDisplay::drawRectangle( int xPosition, int yPosition,
-                                      int width, int height,
-                                      int color[] )
+void AndroidVideoImage::draw( AndroidVideoDisplay* destinationDisplay )
 {
-  drawRectangle( xPosition, yPosition,
-                 width, height,
-                 color[0], color[1], color[2] );
+  CoreVideoImage::draw( destinationDisplay ); // TODO: Needed?
 }
 
 //--------------------------------------------------------------------------------
-void CoreVideoDisplay::drawRectangle( int xPosition, int yPosition,
-                                      int width, int height )
+void AndroidVideoImage::draw( AndroidVideoDisplay* destinationDisplay, int* sourceRect, int* destinationRect )
 {
-  drawRectangle( xPosition, yPosition,
-                 width, height,
-                 foregroundColor[0], foregroundColor[1], foregroundColor[2] );
+  // TODO: Implement.
 }
 
 //--------------------------------------------------------------------------------
-void CoreVideoDisplay::clear( void )
+void AndroidVideoImage::draw( AndroidVideoImage* destinationBitmap, int* sourceRect, int* destinationRect )
 {
+  // TODO: Implement.
+}
 
+//--------------------------------------------------------------------------------
+void AndroidVideoImage::clear( void )
+{
+  // TODO: Implement.
 }
