@@ -106,6 +106,8 @@ void CoreInputDevice::age( void )
 {
   static Input* tempStateChange;
 
+  int numberOfRemainingStateChanges = 0;
+
 	int index;
 	for( index = 0; index < numberOfStateChanges; index++ )
 	{
@@ -138,6 +140,7 @@ void CoreInputDevice::age( void )
         {
           tempStateChange->state = INPUT_STATE_RELEASED;
           tempStateChange->value = 0;
+          stateChange[numberOfRemainingStateChanges++] = stateChange[index];
         }
 
         break;
@@ -159,7 +162,10 @@ void CoreInputDevice::age( void )
       }
 		}
 	}
-	
-	numberOfStateChanges = 0;
-	lastInputId          = -1;
+
+	numberOfStateChanges = numberOfRemainingStateChanges;
+	if( numberOfStateChanges == 0 )
+	{
+	  lastInputId          = -1;
+	}
 }
