@@ -36,7 +36,19 @@ using namespace std;
 #define NUM_MOUSE_DELTAS      2      // (X,Y).
 #define MOUSE_BUFFER_SIZE     7      // Five fingers and two directions?
 
+// Mouse/Touch event types
+#define TOUCH_EVENT_TYPE_DOWN 0
+#define TOUCH_EVENT_TYPE_UP   1
+#define TOUCH_EVENT_TYPE_MOVE 2
+
 // TYPES =========================================================================
+
+struct TouchInput: Input
+{
+  int xPosition;
+  int yPosition;
+};
+
 class AndroidInputMouse: public CoreInputMouse
 {
 public:
@@ -47,13 +59,21 @@ public:
 
   void warp( int x, int y );
 
-  void touchDown( int id, int xPosition, int yPosition );
-  void touchUp( int id, int xPosition, int yPosition );
-  void touchMove( int id, int xPosition, int yPosition );
+  void touchDown( const int& id, const int& xPosition, const int& yPosition );
+  void touchUp( const int& id, const int& xPosition, const int& yPosition );
+  void touchMove( const int& id, const int& xPosition, const int& yPosition );
 
 protected:
 
 private:
+  void queueEvent( const int& eventType, const int& id, const int& xPosition, const int& yPosition );
+  void update( void );
+
+  int numberOfBufferedInputs;
+
+  TouchInput* inputBuffer;
+
+  friend class AndroidInputSystem;
 };
 
 #endif

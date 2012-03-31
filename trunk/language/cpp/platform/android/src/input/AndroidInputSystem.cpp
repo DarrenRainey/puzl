@@ -111,3 +111,16 @@ int AndroidInputSystem::shutdown( void )
 
   return 0;
 }
+
+//--------------------------------------------------------------------------------
+void AndroidInputSystem::update( void )
+{
+  int index;
+
+  // TODO: Add/implement buffered input for keyboards/joysticks.
+
+  for( index = 0; index < numberOfMice; index++ )
+  {
+    ( ( AndroidInputMouse* )mice[index] )->update();
+  }
+}
