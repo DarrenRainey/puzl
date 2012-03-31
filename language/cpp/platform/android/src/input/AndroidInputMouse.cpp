@@ -38,9 +38,22 @@ MA 02110-1301  USA
 //--------------------------------------------------------------------------------
 AndroidInputMouse::AndroidInputMouse( void ): CoreInputMouse()
 {
-  input = new Input*[NUM_MOUSE_BUTTONS + NUM_MOUSE_DELTAS];
-
   int index;
+
+  inputBuffer = new TouchInput[MOUSE_BUFFER_SIZE];
+  for( index = 0; index < MOUSE_BUFFER_SIZE; index++ )
+  {
+    inputBuffer[index].id    = 0;
+    inputBuffer[index].type  = 0;
+    inputBuffer[index].state = 0;
+    inputBuffer[index].value = 0;
+
+    inputBuffer[index].xPosition = 0;
+    inputBuffer[index].yPosition = 0;
+  }
+  numberOfBufferedInputs = 0;
+
+  input = new Input*[NUM_MOUSE_BUTTONS + NUM_MOUSE_DELTAS];
 
   buttonState = new Input[NUM_MOUSE_BUTTONS];
   for( index = 0; index < NUM_MOUSE_BUTTONS; index++ )
@@ -77,6 +90,9 @@ AndroidInputMouse::~AndroidInputMouse( void )
 
   delete [] input;
   input = NULL;
+
+  delete [] inputBuffer;
+  inputBuffer = NULL;
 }
 
 //--------------------------------------------------------------------------------
@@ -92,55 +108,138 @@ void AndroidInputMouse::warp( int x, int y )
 }
 
 //--------------------------------------------------------------------------------
-void AndroidInputMouse::touchDown( int id, int xPosition, int yPosition )
+void AndroidInputMouse::queueEvent( const int& eventType, const int& id, const int& xPosition, const int& yPosition )
 {
-  buttonState[id].state = BUTTON_STATE_PRESSED;
-
-  this->xPosition = xPosition;
-  this->yPosition = yPosition;
-
-  stateChange[numberOfStateChanges++] = input[id];
-}
-
-//--------------------------------------------------------------------------------
-void AndroidInputMouse::touchUp( int id, int xPosition, int yPosition )
-{
-  buttonState[id].state = BUTTON_STATE_RELEASED;
-
-  this->xPosition = xPosition;
-  this->yPosition = yPosition;
-
-  stateChange[numberOfStateChanges++] = input[id];
-}
-
-//--------------------------------------------------------------------------------
-void AndroidInputMouse::touchMove( int id, int xPosition, int yPosition )
-{
-  if( numberOfStateChanges + 1 > stateChangeBufferSize )
+  if( numberOfBufferedInputs > MOUSE_BUFFER_SIZE )
   {
     return;
   }
 
-  if( lock == LOCK_STATE_OFF )
+  static TouchInput* currentBufferedInput = NULL;
+  currentBufferedInput = &inputBuffer[numberOfBufferedInputs++];
+
+  currentBufferedInput->type      = eventType;
+  currentBufferedInput->id        = id;
+  currentBufferedInput->xPosition = xPosition;
+  currentBufferedInput->yPosition = yPosition;
+
+  /*switch( eventType )
   {
-    deltaState[0].value = this->xPosition - xPosition;
-    deltaState[1].value = this->yPosition - yPosition;
-  }
-  else
-  if( lock != LOCK_STATE_START )
+    case TOUCH_EVENT_TYPE_DOWN:
+    {
+      //currentBufferedInput->state = INPUT_STATE_PRESSED;
+
+      break;
+    }
+
+    case TOUCH_EVENT_TYPE_UP:
+    {
+      //currentBufferedInput->state = INPUT_STATE_RELEASED;
+      break;
+    }
+
+    case TOUCH_EVENT_TYPE_MOVE:
+    {
+      //currentBufferedInput->state = INPUT_STATE_PRESSED;
+      break;
+    }
+  }*/
+}
+
+//--------------------------------------------------------------------------------
+void AndroidInputMouse::update( void )
+{
+  static TouchInput* currentBufferedInput = NULL;
+
+  int index;
+  for( index = 0; index < numberOfBufferedInputs; index++ )
   {
-    deltaState[0].value = 0;
-    deltaState[1].value = 0;
+    currentBufferedInput = &inputBuffer[index];
+    switch( currentBufferedInput->type )
+    {
+      case TOUCH_EVENT_TYPE_DOWN:
+      {
+        if( numberOfStateChanges > stateChangeBufferSize )
+        {
+          break;
+        }
 
-    //lock = LOCK_STATE_ON;
+        buttonState[currentBufferedInput->id].state = INPUT_STATE_PRESSED;
+
+        this->xPosition = currentBufferedInput->xPosition;
+        this->yPosition = currentBufferedInput->yPosition;
+
+        stateChange[numberOfStateChanges++] = input[currentBufferedInput->id];
+        break;
+      }
+
+      case TOUCH_EVENT_TYPE_UP:
+      {
+        if( numberOfStateChanges > stateChangeBufferSize )
+        {
+          break;
+        }
+
+        buttonState[currentBufferedInput->id].state = INPUT_STATE_RELEASED;
+
+        this->xPosition = currentBufferedInput->xPosition;
+        this->yPosition = currentBufferedInput->yPosition;
+
+        stateChange[numberOfStateChanges++] = input[currentBufferedInput->id];
+        break;
+      }
+
+      case TOUCH_EVENT_TYPE_MOVE:
+      {
+        if( numberOfStateChanges + 1 > stateChangeBufferSize )
+        {
+          break;
+        }
+
+        if( lock == LOCK_STATE_OFF )
+        {
+          deltaState[0].value = currentBufferedInput->xPosition - this->xPosition;
+          deltaState[1].value = currentBufferedInput->yPosition - this->yPosition;
+        }
+        else
+        if( lock != LOCK_STATE_START )
+        {
+          deltaState[0].value = 0;
+          deltaState[1].value = 0;
+
+          //lock = LOCK_STATE_ON;
+        }
+
+        this->xPosition = currentBufferedInput->xPosition;
+        this->yPosition = currentBufferedInput->yPosition;
+
+        deltaState[0].state = INPUT_STATE_PRESSED;
+        deltaState[1].state = INPUT_STATE_PRESSED;
+
+        stateChange[numberOfStateChanges++] = input[deltaStateInputOffset];
+        stateChange[numberOfStateChanges++] = input[deltaStateInputOffset + 1];
+        break;
+      }
+    }
   }
 
-  this->xPosition = xPosition;
-  this->yPosition = yPosition;
+  numberOfBufferedInputs = 0;
+}
 
-  deltaState[0].state = INPUT_STATE_PRESSED;
-  deltaState[1].state = INPUT_STATE_PRESSED;
+//--------------------------------------------------------------------------------
+void AndroidInputMouse::touchDown( const int& id, const int& xPosition, const int& yPosition )
+{
+  queueEvent( TOUCH_EVENT_TYPE_DOWN, id, xPosition, yPosition );
+}
 
-  stateChange[numberOfStateChanges++] = input[deltaStateInputOffset];
-  stateChange[numberOfStateChanges++] = input[deltaStateInputOffset + 1];
+//--------------------------------------------------------------------------------
+void AndroidInputMouse::touchUp( const int& id, const int& xPosition, const int& yPosition )
+{
+  queueEvent( TOUCH_EVENT_TYPE_UP, id, xPosition, yPosition );
+}
+
+//--------------------------------------------------------------------------------
+void AndroidInputMouse::touchMove( const int& id, const int& xPosition, const int& yPosition )
+{
+  queueEvent( TOUCH_EVENT_TYPE_MOVE, id, xPosition, yPosition );
 }

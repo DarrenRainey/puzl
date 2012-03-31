@@ -41,6 +41,7 @@ public:
   int shutdown( void );
 
 private:
+  void update( void );
 
   friend class AndroidGameShell;
 };
