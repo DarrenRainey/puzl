@@ -72,7 +72,7 @@ public:
   void touchUp( int id, int xPosition, int yPosition );
   void touchMove( int id, int xPosition, int yPosition );
 
-  void inputSystemAge( void );
+  void inputSystemUpdate( void );
 
 protected:
   AndroidVideoSystem* videoSystem;
@@ -103,6 +103,7 @@ protected:
   void setIcon( string filePath );
 };
 
+// -------------------------------------------------------------------------------
 extern "C"
 {
   JNIEXPORT void JNICALL Java_puzl_platform_android_utility_GameShell_nativeInitialize( JNIEnv* env, jobject obj );
@@ -118,12 +119,7 @@ extern "C"
   JNIEXPORT void JNICALL Java_puzl_platform_android_utility_GameShell_nativeOnKeyUp( JNIEnv* env, jobject obj, jint keyCode );
 };
 
-AndroidGameShell* _GameShell;
-GameShellSettings _GameShellSettings;
-
 // -------------------------------------------------------------------------------
 void SetGameShell( AndroidGameShell* gameShell );
-
-// GLOBALS =======================================================================
 
 #endif

@@ -38,6 +38,9 @@ using namespace std;
 
 // GLOBALS =======================================================================
 
+AndroidGameShell* _GameShell;
+GameShellSettings _GameShellSettings;
+
 // FUNCTIONS =====================================================================
 //--------------------------------------------------------------------------------
 AndroidGameShell::AndroidGameShell( const GameShellSettings& gameShellSettings ): CoreGameShell( gameShellSettings )
@@ -275,9 +278,10 @@ void AndroidGameShell::touchMove( int id, int xPosition, int yPosition )
 }
 
 //--------------------------------------------------------------------------------
-void AndroidGameShell::inputSystemAge( void )
+void AndroidGameShell::inputSystemUpdate( void )
 {
   inputSystem->age();
+  inputSystem->update();
 }
 
 // -------------------------------------------------------------------------------
@@ -340,7 +344,7 @@ inline void GameShellLoop( void )
 
   LOGI( "GameShellLoop(): not null" );*/
 
-  _GameShell->inputSystemAge();
+  _GameShell->inputSystemUpdate();
   _GameShell->loop();
 }
 
