@@ -175,6 +175,8 @@ void SdlOglInputMouse::update( SDL_Event* event )
 			xPosition = event->button.x;
 			yPosition = event->button.y;
 
+			deltaState[0].value = deltaState[1].value = 0;
+
 			stateChange[numberOfStateChanges++] = input[buttonId - 1];
 
 			break;
@@ -199,6 +201,8 @@ void SdlOglInputMouse::update( SDL_Event* event )
 
 			xPosition = event->button.x;
 			yPosition = event->button.y;
+
+			deltaState[0].value = deltaState[1].value = 0;
 
 			stateChange[numberOfStateChanges++] = input[buttonId - 1];
 
