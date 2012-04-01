@@ -59,7 +59,10 @@ public:
 
   void clear( void );
 
+  void update( void );
+
 private:
+  bool updateBackgroundColor;
 };
 
 #endif

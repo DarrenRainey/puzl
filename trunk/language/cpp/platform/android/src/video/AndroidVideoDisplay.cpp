@@ -44,7 +44,7 @@ using namespace std;
 //--------------------------------------------------------------------------------
 AndroidVideoDisplay::AndroidVideoDisplay( void ): CoreVideoDisplay()
 {
-
+  updateBackgroundColor = true;
 }
 
 //--------------------------------------------------------------------------------
@@ -114,7 +114,7 @@ void AndroidVideoDisplay::setBackgroundColor( int red, int green, int blue )
 {
   CoreVideoDisplay::setBackgroundColor( red, green, blue );
 
-  glClearColor( ( float )red / 255.0f , ( float )green / 255.0f, ( float )blue / 255.0f, 1.0f );
+  updateBackgroundColor = true;
 }
 
 //--------------------------------------------------------------------------------
@@ -162,4 +162,18 @@ void AndroidVideoDisplay::drawRectangle( int xPosition, int yPosition,
 void AndroidVideoDisplay::clear( void )
 {
   glClear( GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT );
+}
+
+//--------------------------------------------------------------------------------
+void AndroidVideoDisplay::update( void )
+{
+  if( updateBackgroundColor )
+  {
+    glClearColor( ( float )backgroundColor[0] / 255.0f,
+                  ( float )backgroundColor[1] / 255.0f,
+                  ( float )backgroundColor[2] / 255.0f,
+                  1.0f );
+
+    updateBackgroundColor = false;
+  }
 }
