@@ -294,9 +294,9 @@ void SetGameShell( AndroidGameShell* gameShell )
 inline int GameShellInitialize( void )
 {
   LOGI("Android::GameShellInitialize()");
-  _GameShellSettings.screenWidth  = 0;
-  _GameShellSettings.screenHeight = 0;
-  _GameShell = new AndroidGameShell( _GameShellSettings );
+  //_GameShellSettings.screenWidth  = 0;
+  //_GameShellSettings.screenHeight = 0;
+  //_GameShell = new AndroidGameShell( _GameShellSettings );
 
   _GameShell->shellInitialize();
 

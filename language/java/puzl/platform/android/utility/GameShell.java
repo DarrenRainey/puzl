@@ -19,6 +19,8 @@ package puzl.platform.android.utility;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.SystemClock;
+import android.util.Log;
 import android.view.KeyEvent;
 
 public class GameShell extends Activity
@@ -42,14 +44,30 @@ public class GameShell extends Activity
   public static native void nativeTouchMove( int id, int xPosition, int yPosition );
   
   GameShellView gameShellView;
+  protected GameShellThread gameShellThread;
 
   @Override
   protected void onCreate( Bundle icicle )
   {
     super.onCreate( icicle );
     
+    Log.v("puzl", "GameShell.onCreate()");
+    
     gameShellView = new GameShellView( this );
     setContentView( gameShellView );
+    
+    gameShellThread = new GameShellThread( gameShellView );
+    if( !gameShellThread.getRunning() )
+    {
+      initialize();
+      gameShellThread.start();
+    }
+    else
+    {
+      // Run the garbage collector.
+      Runtime runtime = Runtime.getRuntime();
+      runtime.gc();
+    }
   }
 
   @Override
@@ -58,6 +76,7 @@ public class GameShell extends Activity
     super.onPause();
     
     gameShellView.onPause();
+    gameShellThread.onPause();
   }
   
   @Override
@@ -66,21 +85,24 @@ public class GameShell extends Activity
     super.onResume();
     
     gameShellView.onResume();
+    gameShellThread.onResume();
   }
 
   public void onDrawFrame()
   {
     nativeDraw();
-    nativeLoop();
+    //nativeLoop();
   }
 
   public void initializeVideo( int width, int height )
   {
+    Log.v("puzl", "GameShell.initializeVideo()");
     nativeInitializeVideo( width, height );
   }
 
   public void initialize()
   {
+    Log.v("puzl", "GameShell.initialize()");
     nativeInitialize();
   }
   
@@ -115,5 +137,187 @@ public class GameShell extends Activity
   public void touchMove( int id, int xPosition, int yPosition )
   {
     nativeTouchMove( id, xPosition, yPosition );
+  }
+  
+  protected class GameShellThread extends Thread
+  {
+    private boolean running;
+    private boolean suspended;
+    private long lastTime;
+    private Object suspendLock;
+    
+    final static long TICKS_PER_SECOND = 58;
+    final static long SKIP_TICKS = 1000 / TICKS_PER_SECOND;
+    //final static long MAX_FRAMESKIP = 5;
+    
+    GameShellView gameShellView;
+    
+    public GameShellThread( GameShellView gameShellView )
+    {
+      //thread      = new Thread( this, /*programName + " " + */"GameShellThread" );
+      setName( "GameShellThread" );
+      suspendLock = new Object();
+      suspended   = false;
+      
+      lastTime = SystemClock.uptimeMillis();
+      running  = false;
+      
+      this.gameShellView = gameShellView;
+    }
+
+    @Override
+    public void start()
+    {
+      setRunning( true );
+      super.start();
+    }
+    
+    @Override
+    public void run()
+    {
+      Log.v("puzl", "GameShellThread.run():" + this.getId() + " " + "started...");
+      
+      while( running )
+      {
+        gameShellView.gameShellRenderer.waitDrawingComplete();
+        
+        final long time      = SystemClock.uptimeMillis();
+        final long timeDelta = time - lastTime;
+        long finalDelta      = timeDelta;
+        
+        if( timeDelta > 12 )
+        { 
+          lastTime = time;
+          nativeLoop();
+          
+          gameShellView.gameShellRenderer.setDrawReady();
+          //gameShellView.requestRender();
+            
+          final long endTime = SystemClock.uptimeMillis();
+          finalDelta = endTime - time;
+          
+          /*mProfileTime += finalDelta;
+          mProfileFrames++;
+          if( mProfileTime > PROFILE_REPORT_DELAY * 1000 )
+          {
+              final long averageFrameTime = mProfileTime / mProfileFrames;
+              DebugLog.d("Game Profile", "Average: " + averageFrameTime);
+              mProfileTime = 0;
+              mProfileFrames = 0;
+              mGameRoot.sSystemRegistry.hudSystem.setFPS(1000 / (int)averageFrameTime);
+          }*/
+          
+        }
+        
+        //gameShellView.requestRender();
+        
+        if( finalDelta < SKIP_TICKS )
+        {
+          try
+          {
+            Thread.sleep( SKIP_TICKS - finalDelta );
+          }
+          catch( InterruptedException e )
+          {
+            // Interruptions here are no big deal.
+          }
+        }
+        
+        //interpolation = (float)(SystemClock.uptimeMillis() + SKIP_TICKS - nextGameTick) / (float)SKIP_TICKS;
+
+        // Check if should wait
+        synchronized( suspendLock )
+        {
+          if( suspended )
+          {
+            // Do initial pausing stuff.
+            Log.v("puzl", "GameShellThread.run():" + this.getId() + " " + "suspended...");
+          
+            // Wait while suspended.
+            while( suspended )
+            {
+              try
+              {
+                suspendLock.wait();
+              }
+              catch( Exception e )
+              {
+                
+              }
+            }
+            
+            Log.v("puzl", "GameShellThread.run():" + this.getId() + " " + "unsuspended");
+          }
+        }
+      }
+      
+      Log.v("puzl", "GameShellThread.run():" + this.getId() + " " + "finished");
+    }
+    
+    public void onStop()
+    {
+      synchronized( suspendLock )
+      {
+        suspended = false;
+        running   = false;
+        suspendLock.notifyAll();
+      }
+    }
+    
+    public void onPause()
+    {
+      synchronized( suspendLock )
+      {
+        suspended = true;
+      }
+    }
+    
+    public void onResume()
+    {
+      synchronized( suspendLock )
+      {
+        suspended = false;
+        suspendLock.notifyAll();
+      }
+    }
+    
+    public void setRunning( boolean running )
+    {
+      synchronized( suspendLock )
+      {
+        this.running = running;
+        if( !running )
+        {
+          //suspended = false;
+          suspendLock.notify();
+        }
+        else
+        {
+          
+        }
+      }
+    }
+    
+    public boolean getRunning()
+    {
+      return( running );
+    }
+    
+    public void setSuspended( boolean pause )
+    {
+      synchronized( suspendLock )
+      {
+        this.suspended = pause;
+        if( !suspended )
+        {
+          suspendLock.notify();
+        }
+      }
+    }
+    
+    public boolean getSuspended()
+    {
+      return( suspended );
+    }
   }
 }

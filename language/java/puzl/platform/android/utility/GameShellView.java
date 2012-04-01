@@ -72,6 +72,9 @@ class GameShellView extends GLSurfaceView
   
   private GameShell gameShell;
   private SurfaceHolder surfaceHolder;
+  public GameShellRenderer gameShellRenderer;
+  
+  private ContextFactory contextFactory;
 
   public GameShellView( GameShell gameShellActivity )
   {
@@ -82,16 +85,16 @@ class GameShellView extends GLSurfaceView
     
     this.gameShell = gameShellActivity;
     
-    init( false, 0, 0 );
+    initialize( false, 0, 0 );
   }
 
   public GameShellView( Context context, boolean translucent, int depth, int stencil )
   {
     super( context );
-    init( translucent, depth, stencil );
+    initialize( translucent, depth, stencil );
   }
 
-  private void init( boolean translucent, int depth, int stencil )
+  private void initialize( boolean translucent, int depth, int stencil )
   {
     /* By default, GLSurfaceView() creates a RGB_565 opaque surface.
      * If we want a translucent one, we should change the surface's
@@ -104,10 +107,8 @@ class GameShellView extends GLSurfaceView
       surfaceHolder.setFormat( PixelFormat.TRANSLUCENT );
     }
   
-    /* Setup the context factory for 2.0 rendering.
-     * See ContextFactory class definition below
-     */
-    setEGLContextFactory( new ContextFactory() );
+    contextFactory = new ContextFactory();
+    setEGLContextFactory( contextFactory );
   
     /* We need to choose an EGLConfig that matches the format of
      * our surface exactly. This is going to be done in our
@@ -118,8 +119,11 @@ class GameShellView extends GLSurfaceView
                          new ConfigChooser( 8, 8, 8, 8, depth, stencil ) :
                          new ConfigChooser( 5, 6, 5, 0, depth, stencil ) );
   
-    /* Set the renderer responsible for frame rendering */
-    setRenderer( new Renderer( gameShell, this ) );
+    // Set the renderer responsible for frame rendering.
+    gameShellRenderer = new GameShellRenderer( gameShell, this );
+    setRenderer( gameShellRenderer );
+    
+    //setRenderMode( GLSurfaceView.RENDERMODE_WHEN_DIRTY );
   }
 
   private static class ContextFactory implements GLSurfaceView.EGLContextFactory
@@ -127,15 +131,14 @@ class GameShellView extends GLSurfaceView
     private static int EGL_CONTEXT_CLIENT_VERSION = 0x3098;
     public EGLContext createContext( EGL10 egl, EGLDisplay display, EGLConfig eglConfig )
     {
-      Log.w(TAG, "BEGIN: creating OpenGL ES 2.0 context");
-      checkEglError( "Before eglCreateContext", egl );
+      //Log.w(TAG, "BEGIN: creating OpenGL ES 2.0 context");
+      //checkEglError( "Before eglCreateContext", egl );
       
-      int[] attrib_list = {EGL_CONTEXT_CLIENT_VERSION, 1, EGL10.EGL_NONE};
-      EGLContext context = egl.eglCreateContext( display, eglConfig,
-                                                 EGL10.EGL_NO_CONTEXT, attrib_list );
+      int[] attributeList = {EGL_CONTEXT_CLIENT_VERSION, 1, EGL10.EGL_NONE};
+      EGLContext context = egl.eglCreateContext( display, eglConfig, EGL10.EGL_NO_CONTEXT, attributeList );
       
-      checkEglError( "After eglCreateContext", egl );
-      Log.w(TAG, "END: creating OpenGL ES 2.0 context");
+      //checkEglError( "After eglCreateContext", egl );
+      //Log.w(TAG, "END: creating OpenGL ES 2.0 context");
       
       return context;
     }
@@ -146,14 +149,14 @@ class GameShellView extends GLSurfaceView
     }
   }
 
-  private static void checkEglError( String prompt, EGL10 egl )
+  /*private static void checkEglError( String prompt, EGL10 egl )
   {
     int error;
     while( ( error = egl.eglGetError() ) != EGL10.EGL_SUCCESS )
     {
       Log.e( TAG, String.format( "%s: EGL error: 0x%x", prompt, error ) );
     }
-  }
+  }*/
 
   private static class ConfigChooser implements GLSurfaceView.EGLConfigChooser
   {
@@ -384,14 +387,14 @@ class GameShellView extends GLSurfaceView
   public boolean onTouchEvent( final MotionEvent event )
   {
     // Don't allow more than 60 motion events per second.
-    try
+    /*try
     {
       Thread.sleep( 16 );
     }
     catch( InterruptedException e )
     {
       
-    }
+    }*/
     
     final int action = event.getAction();
     if( action == MotionEvent.ACTION_DOWN )
@@ -433,24 +436,55 @@ class GameShellView extends GLSurfaceView
     return true;
   }
 
-  private static class Renderer implements GLSurfaceView.Renderer
+  static class GameShellRenderer implements GLSurfaceView.Renderer
   {
-    GameShell gameShellActivity;
-    //GameShellView gameShellView;
+    private GameShell gameShellActivity;
     
-    public Renderer( GameShell gameShellActivity, GameShellView gameShellView )
+    @SuppressWarnings( "unused" )
+    private GameShellView gameShellView;
+    
+    private boolean updateDisplay;
+    private Object drawLock;
+    
+    public GameShellRenderer( GameShell gameShellActivity, GameShellView gameShellView )
     {
       this.gameShellActivity = gameShellActivity;
-      //this.gameShellView = gameShellView;
+      this.gameShellView     = gameShellView;
+      
+      updateDisplay = true;
+      drawLock = new Object();
     }
     
     public void onDrawFrame( GL10 gl )
     {
-      gameShellActivity.onDrawFrame();
+      synchronized( drawLock )
+      {
+        if( !updateDisplay )
+        {
+          while( !updateDisplay )
+          {
+            try
+            {
+              drawLock.wait();
+            }
+            catch( InterruptedException e )
+            {
+              // No big deal if this wait is interrupted.
+            }
+          }
+        }
+        updateDisplay = false;
+      }
+      
+      synchronized( this )
+      {
+        gameShellActivity.onDrawFrame();
+      }
     }
   
     public void onSurfaceChanged( GL10 gl, int width, int height )
     {
+      Log.v( "puzl", String.format( "GameShellView.Renderer.onSurfaceChanged(): %s %s\n", width, height ) );
       /*if( !gameShellView.enableStereoScopic( true ) )
       {
         gameShellView.enableStereoScopic( false );
@@ -461,8 +495,18 @@ class GameShellView extends GLSurfaceView
   
     public void onSurfaceCreated( GL10 gl, EGLConfig config )
     {
-      //Log.w( TAG, String.format( "DIMENSIONS: %s %s\n", width, height ) );
-      gameShellActivity.initialize();
+      Log.v( "puzl", String.format( "GameShellView.Renderer.onSurfaceCreated()" ) );
     }
+    
+    public synchronized void setDrawReady()
+    {
+      synchronized( drawLock )
+      {
+        updateDisplay = true;
+        drawLock.notify();
+      }
+    }
+    
+    public synchronized void waitDrawingComplete(){}
   }
 }
