@@ -474,11 +474,13 @@ class GameShellView extends GLSurfaceView
           }
         }
         updateDisplay = false;
+        drawLock.notify();
       }
       
       synchronized( this )
       {
         gameShellActivity.onDrawFrame();
+        this.notify();
       }
     }
   

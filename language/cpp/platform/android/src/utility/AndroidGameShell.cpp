@@ -73,7 +73,7 @@ void AndroidGameShell::loop( void )
 }
 
 //--------------------------------------------------------------------------------
-void AndroidGameShell::draw( void )
+void AndroidGameShell::draw( const float& interpolation )
 {
   display->update();
 }
@@ -323,7 +323,7 @@ inline int GameShellInitializeVideo( int screenWidth, int screenHeight )
 }
 
 //--------------------------------------------------------------------------------
-inline void GameShellDraw( void )
+inline void GameShellDraw( const float& interpolation )
 {
   /*if( _GameShell == NULL )
   {
@@ -331,7 +331,7 @@ inline void GameShellDraw( void )
   }
 
   LOGI( "GameShellDraw(): not null" );*/
-  _GameShell->draw();
+  _GameShell->draw( interpolation );
 }
 
 //--------------------------------------------------------------------------------
@@ -397,9 +397,9 @@ JNIEXPORT void JNICALL Java_puzl_platform_android_utility_GameShell_nativeLoop( 
 }
 
 //--------------------------------------------------------------------------------
-JNIEXPORT void JNICALL Java_puzl_platform_android_utility_GameShell_nativeDraw( JNIEnv* env, jobject obj )
+JNIEXPORT void JNICALL Java_puzl_platform_android_utility_GameShell_nativeDraw( JNIEnv* env, jobject obj, jfloat interpolation )
 {
-  GameShellDraw();
+  GameShellDraw( interpolation );
 }
 
 //--------------------------------------------------------------------------------

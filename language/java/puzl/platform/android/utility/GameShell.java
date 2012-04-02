@@ -34,7 +34,7 @@ public class GameShell extends Activity
   //public static native void nativeShutdown();
   public static native void nativeInitializeVideo( int width, int height );
   public static native void nativeLoop();
-  public static native void nativeDraw();
+  public static native void nativeDraw( float interpolation );
   
   public static native void nativeOnKeyDown( int keyCode );
   public static native void nativeOnKeyUp( int keyCode );
@@ -90,7 +90,7 @@ public class GameShell extends Activity
 
   public void onDrawFrame()
   {
-    nativeDraw();
+    nativeDraw( gameShellThread.interpolation );
     //nativeLoop();
   }
 
@@ -143,12 +143,14 @@ public class GameShell extends Activity
   {
     private boolean running;
     private boolean suspended;
-    private long lastTime;
+    //private long lastTime;
     private Object suspendLock;
     
-    final static long TICKS_PER_SECOND = 58;
+    final static long TICKS_PER_SECOND = 60;
     final static long SKIP_TICKS = 1000 / TICKS_PER_SECOND;
-    //final static long MAX_FRAMESKIP = 5;
+    final static long MAX_FRAMESKIP = 5;
+    
+    public float interpolation;
     
     GameShellView gameShellView;
     
@@ -159,7 +161,7 @@ public class GameShell extends Activity
       suspendLock = new Object();
       suspended   = false;
       
-      lastTime = SystemClock.uptimeMillis();
+      //lastTime = SystemClock.uptimeMillis();
       running  = false;
       
       this.gameShellView = gameShellView;
@@ -176,54 +178,43 @@ public class GameShell extends Activity
     public void run()
     {
       Log.v("puzl", "GameShellThread.run():" + this.getId() + " " + "started...");
-      
+
+      long nextTime = SystemClock.uptimeMillis();
+      int loops;
+
       while( running )
       {
         gameShellView.gameShellRenderer.waitDrawingComplete();
-        
-        final long time      = SystemClock.uptimeMillis();
-        final long timeDelta = time - lastTime;
-        long finalDelta      = timeDelta;
-        
-        if( timeDelta > 12 )
-        { 
-          lastTime = time;
+
+        loops = 0;
+        while( SystemClock.uptimeMillis() > nextTime && loops < MAX_FRAMESKIP )
+        {
           nativeLoop();
-          
-          gameShellView.gameShellRenderer.setDrawReady();
-          //gameShellView.requestRender();
-            
-          final long endTime = SystemClock.uptimeMillis();
-          finalDelta = endTime - time;
-          
-          /*mProfileTime += finalDelta;
-          mProfileFrames++;
-          if( mProfileTime > PROFILE_REPORT_DELAY * 1000 )
-          {
-              final long averageFrameTime = mProfileTime / mProfileFrames;
-              DebugLog.d("Game Profile", "Average: " + averageFrameTime);
-              mProfileTime = 0;
-              mProfileFrames = 0;
-              mGameRoot.sSystemRegistry.hudSystem.setFPS(1000 / (int)averageFrameTime);
-          }*/
-          
+
+          nextTime += SKIP_TICKS;
+          loops++;
         }
-        
+
+        interpolation = ( float )( SystemClock.uptimeMillis() + SKIP_TICKS - nextTime ) / ( float )SKIP_TICKS;
+
+        //final long time = SystemClock.uptimeMillis();
+        //final long timeDelta = time - lastTime;
+        //lastTime = time;
+
         //gameShellView.requestRender();
-        
-        if( finalDelta < SKIP_TICKS )
+        gameShellView.gameShellRenderer.setDrawReady();
+
+        /*if( timeDelta < SKIP_TICKS )
         {
           try
           {
-            Thread.sleep( SKIP_TICKS - finalDelta );
+            Thread.sleep( SKIP_TICKS - timeDelta );
           }
           catch( InterruptedException e )
           {
             // Interruptions here are no big deal.
           }
-        }
-        
-        //interpolation = (float)(SystemClock.uptimeMillis() + SKIP_TICKS - nextGameTick) / (float)SKIP_TICKS;
+        }*/
 
         // Check if should wait
         synchronized( suspendLock )
@@ -232,7 +223,7 @@ public class GameShell extends Activity
           {
             // Do initial pausing stuff.
             Log.v("puzl", "GameShellThread.run():" + this.getId() + " " + "suspended...");
-          
+
             // Wait while suspended.
             while( suspended )
             {
@@ -242,15 +233,15 @@ public class GameShell extends Activity
               }
               catch( Exception e )
               {
-                
+
               }
             }
-            
+
             Log.v("puzl", "GameShellThread.run():" + this.getId() + " " + "unsuspended");
           }
         }
       }
-      
+
       Log.v("puzl", "GameShellThread.run():" + this.getId() + " " + "finished");
     }
     

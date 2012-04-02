@@ -84,7 +84,7 @@ void CoreGameShell::loop( void )
 }
 
 //--------------------------------------------------------------------------------
-void CoreGameShell::draw( void )
+void CoreGameShell::draw( const float& interpolation )
 {
 
 }
