@@ -61,7 +61,7 @@ public:
   virtual int shutdown( void );
 
   virtual void loop( void );
-  virtual void draw( void );
+  virtual void draw( const float& interpolation = 0.0f );
 
   int reloadVideo( const GameShellSettings& gameShellSettings );
 
@@ -108,7 +108,7 @@ extern "C"
 {
   JNIEXPORT void JNICALL Java_puzl_platform_android_utility_GameShell_nativeInitialize( JNIEnv* env, jobject obj );
   JNIEXPORT void JNICALL Java_puzl_platform_android_utility_GameShell_nativeInitializeVideo( JNIEnv* env, jobject obj, jint width, jint height );
-  JNIEXPORT void JNICALL Java_puzl_platform_android_utility_GameShell_nativeDraw( JNIEnv* env, jobject obj );
+  JNIEXPORT void JNICALL Java_puzl_platform_android_utility_GameShell_nativeDraw( JNIEnv* env, jobject obj, jfloat interpolation );
   JNIEXPORT void JNICALL Java_puzl_platform_android_utility_GameShell_nativeLoop( JNIEnv* env, jobject obj );
 
   JNIEXPORT void JNICALL Java_puzl_platform_android_utility_GameShell_nativeTouchDown( JNIEnv* env, jobject obj, jint id, jint xPosition, jint yPosition );

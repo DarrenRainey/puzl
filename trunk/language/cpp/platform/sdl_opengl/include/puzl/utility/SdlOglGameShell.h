@@ -51,7 +51,7 @@ public:
   virtual int shutdown( void );
   
   virtual void loop( void );
-  virtual void draw( void );
+  virtual void draw( const float& interpolation = 0.0f );
   
 protected:
   SdlOglVideoSystem* videoSystem;

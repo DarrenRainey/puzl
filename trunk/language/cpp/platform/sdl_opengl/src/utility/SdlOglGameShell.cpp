@@ -62,29 +62,30 @@ void SdlOglGameShell::shellLoop( void )
 {
   const unsigned int TICKS_PER_SECOND = 60;
   const unsigned int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
-  const unsigned int MAX_FRAMESKIP = 10;
+  const unsigned int MAX_FRAMESKIP = 5;
   
-  unsigned int nowTime;
+  float interpolation = 0.0f;
   nextTime = SDL_GetTicks();
   unsigned int loops;
   
   // Main loop.
   while( !quit )
   {
+    display->clear();
+    draw( interpolation );
+    display->present();
+
     loops = 0;
-    nowTime = SDL_GetTicks();
-    while( nowTime > nextTime && loops < MAX_FRAMESKIP )
+    while( SDL_GetTicks() > nextTime && loops < MAX_FRAMESKIP )
     {
-      display->clear();
-      draw();
-      display->present();
-    
       updateSystem();
       loop();
       
       nextTime += SKIP_TICKS;
       loops++;
     }
+
+    interpolation = ( float )( SDL_GetTicks() + SKIP_TICKS - nextTime ) / ( float )SKIP_TICKS;
   }
 }
 
@@ -107,7 +108,7 @@ void SdlOglGameShell::loop( void )
 }
 
 //--------------------------------------------------------------------------------
-void SdlOglGameShell::draw( void )
+void SdlOglGameShell::draw( const float& interpolation )
 {
 
 }
