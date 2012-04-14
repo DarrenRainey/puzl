@@ -387,14 +387,14 @@ class GameShellView extends GLSurfaceView
   public boolean onTouchEvent( final MotionEvent event )
   {
     // Don't allow more than 60 motion events per second.
-    /*try
+    try
     {
       Thread.sleep( 16 );
     }
     catch( InterruptedException e )
     {
       
-    }*/
+    }
     
     final int action = event.getAction();
     if( action == MotionEvent.ACTION_DOWN )
