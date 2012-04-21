@@ -143,7 +143,7 @@ public class GameShell extends Activity
   {
     private boolean running;
     private boolean suspended;
-    //private long lastTime;
+    private long lastTime;
     private Object suspendLock;
     
     final static long TICKS_PER_SECOND = 60;
@@ -156,7 +156,6 @@ public class GameShell extends Activity
     
     public GameShellThread( GameShellView gameShellView )
     {
-      //thread      = new Thread( this, /*programName + " " + */"GameShellThread" );
       setName( "GameShellThread" );
       suspendLock = new Object();
       suspended   = false;
@@ -179,42 +178,64 @@ public class GameShell extends Activity
     {
       Log.v("puzl", "GameShellThread.run():" + this.getId() + " " + "started...");
 
-      long nextTime = SystemClock.uptimeMillis();
-      int loops;
+      //long nextTime = SystemClock.uptimeMillis();
+      //lastTime = nextTime;
+      //int loops;
+      
+      interpolation = 0;
 
       while( running )
       {
+        //Log.v( "puzl", "GameShellThread.run(): running " + SystemClock.uptimeMillis() );
+        
         gameShellView.gameShellRenderer.waitDrawingComplete();
-
-        loops = 0;
+        
+        //Log.v( "puzl", "GameShellThread.run(): begin processing logic " + SystemClock.uptimeMillis() );
+        
+        /*loops = 0;
         while( SystemClock.uptimeMillis() > nextTime && loops < MAX_FRAMESKIP )
-        {
+        {*/
           nativeLoop();
 
-          nextTime += SKIP_TICKS;
+          /*nextTime += SKIP_TICKS;
           loops++;
-        }
-
-        interpolation = ( float )( SystemClock.uptimeMillis() + SKIP_TICKS - nextTime ) / ( float )SKIP_TICKS;
-
-        //final long time = SystemClock.uptimeMillis();
-        //final long timeDelta = time - lastTime;
-        //lastTime = time;
-
-        //gameShellView.requestRender();
-        gameShellView.gameShellRenderer.setDrawReady();
-
-        /*if( timeDelta < SKIP_TICKS )
-        {
-          try
-          {
-            Thread.sleep( SKIP_TICKS - timeDelta );
-          }
-          catch( InterruptedException e )
-          {
-            // Interruptions here are no big deal.
-          }
         }*/
+
+        //interpolation = ( float )( SystemClock.uptimeMillis() + SKIP_TICKS - nextTime ) / ( float )SKIP_TICKS;
+        
+        //Log.v( "puzl", "GameShellThread.run(): finished processing logic " + SystemClock.uptimeMillis() );
+        
+        gameShellView.gameShellRenderer.setDrawReady();
+        gameShellView.requestRender();
+
+        final long time = SystemClock.uptimeMillis();
+        final long timeDelta = time - lastTime;
+        lastTime = time;
+
+        if( timeDelta < SKIP_TICKS )
+        {
+          //Log.v( "puzl", "GameShellThread.run(): going to sleep " + SystemClock.uptimeMillis() );
+          final long sleepTime = SKIP_TICKS - timeDelta;
+          //if( sleepTime < SKIP_TICKS / 2 )
+          {
+            //Log.v( "puzl", "GameShellThread.run(): sleep time: " + sleepTime );
+            try
+            {
+              //Thread.sleep( SKIP_TICKS - timeDelta );
+              Thread.sleep( sleepTime );
+            }
+            catch( InterruptedException e )
+            {
+              // Interruptions here are no big deal.
+            }
+          }
+          //Log.v( "puzl", "GameShellThread.run(): waking up " + SystemClock.uptimeMillis() );
+          
+        }
+        
+        //lastTime = SystemClock.uptimeMillis();
+        
+        //Log.v( "puzl", "GameShellThread.run(): total time: " + ( SystemClock.uptimeMillis() - time + timeDelta ) );
 
         // Check if should wait
         synchronized( suspendLock )

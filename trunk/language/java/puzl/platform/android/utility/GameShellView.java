@@ -36,6 +36,7 @@ package puzl.platform.android.utility;
 import android.content.Context;
 import android.graphics.PixelFormat;
 import android.opengl.GLSurfaceView;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -123,7 +124,7 @@ class GameShellView extends GLSurfaceView
     gameShellRenderer = new GameShellRenderer( gameShell, this );
     setRenderer( gameShellRenderer );
     
-    //setRenderMode( GLSurfaceView.RENDERMODE_WHEN_DIRTY );
+    setRenderMode( GLSurfaceView.RENDERMODE_WHEN_DIRTY );
   }
 
   private static class ContextFactory implements GLSurfaceView.EGLContextFactory
@@ -387,14 +388,14 @@ class GameShellView extends GLSurfaceView
   public boolean onTouchEvent( final MotionEvent event )
   {
     // Don't allow more than 60 motion events per second.
-    try
+    /*try
     {
       Thread.sleep( 16 );
     }
     catch( InterruptedException e )
     {
       
-    }
+    }*/
     
     final int action = event.getAction();
     if( action == MotionEvent.ACTION_DOWN )
@@ -432,6 +433,8 @@ class GameShellView extends GLSurfaceView
                   }
       );
     }
+    
+    //gameShellRenderer.waitDrawingComplete();
 
     return true;
   }
@@ -457,30 +460,32 @@ class GameShellView extends GLSurfaceView
     
     public void onDrawFrame( GL10 gl )
     {
+      //Log.i( "puzl", "GameShellRenderer.onDrawFrame(): " + SystemClock.uptimeMillis() );
       synchronized( drawLock )
       {
-        if( !updateDisplay )
+        while( !updateDisplay )
         {
-          while( !updateDisplay )
+          try
           {
-            try
-            {
-              drawLock.wait();
-            }
-            catch( InterruptedException e )
-            {
-              // No big deal if this wait is interrupted.
-            }
+            drawLock.wait();
+          }
+          catch( InterruptedException e )
+          {
+            // No big deal if this wait is interrupted.
           }
         }
+        
+        synchronized( this )
+        {
+          //Log.i( "puzl", "GameShellRenderer.onDrawFrame(): preparing to draw" + SystemClock.uptimeMillis() );
+          gameShellActivity.onDrawFrame();
+          //Log.i( "puzl", "GameShellRenderer.onDrawFrame(): finishing drawing" + SystemClock.uptimeMillis() );
+          
+          this.notify();
+        }
+          
         updateDisplay = false;
         drawLock.notify();
-      }
-      
-      synchronized( this )
-      {
-        gameShellActivity.onDrawFrame();
-        this.notify();
       }
     }
   
@@ -509,6 +514,24 @@ class GameShellView extends GLSurfaceView
       }
     }
     
-    public synchronized void waitDrawingComplete(){}
+    public void waitDrawingComplete()
+    {
+      synchronized( drawLock )
+      {
+        while( updateDisplay )
+        {
+          try
+          {
+            drawLock.wait();
+          }
+          catch( InterruptedException e )
+          {
+            // No big deal if this wait is interrupted.
+          }
+        }
+
+        drawLock.notify();
+      }
+    }
   }
 }
