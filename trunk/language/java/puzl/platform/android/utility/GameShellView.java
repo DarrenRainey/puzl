@@ -33,10 +33,13 @@ package puzl.platform.android.utility;
 
 //import com.htc.view.DisplaySetting;
 
+import java.nio.IntBuffer;
+
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.PixelFormat;
 import android.opengl.GLSurfaceView;
-import android.os.SystemClock;
+import android.opengl.GLUtils;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -443,11 +446,13 @@ class GameShellView extends GLSurfaceView
   {
     private GameShell gameShellActivity;
     
-    @SuppressWarnings( "unused" )
     private GameShellView gameShellView;
     
     private boolean updateDisplay;
     private Object drawLock;
+    
+    private GL10 gl;
+    IntBuffer texturesBuffer;
     
     public GameShellRenderer( GameShell gameShellActivity, GameShellView gameShellView )
     {
@@ -492,6 +497,10 @@ class GameShellView extends GLSurfaceView
     public void onSurfaceChanged( GL10 gl, int width, int height )
     {
       Log.v( "puzl", String.format( "GameShellView.Renderer.onSurfaceChanged(): %s %s\n", width, height ) );
+      
+      this.gl = gl;
+      GameShell._gameShellView = gameShellView;
+      
       /*if( !gameShellView.enableStereoScopic( true ) )
       {
         gameShellView.enableStereoScopic( false );
@@ -503,6 +512,9 @@ class GameShellView extends GLSurfaceView
     public void onSurfaceCreated( GL10 gl, EGLConfig config )
     {
       Log.v( "puzl", String.format( "GameShellView.Renderer.onSurfaceCreated()" ) );
+      
+      this.gl = gl;
+      GameShell._gameShellView = gameShellView;
     }
     
     public synchronized void setDrawReady()
@@ -532,6 +544,31 @@ class GameShellView extends GLSurfaceView
 
         drawLock.notify();
       }
+    }
+    
+    int loadTextureFromBitmap( Bitmap bitmap )
+    {
+      //Log.v( "puzl", String.format( "GameShellView.Renderer.loadTextureFromBitmap()" ) );
+      
+      // Generate one texture pointer...
+      texturesBuffer = IntBuffer.allocate( 1 );
+      gl.glGenTextures( 1, texturesBuffer );
+      
+      // ...and bind it to our array.
+      gl.glBindTexture( GL10.GL_TEXTURE_2D, texturesBuffer.get( 0 ) );
+        
+      // Create Nearest Filtered Texture.
+      gl.glTexParameterf( GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_NEAREST );
+      gl.glTexParameterf( GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_NEAREST );
+      
+      // Different possible texture parameters, e.g. GL10.GL_CLAMP_TO_EDGE.
+      gl.glTexParameterf( GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_S, GL10.GL_REPEAT );
+      gl.glTexParameterf( GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_T, GL10.GL_REPEAT );
+        
+      // Use the Android GLUtils to specify a two-dimensional texture image from our bitmap.
+      GLUtils.texImage2D( GL10.GL_TEXTURE_2D, 0, bitmap, 0 );
+      
+      return texturesBuffer.get( 0 );
     }
   }
 }
