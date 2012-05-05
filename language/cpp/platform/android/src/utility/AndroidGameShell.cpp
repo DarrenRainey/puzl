@@ -50,7 +50,7 @@ jmethodID _JavaMethodIDGetTextureFromFile;
 //--------------------------------------------------------------------------------
 AndroidGameShell::AndroidGameShell( const GameShellSettings& gameShellSettings ): CoreGameShell( gameShellSettings )
 {
-
+  videoSystem = NULL;
 }
 
 //--------------------------------------------------------------------------------
@@ -88,7 +88,6 @@ int AndroidGameShell::shellInitialize( void )
 {
   cout << "AndroidGameShell::shellInitialize()" << endl;
 
-  initializeVideo();
   initializeInput();
   initializeAudio();
 
@@ -124,9 +123,13 @@ int AndroidGameShell::reloadVideo( const GameShellSettings& gameShellSettings )
 {
   this->gameShellSettings = gameShellSettings;
 
-  shutdownVideo();
-  initializeVideo();
+  if( videoSystem != NULL )
+  {
+    releaseVideo();
+    shutdownVideo();
+  }
 
+  initializeVideo();
   return reloadVideo();
 }
 
@@ -231,11 +234,13 @@ int AndroidGameShell::shutdownVideo( void )
   {
     cout << "GameShell::shutdownInput(): Failed to shut down video system." << endl;
     delete videoSystem;
+    videoSystem = NULL;
     return -1;
   }
   else
   {
     delete videoSystem;
+    videoSystem = NULL;
     return 0;
   }
 }
