@@ -41,6 +41,11 @@ using namespace std;
 AndroidGameShell* _GameShell;
 GameShellSettings _GameShellSettings;
 
+static JavaVM*   _JavaVM;
+jclass    _JavaClass  = NULL;
+jobject   _JavaObject = NULL;
+jmethodID _JavaMethodIDGetTextureFromFile;
+
 // FUNCTIONS =====================================================================
 //--------------------------------------------------------------------------------
 AndroidGameShell::AndroidGameShell( const GameShellSettings& gameShellSettings ): CoreGameShell( gameShellSettings )
@@ -122,7 +127,7 @@ int AndroidGameShell::reloadVideo( const GameShellSettings& gameShellSettings )
   shutdownVideo();
   initializeVideo();
 
-  return 0;
+  return reloadVideo();
 }
 
 //--------------------------------------------------------------------------------
@@ -284,6 +289,30 @@ void AndroidGameShell::inputSystemUpdate( void )
   inputSystem->update();
 }
 
+//--------------------------------------------------------------------------------
+int AndroidGameShell::createTextureFromFile( string fileName )
+{
+  JNIEnv* jniEnvironment;
+  int status = _JavaVM->GetEnv( ( void** )&jniEnvironment, JNI_VERSION_1_4 );
+  if( status < 0 )
+  {
+    LOGI("Android::createTextureFromFile() Failed to get JNI Env.");
+  }
+
+  jstring fileNameJavaString = jniEnvironment->NewStringUTF( fileName.c_str() );
+  jint textureID = ( jint )jniEnvironment->CallStaticIntMethod( _JavaClass, _JavaMethodIDGetTextureFromFile, fileNameJavaString );
+  jniEnvironment->DeleteLocalRef( fileNameJavaString );
+
+  LOGI( fileName.c_str() );
+  stringstream ss;
+  ss << textureID;
+  string result;
+  ss >> result;
+  LOGI( result.c_str() );
+
+  return textureID;
+}
+
 // -------------------------------------------------------------------------------
 void SetGameShell( AndroidGameShell* gameShell )
 {
@@ -291,7 +320,7 @@ void SetGameShell( AndroidGameShell* gameShell )
 }
 
 //--------------------------------------------------------------------------------
-inline int GameShellInitialize( void )
+inline int GameShellInitialize( JNIEnv* jniEnvironment, jobject javaObject )
 {
   LOGI("Android::GameShellInitialize()");
   //_GameShellSettings.screenWidth  = 0;
@@ -305,14 +334,38 @@ inline int GameShellInitialize( void )
 }
 
 //--------------------------------------------------------------------------------
-inline int GameShellInitializeVideo( int screenWidth, int screenHeight )
+inline int GameShellInitializeVideo( jobject javaObject, int screenWidth, int screenHeight )
 {
+  LOGI("Android::GameShellInitializeVideo()");
   /*if( _GameShell == NULL )
   {
     return -1;
   }
 
   LOGI( "GameShellInitializeVideo(): not null" );*/
+
+  JNIEnv* jniEnvironment;
+  _JavaVM->GetEnv( ( void** )&jniEnvironment, JNI_VERSION_1_4 );
+  if( _JavaObject == NULL )
+  {
+    _JavaObject = jniEnvironment->NewGlobalRef( javaObject );
+  }
+
+  jmethodID getNameMethodID = jniEnvironment->GetMethodID( _JavaClass, "toString", "()Ljava/lang/String;" );
+  jstring className = ( jstring )jniEnvironment->CallObjectMethod( _JavaClass, getNameMethodID );
+
+  jboolean copy;
+
+  // translate java string to c string
+  const char* cstr = jniEnvironment->GetStringUTFChars( className, &copy );
+
+  LOGI( cstr );
+
+  _JavaMethodIDGetTextureFromFile = jniEnvironment->GetStaticMethodID( _JavaClass, "createTextureFromFile", "(Ljava/lang/String;)I" );
+  if( _JavaMethodIDGetTextureFromFile == NULL )
+  {
+    LOGI("GameShellInitializeVideo() Failed to find method id.");
+  }
 
   _GameShellSettings.screenWidth  = screenWidth;
   _GameShellSettings.screenHeight = screenHeight;
@@ -379,15 +432,44 @@ inline void GameShellTouchMove( int id, int xPosition, int yPosition )
 }
 
 //--------------------------------------------------------------------------------
+JNIEXPORT jint JNICALL JNI_OnLoad( JavaVM* vm, void* reserved )
+{
+  JNIEnv* jniEnvironment;
+  _JavaVM = vm;
+  if( vm->GetEnv( ( void** )&jniEnvironment, JNI_VERSION_1_4 ) != JNI_OK )
+  {
+    return -1;
+  }
+
+  /*int status = _JavaVM->AttachCurrentThread( &jniEnvironment, NULL );
+  if( status < 0 )
+  {
+    LOGI("JNI_OnLoad() Failed to attach current thread.");
+  }*/
+
+  //_JavaClass = jniEnvironment->GetObjectClass( _JavaObject );
+  if( _JavaClass == NULL )
+  {
+    _JavaClass = ( jclass )jniEnvironment->NewGlobalRef( jniEnvironment->FindClass( "puzl/platform/android/utility/GameShell" ) );
+    if( _JavaClass == NULL )
+    {
+      LOGI("GameShellInitializeVideo() Failed to find class.");
+    }
+  }
+
+  return JNI_VERSION_1_4;
+}
+
+//--------------------------------------------------------------------------------
 JNIEXPORT void JNICALL Java_puzl_platform_android_utility_GameShell_nativeInitialize( JNIEnv* env, jobject obj )
 {
-  GameShellInitialize();
+  GameShellInitialize( env, obj );
 }
 
 //--------------------------------------------------------------------------------
 JNIEXPORT void JNICALL Java_puzl_platform_android_utility_GameShell_nativeInitializeVideo( JNIEnv* env, jobject obj, jint width, jint height )
 {
-  GameShellInitializeVideo( width, height );
+  GameShellInitializeVideo( obj, width, height );
 }
 
 //--------------------------------------------------------------------------------

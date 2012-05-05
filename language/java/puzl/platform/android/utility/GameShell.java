@@ -17,7 +17,12 @@
 package puzl.platform.android.utility;
 
 
+import java.io.IOException;
+import java.io.InputStream;
 import android.app.Activity;
+import android.content.res.AssetManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.Log;
@@ -43,8 +48,11 @@ public class GameShell extends Activity
   public static native void nativeTouchUp( int id, int xPosition, int yPosition );
   public static native void nativeTouchMove( int id, int xPosition, int yPosition );
   
-  GameShellView gameShellView;
+  private GameShellView gameShellView;
   protected GameShellThread gameShellThread;
+  
+  static protected AssetManager assetManager;
+  static GameShellView _gameShellView;
 
   @Override
   protected void onCreate( Bundle icicle )
@@ -52,6 +60,8 @@ public class GameShell extends Activity
     super.onCreate( icicle );
     
     Log.v("puzl", "GameShell.onCreate()");
+    
+    assetManager = getAssets();
     
     gameShellView = new GameShellView( this );
     setContentView( gameShellView );
@@ -293,6 +303,16 @@ public class GameShell extends Activity
       }
     }
     
+    protected void onRestart()
+    {
+      Log.v( "puzl", "onRestart()" );
+    }
+
+    protected void onDestroy()
+    {
+      Log.v( "puzl", "onDestroy()" );
+    }
+    
     public void setRunning( boolean running )
     {
       synchronized( suspendLock )
@@ -331,5 +351,94 @@ public class GameShell extends Activity
     {
       return( suspended );
     }
+  }
+  
+  public byte[] getDataFromFile( String fileName )
+  {
+    InputStream is = null;
+    byte[] data = null;
+    try
+    {
+      is = assetManager.open( fileName.substring( 1 ) );
+      int length = is.available();
+      data = new byte[length];
+      is.read( data );
+    }
+    catch( java.io.IOException e )
+    {
+      
+    } 
+    finally
+    {
+      // Always clear and close.
+      try
+      {
+        is.close();
+      }
+      catch( IOException e )
+      {
+        e.printStackTrace();
+      }
+      
+      is = null;
+    }
+
+    return data;
+  }
+  
+  public static int createTextureFromFile2( String fileName )
+  {
+    return 0;
+  }
+  
+  private static int createTextureFromFile( String fileName )
+  {
+    //Log.v( "puzl", "GameShell::createTextureFromFile(" + fileName + ")" );
+    InputStream inputStream     = null;
+    Bitmap      bitmap          = null;
+        
+    try
+    {
+      inputStream = assetManager.open( fileName );
+      bitmap      = BitmapFactory.decodeStream( inputStream );
+    }
+    catch( IOException e )
+    {
+      
+    } 
+    finally
+    {
+      // Always clear and close.
+      try
+      {
+        inputStream.close();
+      }
+      catch( IOException e )
+      {
+        e.printStackTrace();
+      }
+      
+      inputStream = null;
+    }
+    
+    Log.v( "puzl", "GameShell::createTextureFromFile() width:  " + bitmap.getWidth() );
+    Log.v( "puzl", "GameShell::createTextureFromFile() height: " + bitmap.getHeight() );
+    
+    int textureID = 0;
+    
+    if( bitmap != null )
+    {
+      //Log.v( "puzl", "GameShell::createTextureFromFile() bitmap!=null, " );
+      if( _gameShellView != null )
+      {
+        //Log.v( "puzl", "GameShell::createTextureFromFile() gameshellview!=null" );
+        textureID = _gameShellView.gameShellRenderer.loadTextureFromBitmap( bitmap );
+      }
+      
+      // Clean up.
+      bitmap.recycle();
+    } 
+    
+    return textureID;
   }
 }

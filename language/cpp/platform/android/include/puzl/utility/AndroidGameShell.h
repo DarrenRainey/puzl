@@ -32,6 +32,8 @@ MA 02110-1301  USA
 #include <jni.h>
 #include <android/log.h>
 
+#include <string>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -74,6 +76,8 @@ public:
 
   void inputSystemUpdate( void );
 
+  int createTextureFromFile( string fileName );
+
 protected:
   AndroidVideoSystem* videoSystem;
   AndroidAudioSystem* audioSystem;
@@ -106,6 +110,8 @@ protected:
 // -------------------------------------------------------------------------------
 extern "C"
 {
+  JNIEXPORT jint JNICALL JNI_OnLoad( JavaVM* vm, void* reserved );
+
   JNIEXPORT void JNICALL Java_puzl_platform_android_utility_GameShell_nativeInitialize( JNIEnv* env, jobject obj );
   JNIEXPORT void JNICALL Java_puzl_platform_android_utility_GameShell_nativeInitializeVideo( JNIEnv* env, jobject obj, jint width, jint height );
   JNIEXPORT void JNICALL Java_puzl_platform_android_utility_GameShell_nativeDraw( JNIEnv* env, jobject obj, jfloat interpolation );
