@@ -391,7 +391,7 @@ public class GameShell extends Activity
     return 0;
   }
   
-  private static int createTextureFromFile( String fileName )
+  private static int[] createTextureFromFile( String fileName )
   {
     //Log.v( "puzl", "GameShell::createTextureFromFile(" + fileName + ")" );
     InputStream inputStream     = null;
@@ -421,10 +421,12 @@ public class GameShell extends Activity
       inputStream = null;
     }
     
-    Log.v( "puzl", "GameShell::createTextureFromFile() width:  " + bitmap.getWidth() );
-    Log.v( "puzl", "GameShell::createTextureFromFile() height: " + bitmap.getHeight() );
+    int textureInfo[] = new int[3];
     
-    int textureID = 0;
+    textureInfo[1] = bitmap.getWidth();
+    textureInfo[2] = bitmap.getHeight();
+    
+    //int textureID = 0;
     
     if( bitmap != null )
     {
@@ -432,13 +434,13 @@ public class GameShell extends Activity
       if( _gameShellView != null )
       {
         //Log.v( "puzl", "GameShell::createTextureFromFile() gameshellview!=null" );
-        textureID = _gameShellView.gameShellRenderer.loadTextureFromBitmap( bitmap );
+        textureInfo[0] = _gameShellView.gameShellRenderer.loadTextureFromBitmap( bitmap );
       }
       
       // Clean up.
       bitmap.recycle();
     } 
     
-    return textureID;
+    return textureInfo;
   }
 }

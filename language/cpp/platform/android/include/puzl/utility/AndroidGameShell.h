@@ -76,7 +76,7 @@ public:
 
   void inputSystemUpdate( void );
 
-  int createTextureFromFile( string fileName );
+  int createTextureFromFile( string fileName, int* width = NULL, int* height = NULL );
 
 protected:
   AndroidVideoSystem* videoSystem;

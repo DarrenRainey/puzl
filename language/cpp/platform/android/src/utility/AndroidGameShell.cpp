@@ -290,7 +290,7 @@ void AndroidGameShell::inputSystemUpdate( void )
 }
 
 //--------------------------------------------------------------------------------
-int AndroidGameShell::createTextureFromFile( string fileName )
+int AndroidGameShell::createTextureFromFile( string fileName, int* width, int* height )
 {
   JNIEnv* jniEnvironment;
   int status = _JavaVM->GetEnv( ( void** )&jniEnvironment, JNI_VERSION_1_4 );
@@ -300,8 +300,30 @@ int AndroidGameShell::createTextureFromFile( string fileName )
   }
 
   jstring fileNameJavaString = jniEnvironment->NewStringUTF( fileName.c_str() );
-  jint textureID = ( jint )jniEnvironment->CallStaticIntMethod( _JavaClass, _JavaMethodIDGetTextureFromFile, fileNameJavaString );
+  jarray textureInfo = ( jarray )jniEnvironment->CallStaticObjectMethod( _JavaClass, _JavaMethodIDGetTextureFromFile, fileNameJavaString );
   jniEnvironment->DeleteLocalRef( fileNameJavaString );
+
+  if( textureInfo == NULL )
+  {
+    return 0;
+  }
+
+  //int size = jniEnvironment->GetArrayLength( textureInfo );
+  int* textureInfoArray = ( int* )jniEnvironment->GetPrimitiveArrayCritical( textureInfo, NULL );
+
+  int textureID = textureInfoArray[0];
+
+  if( width != NULL )
+  {
+    *width = textureInfoArray[1];
+  }
+
+  if( height != NULL )
+  {
+    *height = textureInfoArray[2];
+  }
+
+  jniEnvironment->ReleasePrimitiveArrayCritical( textureInfo, ( void* )textureInfoArray, 0 );
 
   LOGI( fileName.c_str() );
   stringstream ss;
@@ -354,14 +376,12 @@ inline int GameShellInitializeVideo( jobject javaObject, int screenWidth, int sc
   jmethodID getNameMethodID = jniEnvironment->GetMethodID( _JavaClass, "toString", "()Ljava/lang/String;" );
   jstring className = ( jstring )jniEnvironment->CallObjectMethod( _JavaClass, getNameMethodID );
 
+  // Translate Java string to C string.
   jboolean copy;
-
-  // translate java string to c string
   const char* cstr = jniEnvironment->GetStringUTFChars( className, &copy );
-
   LOGI( cstr );
 
-  _JavaMethodIDGetTextureFromFile = jniEnvironment->GetStaticMethodID( _JavaClass, "createTextureFromFile", "(Ljava/lang/String;)I" );
+  _JavaMethodIDGetTextureFromFile = jniEnvironment->GetStaticMethodID( _JavaClass, "createTextureFromFile", "(Ljava/lang/String;)[I" );
   if( _JavaMethodIDGetTextureFromFile == NULL )
   {
     LOGI("GameShellInitializeVideo() Failed to find method id.");
