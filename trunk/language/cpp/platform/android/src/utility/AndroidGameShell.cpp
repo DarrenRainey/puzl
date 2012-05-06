@@ -157,7 +157,7 @@ int AndroidGameShell::initializeInput( void )
   }
 
   keyboards = ( AndroidInputKeyboard** )( inputSystem->getKeyboards() );
-  //keyboard = keyboards[0]; // TODO: Check if exists.
+  keyboard = keyboards[0]; // TODO: Check if exists.
 
   mice = ( AndroidInputMouse** )( inputSystem->getMice() );
   joysticks = ( AndroidInputJoystick** )( inputSystem->getJoysticks() );
@@ -260,13 +260,19 @@ void AndroidGameShell::setIcon( string filePath )
 //--------------------------------------------------------------------------------
 void AndroidGameShell::onKeyDown( int keyCode )
 {
-  keyboard->onKeyDown( keyCode );
+  if( keyboard != NULL )
+  {
+    keyboard->onKeyDown( keyCode );
+  }
 }
 
 //--------------------------------------------------------------------------------
 void AndroidGameShell::onKeyUp( int keyCode )
 {
-  keyboard->onKeyUp( keyCode );
+  if( keyboard != NULL )
+  {
+    keyboard->onKeyUp( keyCode );
+  }
 }
 
 //--------------------------------------------------------------------------------
