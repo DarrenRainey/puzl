@@ -21,6 +21,8 @@ MA 02110-1301  USA
 
 // INCLUDES ======================================================================
 #include <puzl/video/AndroidVideoImage.h>
+
+#include <puzl/utility/AndroidGameShell.h>
 #include <puzl/video/AndroidVideoDisplay.h>
 
 #include <iostream>
@@ -36,6 +38,8 @@ using namespace std;
 // EXTERNALS =====================================================================
 
 // GLOBALS =======================================================================
+
+extern AndroidGameShell* _GameShell;
 
 // FUNCTIONS =====================================================================
 
@@ -78,12 +82,21 @@ int AndroidVideoImage::destroy( void )
 //--------------------------------------------------------------------------------
 int AndroidVideoImage::release( void )
 {
+  if( textureID != 0 )
+  {
+    glDeleteTextures( 1, &textureID );
+    textureID = 0;
+  }
+
   return CoreVideoImage::release();
 }
 
 //--------------------------------------------------------------------------------
 int AndroidVideoImage::load( string fileName, int numberOfColorKeys, int** colorKey )
 {
+  textureID = _GameShell->createTextureFromFile( fileName, realWidth, realHeight );
+  setRealDimensions( *realWidth, *realHeight );
+  setDimensions( *realWidth, *realHeight );
   return 0;
 }
 
@@ -97,12 +110,52 @@ int AndroidVideoImage::reload( void )
 void AndroidVideoImage::draw( AndroidVideoDisplay* destinationDisplay )
 {
   CoreVideoImage::draw( destinationDisplay ); // TODO: Needed?
+  AndroidVideoImage::draw( destinationDisplay, sourceRect, destinationRect );
 }
 
 //--------------------------------------------------------------------------------
 void AndroidVideoImage::draw( AndroidVideoDisplay* destinationDisplay, int* sourceRect, int* destinationRect )
 {
-  // TODO: Implement.
+  static GLfloat quad[] =
+  {
+    0.0f, 0.0f, // 0, 0,
+    0.0f, 0.0f, // 0, height,
+    0.0f, 0.0f, // width, height,
+    0.0f, 0.0f  // width, 0
+  };
+
+  static GLfloat textureQuad[] =
+  {
+    0.0f, 0.0f, // 0, 0,
+    0.0f, 1.0f, // 0, height,
+    1.0f, 1.0f, // width, height,
+    1.0f, 0.0f  // width, 0
+  };
+
+  quad[3] = ( GLfloat )( destinationRect[RECT_INDEX_HEIGHT] ); // height
+  quad[4] = ( GLfloat )( destinationRect[RECT_INDEX_WIDTH] ); // width
+  quad[5] = quad[3]; //quad[5] = ( float )height;
+  quad[6] = quad[4]; //quad[6] = ( float )width;
+
+  glBindTexture( GL_TEXTURE_2D, textureID );
+
+  glEnable( GL_TEXTURE_2D );
+
+  glEnableClientState( GL_TEXTURE_COORD_ARRAY );
+
+  glVertexPointer( 2, GL_FLOAT, 0, quad );
+  glTexCoordPointer( 2, GL_FLOAT, 0, textureQuad );
+
+  glMatrixMode( GL_MODELVIEW );
+  glLoadIdentity();
+
+  glTranslatef( ( GLfloat )destinationRect[RECT_INDEX_X_POSITION],
+                ( GLfloat )destinationRect[RECT_INDEX_Y_POSITION],
+                0.0f );
+
+  glColor4ub( 255, 255, 255, 255 );
+
+  glDrawArrays( GL_TRIANGLE_FAN, 0, 4 );
 }
 
 //--------------------------------------------------------------------------------

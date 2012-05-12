@@ -25,6 +25,8 @@ MA 02110-1301  USA
 // INCLUDES ======================================================================
 #include <puzl/video/CoreVideoImage.h>
 
+#include <GLES/gl.h>
+
 #include <string>
 
 using namespace std;
@@ -57,6 +59,7 @@ public:
   int reload( void );
 
 private:
+  GLuint textureID;
 };
 
 #endif
