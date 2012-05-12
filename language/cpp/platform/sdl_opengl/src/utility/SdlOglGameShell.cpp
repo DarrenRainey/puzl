@@ -130,7 +130,9 @@ int SdlOglGameShell::shellInitialize( void )
 	SDL_EventState( SDL_SYSWMEVENT, SDL_ENABLE );
 #endif
 	
-	return initialize();
+	int result = initialize();
+	reloadVideo();
+	return result;
 }
 
 //--------------------------------------------------------------------------------

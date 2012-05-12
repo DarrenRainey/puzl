@@ -42,7 +42,8 @@ using namespace std;
 //--------------------------------------------------------------------------------
 SdlOglVideoImage::SdlOglVideoImage( void ): CoreVideoImage()
 {
-	texture = NULL;
+  surface = NULL;
+  texture = NULL;
 }
 
 //--------------------------------------------------------------------------------
@@ -218,15 +219,21 @@ int SdlOglVideoImage::release( void )
 //--------------------------------------------------------------------------------
 int SdlOglVideoImage::load( string fileName, int numberOfColorKeys, int** colorKey )
 {
-	SDL_Surface* temporarySurface;
+  //cout << "SdlOglVideoImage::load()" << endl;
+  if( texture != NULL )
+  {
+    return reload();
+  }
 	
 	if( surface != NULL )
 	{
-		destroy();
+	  cout << "SdlOglVideoImage::load() surface is not null." << endl;
+	  //SDL_FreeSurface( surface );
+	  destroy(); // NOTE: The correct thing to do here?
 	}
 	
 	// Load the image from file.
-	temporarySurface = IMG_Load( fileName.c_str() );
+	SDL_Surface* temporarySurface = IMG_Load( fileName.c_str() );
 	
 	// Convert the surface format to that of the passed 'ExampleBuffer'.
 	surface = SDL_DisplayFormatAlpha( temporarySurface );
@@ -236,11 +243,12 @@ int SdlOglVideoImage::load( string fileName, int numberOfColorKeys, int** colorK
 	if( surface == NULL )
 	{
 		cout << "Failed to load VideoImage" << endl;
+		texture = NULL;
 		return -1;
 	}
 	else
 	{
-		this->fileName = fileName;
+	  this->fileName = fileName;
 		this->numberOfColorKeys = numberOfColorKeys;
 		this->colorKey = colorKey;
 		
@@ -264,7 +272,7 @@ int SdlOglVideoImage::load( string fileName, int numberOfColorKeys, int** colorK
 			color[0][1] = 255;
 			color[0][2] = 255;
 		}
-		
+
 		*width = surface->w;
 		*height = surface->h;
 		return createTexture();
@@ -310,7 +318,8 @@ int SdlOglVideoImage::reload( void )
 //--------------------------------------------------------------------------------
 int SdlOglVideoImage::createTexture( void )
 {
-	int index;
+  //cout << "SdlOglVideoImage::createTexture()" << endl;
+  int index;
 	
 	// Set our VideoImage's dimensions
 	if( surface != NULL )
@@ -343,6 +352,8 @@ int SdlOglVideoImage::createTexture( void )
 	if( !videoInfo )
 	{
 		SDL_FreeSurface( surface );
+		surface = NULL;
+		texture = NULL;
 		cout << "createTexture failure" << endl;
 		return( -1 );
 	}
@@ -386,7 +397,7 @@ int SdlOglVideoImage::createTexture( void )
 	}
 	else
 	{
-		texture = new GLuint[0];
+	  	texture = new GLuint[0];
 		glGenTextures( 1, texture );
 		colorKeyNeedsDestroy = false;
 	}
@@ -496,7 +507,9 @@ int SdlOglVideoImage::createTexture( void )
 
 	// Now we need to free the bitmap data that we loaded since openGL stored it as a texture
 	delete [] newData;
+	newData = NULL;
 	SDL_FreeSurface( surface );
+	surface = NULL;
 	
 	if( colorKeyNeedsDestroy )
 	{
