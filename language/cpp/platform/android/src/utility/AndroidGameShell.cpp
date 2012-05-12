@@ -50,7 +50,9 @@ jmethodID _JavaMethodIDGetTextureFromFile;
 //--------------------------------------------------------------------------------
 AndroidGameShell::AndroidGameShell( const GameShellSettings& gameShellSettings ): CoreGameShell( gameShellSettings )
 {
+  inputSystem = NULL;
   videoSystem = NULL;
+  audioSystem = NULL;
 }
 
 //--------------------------------------------------------------------------------
@@ -103,6 +105,7 @@ int AndroidGameShell::initializeVideo( void )
   {
     cout << "GameShell::initializeVideo(): Failed to initialize video system." << endl;
     delete videoSystem;
+    videoSystem = NULL;
     return -1;
   }
 
@@ -112,6 +115,7 @@ int AndroidGameShell::initializeVideo( void )
     cout << "GameShell::initializeVideo(): Failed to initialize video display." << endl;
     videoSystem->shutdown();
     delete videoSystem;
+    videoSystem = NULL;
     return -1;
   }
 
@@ -153,6 +157,7 @@ int AndroidGameShell::initializeInput( void )
   {
     cout << "GameShell::initializeInput(): Failed to initialize input system." << endl;
     delete inputSystem;
+    inputSystem = NULL;
     return -1;
   }
 
@@ -173,6 +178,7 @@ int AndroidGameShell::initializeAudio( void )
   {
     cout << "GameShell::initializeAudio(): Failed to initialize audio system." << endl;
     delete audioSystem;
+    audioSystem = NULL;
     return -1;
   }
 
@@ -195,54 +201,46 @@ int AndroidGameShell::shellShutdown( void )
 //--------------------------------------------------------------------------------
 int AndroidGameShell::shutdownInput( void )
 {
-  /*cout << "shutdownInput" << endl;
-  if( inputSystem->shutdown() < 0 )
+  cout << "shutdownInput" << endl;
+  int result = inputSystem->shutdown();
+  if( result < 0 )
   {
     cout << "GameShell::shutdownInput(): Failed to shut down input system." << endl;
-    delete inputSystem;
-    return -1;
   }
-  else
-  {
-    delete inputSystem;
-    return 0;
-  }*/
+
+  delete inputSystem;
+  inputSystem = NULL;
+  return result;
 }
 
 //--------------------------------------------------------------------------------
 int AndroidGameShell::shutdownAudio( void )
 {
   cout << "shutdownAudio" << endl;
-  if( audioSystem->shutdown() < 0 )
+  int result = audioSystem->shutdown();
+  if( result < 0 )
   {
     cout << "GameShell::shutdownInput(): Failed to shut down audio system." << endl;
-    delete audioSystem;
-    return -1;
   }
-  else
-  {
-    delete audioSystem;
-    return 0;
-  }
+
+  delete audioSystem;
+  audioSystem = NULL;
+  return result;
 }
 
 //--------------------------------------------------------------------------------
 int AndroidGameShell::shutdownVideo( void )
 {
   cout << "AndroidGameShell::shutdownVideo()" << endl;
-  if( videoSystem->shutdown() < 0 )
+  int result = videoSystem->shutdown();
+  if( result < 0 )
   {
     cout << "GameShell::shutdownInput(): Failed to shut down video system." << endl;
-    delete videoSystem;
-    videoSystem = NULL;
-    return -1;
   }
-  else
-  {
-    delete videoSystem;
-    videoSystem = NULL;
-    return 0;
-  }
+
+  delete videoSystem;
+  videoSystem = NULL;
+  return result;
 }
 
 //--------------------------------------------------------------------------------
