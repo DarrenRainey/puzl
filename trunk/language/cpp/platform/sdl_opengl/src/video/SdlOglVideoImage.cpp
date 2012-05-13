@@ -51,6 +51,8 @@ SdlOglVideoImage::SdlOglVideoImage( SdlOglVideoImage& videoImage ): CoreVideoIma
 {
 	texelWidth  = 1.0f / ( float )*realWidth;
 	texelHeight = 1.0f / ( float )*realHeight;
+
+	texture = videoImage.texture;
 }
 
 //--------------------------------------------------------------------------------
@@ -521,7 +523,7 @@ int SdlOglVideoImage::createTexture( void )
 }
 
 //--------------------------------------------------------------------------------
-void SdlOglVideoImage::draw( SdlOglVideoDisplay* destinationDisplay )
+void SdlOglVideoImage::draw( CoreVideoDisplay* destinationDisplay )
 {
 	CoreVideoImage::draw( destinationDisplay ); // TODO: Needed?
 	
@@ -531,15 +533,15 @@ void SdlOglVideoImage::draw( SdlOglVideoDisplay* destinationDisplay )
 
 
 //--------------------------------------------------------------------------------
-void SdlOglVideoImage::draw( SdlOglVideoDisplay* destinationDisplay, int* sourceRect, int* destinationRect )
+void SdlOglVideoImage::draw( CoreVideoDisplay* destinationDisplay, int* sourceRect, int* destinationRect )
 {
 	drawPrimary( sourceRect, destinationRect );
 }
 
 //--------------------------------------------------------------------------------
-void SdlOglVideoImage::draw( SdlOglVideoImage* destinationBitmap, int* sourceRect, int* destinationRect )
+void SdlOglVideoImage::draw( CoreVideoImage* destinationBitmap, int* sourceRect, int* destinationRect )
 {
-	GLint viewport[4];			// Backup space for current OpenGL viewport
+	static GLint viewport[4];			// Backup space for current OpenGL viewport
 	
 	// Get current screen/viewport before we alter it for accelerated texture copying
 	glGetIntegerv( GL_VIEWPORT, viewport );

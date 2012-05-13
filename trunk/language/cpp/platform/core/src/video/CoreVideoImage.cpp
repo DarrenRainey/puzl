@@ -60,6 +60,12 @@ CoreVideoImage::CoreVideoImage( void )
 	
 	transparency = true;
 	
+	color = new int*[1];
+  color[0] = new int[3];
+  color[0][0] = 255; // Default white.
+  color[0][1] = 255;
+  color[0][2] = 255;
+
 	numberOfColorKeys = 0;
 	colorKey = NULL;
 	colorKeyIndex = 0;
