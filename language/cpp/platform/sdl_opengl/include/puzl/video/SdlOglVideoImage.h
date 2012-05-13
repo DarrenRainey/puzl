@@ -56,9 +56,9 @@ public:
   SdlOglVideoImage( SdlOglVideoImage& videoImage );
 	~SdlOglVideoImage( void );
 
-	void draw( SdlOglVideoDisplay* destinationDisplay );
-	void draw( SdlOglVideoDisplay* destinationDisplay, int* sourceRect, int* destinationRect );
-	void draw( SdlOglVideoImage* destinationImage, int* sourceRect = NULL, int* destinationRect = NULL );
+	void draw( CoreVideoDisplay* destinationDisplay );
+	void draw( CoreVideoDisplay* destinationDisplay, int* sourceRect, int* destinationRect );
+	void draw( CoreVideoImage* destinationImage, int* sourceRect = NULL, int* destinationRect = NULL );
 	
 	void clear( void );
 
