@@ -109,11 +109,13 @@ function VideoDisplay( width, height )
   
   this.setBackgroundColor = function( color )
   {
+    //this.backgroundColor = "rgb(" + color.red + "," + color.green + "," + color.blue + ")";
     this.backgroundColor = color;
   };
   
   this.setForegroundColor = function( color )
   {
+    //this.foregroundColor = "rgb(" + color.red + "," + color.green + "," + color.blue + ")";
     this.foregroundColor = color;
   };
   
@@ -122,6 +124,13 @@ function VideoDisplay( width, height )
     this.context.fillStyle = this.foregroundColor;
     this.context.fillRect( xPosition, yPosition, width, height );
   };
+  
+  /*this.getColorRgb = function( red, green, blue )
+  {
+    var color = new Color();
+    color.setRgb( red, green, blue );
+    return color;
+  };*/
   
   this.constructor( width, height );
   return this;
