@@ -30,11 +30,11 @@ function GameShell( gameShellSettings )
   
   this.run = function()
   {
-    this.initialize();
-    this.mainLoop();
+    this.shellInitialize();
+    this.shellLoop();
   };
   
-  this.initialize = function()
+  this.shellInitialize = function()
   {
     //console.log( "GameShell::initialize()" );
     this.inputSystem = new InputSystem();
@@ -44,14 +44,16 @@ function GameShell( gameShellSettings )
     this.display     = this.videoSystem.getDisplay();
     
     this.audioSystem = new AudioSystem();
+    
+    this.initialize();
   };
 
-  this.shutdown = function()
+  this.shellShutdown = function()
   {
     //console.log( "GameShell::shtudown()" );
   };
   
-  this.mainLoop = function()
+  this.shellLoop = function()
   {
     if( !this.quit )
     {
@@ -59,17 +61,19 @@ function GameShell( gameShellSettings )
       this.inputSystem.update();
       
       this.videoSystem.getRequestAnimFrame( VBlank );
-      this.draw();
+      this.shellDraw();
     }
     else
     {
       this.shutdown();
+      this.shellShutdown();
     }
   };
   
-  this.draw = function()
+  this.shellDraw = function()
   {
     this.videoSystem.draw();
+    this.draw();
   };
   
   this.constructor( gameShellSettings );
@@ -78,5 +82,5 @@ function GameShell( gameShellSettings )
 
 function VBlank()
 {
-  GlobalGameShell.mainLoop();
+  GlobalGameShell.shellLoop();
 }
