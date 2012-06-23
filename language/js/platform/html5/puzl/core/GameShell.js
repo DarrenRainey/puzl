@@ -6,6 +6,16 @@ function GameShellSettings()
 
 var GlobalGameShell;
 
+var GlobalVideoDisplay;
+function DocumentBodyOnResize()
+{
+  GlobalGameShell.documentBodyOnResize();
+}
+
+document.body.onload   = DocumentBodyOnResize;
+document.body.onresize = DocumentBodyOnResize;
+//window.onresize        = DocumentBodyOnResize;
+
 function GameShell( gameShellSettings )
 {
   this.inputSystem;
@@ -30,8 +40,14 @@ function GameShell( gameShellSettings )
   
   this.run = function()
   {
-    this.shellInitialize();
-    this.shellLoop();
+    //this.postInitialize();
+    
+    //if( this.videoSystem.videoImageLoadQueue.length == 0 )
+    //{
+      this.shellInitialize();
+      //this.postInitialize();
+      //this.shellLoop();
+    //}
   };
   
   this.shellInitialize = function()
@@ -42,10 +58,19 @@ function GameShell( gameShellSettings )
     
     this.videoSystem = new VideoSystem( this.gameShellSettings.width, this.gameShellSettings.height );
     this.display     = this.videoSystem.getDisplay();
+    GlobalVideoDisplay = this.display;
     
     this.audioSystem = new AudioSystem();
     
     this.initialize();
+
+    this.videoSystem.processImageLoadQueue();
+  };
+
+  this.shellPostInitialize = function()
+  {
+    this.postInitialize();
+    this.shellLoop();
   };
 
   this.shellShutdown = function()
@@ -75,6 +100,19 @@ function GameShell( gameShellSettings )
     this.videoSystem.draw();
     this.draw();
   };
+
+  this.documentBodyOnResize = function()
+  {
+    /*if( this.fullScreen )
+    {
+      this.setDimensions( document.width, document.height );
+    }*/
+    //console.log( "body resize" );
+    this.resize();
+  };
+
+  this.resize = function(){};
+  this.postInitialize = function(){};
   
   this.constructor( gameShellSettings );
   return this;
