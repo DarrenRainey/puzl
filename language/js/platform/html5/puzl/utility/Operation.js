@@ -120,7 +120,7 @@ function Operation()
   //--------------------------------------------------------------------------------
   this.setCurrentFrame = function( frameIndex )
   {
-    if( !( ( frameIndex < 0 ) || ( frameIndex > numberOfFrames - 1 ) ) )
+    if( !( ( frameIndex < 0 ) || ( frameIndex > this.numberOfFrames - 1 ) ) )
     {
       this.currentFrame = frameIndex;
     }
