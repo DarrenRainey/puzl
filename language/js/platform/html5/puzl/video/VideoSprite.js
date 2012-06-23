@@ -101,12 +101,26 @@ VideoSprite.prototype.draw = function( drawObject )
   cellX = ( cellX * ( this.cellWidth  + 1 ) ) + 1;
   cellY = ( cellY * ( this.cellHeight + 1 ) ) + 1;
 
-  DrawWithNearestScale( this, drawObject,
-                              cellX, cellY,
-                              this.cellWidth, this.cellHeight,
-                              this.xPosition, this.yPosition,
-                              this.width, this.height );
-
+  if( drawObject.display == null )
+  {
+    DrawWithNearestScale( this, drawObject,
+                          cellX, cellY,
+                          this.cellWidth, this.cellHeight,
+                          this.xPosition, this.yPosition,
+                          this.width, this.height );
+  }
+  else
+  {
+    var xScale = drawObject.display.xScale;
+    var yScale = drawObject.display.yScale;
+    
+    DrawWithNearestScale( this, drawObject,
+                          cellX, cellY,
+                          this.cellWidth, this.cellHeight,
+                          this.xPosition * xScale, this.yPosition * yScale,
+                          this.width * xScale, this.height * yScale );
+  }
+  
   if( hasAlpha )
   {
     context.globalAlpha = 1.0;

@@ -90,11 +90,12 @@ function ProcessVideoImageLoad( loadEvent )
     videoImage = GlobalVideoSystem.videoImageLoadQueue[index];
     if( id == videoImage.id )
     {
-      SetCanvasDimensions( videoImage.getCanvas(), videoImage.image.width, videoImage.image.height );
+      videoImage.setRealDimensions( videoImage.image.width, videoImage.image.height );
+      //SetCanvasDimensions( videoImage.getCanvas(), videoImage.image.width, videoImage.image.height );
       videoImage.getContext().drawImage( videoImage.image, 0, 0 );
       
       GlobalVideoSystem.videoImageLoadQueue.splice( index, 1 );
-      videoImage.image.src = null;
+      videoImage.image.src = null; // NOTE: Should this be nulled here?
       break;
     }
   }

@@ -1,35 +1,30 @@
 // var GlobalVideoDisplay;
-// function DocumentBodyOnResize()
-// {
-//   GlobalVideoDisplay.documentBodyOnResize();
-// }
-// 
-// document.body.onload = DocumentBodyOnResize;
-// document.body.onresize = DocumentBodyOnResize;
-// //window.onresize =  DocumentBodyOnResize;
 
 function VideoDisplay()
 {
-  //this.canvas;
-  //this.context;
+  this.realWidth;
+  this.realHeight;
+  this.xScale;
+  this.yScale;
+  this.maintainAspectRatio;
+
+  this.centerDisplay;
+  this.xOffset;
+  this.yOffset;
   
-  //this.realWidth;
-  //this.realHeight;
-  //this.width;
-  //this.height;
   this.fullScreen;
   
-  //this.backgroundColor;
   this.foregroundColor;
   
   this.constructor = function()
-  { 
-//     GlobalVideoDisplay = this;
-    
-    //this.canvas  = createCanvas( "canvas" );
-    //this.context = GetCanvasContext2D( this.canvas );
+  {
+    //GlobalVideoDisplay = this;
     
     this.setFullScreen( false );
+
+    this.centerDisplay = true;
+    this.maintainAspectRatio = true;
+    this.setRealDimensions( this.getHeight(), this.getWidth() );
     
     this.setBackgroundColor( "rgb(0,0,0)" );
   };
@@ -37,7 +32,6 @@ function VideoDisplay()
   this.setFullScreen = function( fullScreen )
   {
     this.fullScreen = fullScreen;
-    //this.setDimensions( document.width, document.height );
   };
 
   this.getHeight = function()
@@ -63,11 +57,48 @@ function VideoDisplay()
                      Math.max( document.body.offsetWidth, document.documentElement.offsetWidth ),
                      Math.max( document.body.clientWidth, document.documentElement.clientWidth ) );
   };
+
+  this.setRealDimensions = function( width, height )
+  {
+    this.realWidth  = width;
+    this.realHeight = height;
+
+    // Determine scale.
+    this.xScale = Math.floor( this.getWidth()  / this.realWidth );
+    if( this.xScale <= 0 )
+    {
+      this.xScale = 1;
+    }
+    
+    this.yScale = Math.floor( this.getHeight() / this.realHeight );
+    if( this.yScale <= 0 )
+    {
+      this.yScale = 1;
+    }
+
+    if( this.maintainAspectRatio )
+    {
+      this.xScale = this.yScale = Math.min( this.xScale, this.yScale );
+    }
+
+    // Determine position offset.
+    if( this.centerDisplay )
+    {
+      this.xOffset = Math.floor( ( this.getWidth()  - ( this.realWidth  * this.xScale ) ) / 2 );
+      this.yOffset = Math.floor( ( this.getHeight() - ( this.realHeight * this.yScale ) ) / 2 );
+    }
+    else
+    {
+      this.xOffset = 0;
+      this.yOffset = 0;
+    }
+  };
   
   this.clear = function()
   {
-    //this.context.fillStyle = this.backgroundColor;
-    //this.context.fillRect( 0, 0, this.realWidth, this.realHeight );
+    // TODO: Determine what this function should do.
+    // Perhaps clear list of registered VideoObjects and null their links to
+    // this display.
   };
   
   this.setBackgroundColor = function( color )
