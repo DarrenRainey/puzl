@@ -1,116 +1,79 @@
-function createCanvas( id )
-{
-  document.write( "<canvas id=\"" + id + "\" style=\"position: absolute; left: 0; top: 0; z-index: 1;\">Canvas not supported.</canvas>" );
-  return getCanvas( id );
-}
+// var GlobalVideoDisplay;
+// function DocumentBodyOnResize()
+// {
+//   GlobalVideoDisplay.documentBodyOnResize();
+// }
+// 
+// document.body.onload = DocumentBodyOnResize;
+// document.body.onresize = DocumentBodyOnResize;
+// //window.onresize =  DocumentBodyOnResize;
 
-function getCanvas( id )
+function VideoDisplay()
 {
-  var canvas = document.getElementById( id );
-  if( !canvas || !canvas.getContext )
-  {
-    console.error( "Failed to get canvas element by id." );
-    return;
-  }
+  //this.canvas;
+  //this.context;
   
-  return canvas;
-}
-
-function getContext2D( canvas )
-{
-  var context = canvas.getContext( "2d" );
-  if( !context || !context.drawImage )
-  {
-    console.error( "Failed to load 2D context from canvas." );
-    return;
-  }
-  
-  return context;
-}
-
-var GlobalVideoDisplay;
-function DocumentBodyOnResize()
-{
-  GlobalVideoDisplay.documentBodyOnResize();
-}
-
-document.body.onload = DocumentBodyOnResize;
-document.body.onresize = DocumentBodyOnResize;
-//window.onresize =  DocumentBodyOnResize;
-
-function VideoDisplay( width, height )
-{
-  this.canvas;
-  this.context;
-  
-  this.realWidth;
-  this.realHeight;
-  this.width;
-  this.height;
+  //this.realWidth;
+  //this.realHeight;
+  //this.width;
+  //this.height;
   this.fullScreen;
   
-  this.backgroundColor;
+  //this.backgroundColor;
   this.foregroundColor;
   
-  this.constructor = function( width, height )
+  this.constructor = function()
   { 
-    GlobalVideoDisplay = this;
+//     GlobalVideoDisplay = this;
     
-    this.canvas  = createCanvas( "canvas" );
-    this.context = getContext2D( this.canvas );
-  
-    this.setDimensions( width, height );
-    this.setRealDimensions( width, height );
+    //this.canvas  = createCanvas( "canvas" );
+    //this.context = GetCanvasContext2D( this.canvas );
+    
     this.setFullScreen( false );
     
-    this.backgroundColor = "rgb(0,0,0)";
-  };
-  
-  this.setDimensions = function( width, height )
-  {
-    this.width  = width;
-    this.height = height;
-    //this.canvas.width  = this.realWidth  = width;
-    //this.canvas.height = this.realHeight = height;
-  };
-  
-  this.setRealDimensions = function( width, height )
-  {
-    this.canvas.width  = this.realWidth  = width;
-    this.canvas.height = this.realHeight = height;
+    this.setBackgroundColor( "rgb(0,0,0)" );
   };
   
   this.setFullScreen = function( fullScreen )
   {
     this.fullScreen = fullScreen;
-    if( fullScreen )
-    {
-      this.setRealDimensions( document.width, document.height );
-    }
-    else
-    {
-      this.setRealDimensions( this.width, this.height );
-    }
+    //this.setDimensions( document.width, document.height );
+  };
+
+  this.getHeight = function()
+  {
+    //return document.height;
+    /*console.log( document.body.scrollHeight +":"+ document.documentElement.scrollHeight+":"+
+                     document.body.offsetHeight+":"+document.documentElement.offsetHeight+":"+
+                     document.body.clientHeight+":"+document.documentElement.clientHeight );*/
+    
+    return Math.max( /*Math.max( document.body.scrollHeight, document.documentElement.scrollHeight ),*/
+                     Math.max( document.body.offsetHeight, document.documentElement.offsetHeight ),
+                     Math.max( document.body.clientHeight, document.documentElement.clientHeight ) );
   };
   
-  this.documentBodyOnResize = function()
+  this.getWidth = function()
   {
-    if( this.fullScreen )
-    {
-      this.setRealDimensions( document.width, document.height );
-    }
+    //return document.width;
+    /*console.log( document.body.scrollWidth +":"+ document.documentElement.scrollWidth+":"+
+                     document.body.offsetWidth+":"+document.documentElement.offsetWidth+":"+
+                     document.body.clientWidth+":"+document.documentElement.clientWidth );*/
+                     
+    return Math.max( /*Math.max( document.body.scrollWidth, document.documentElement.scrollWidth ),*/
+                     Math.max( document.body.offsetWidth, document.documentElement.offsetWidth ),
+                     Math.max( document.body.clientWidth, document.documentElement.clientWidth ) );
   };
   
   this.clear = function()
   {
-    this.context.fillStyle = this.backgroundColor;
-    this.context.fillRect( 0, 0, this.realWidth, this.realHeight );
+    //this.context.fillStyle = this.backgroundColor;
+    //this.context.fillRect( 0, 0, this.realWidth, this.realHeight );
   };
   
   this.setBackgroundColor = function( color )
   {
     //this.backgroundColor = "rgb(" + color.red + "," + color.green + "," + color.blue + ")";
-    this.backgroundColor = color;
+    document.body.style.backgroundColor = color;
   };
   
   this.setForegroundColor = function( color )
@@ -121,8 +84,15 @@ function VideoDisplay( width, height )
   
   this.drawRectangle = function( xPosition, yPosition, width, height )
   {
-    this.context.fillStyle = this.foregroundColor;
-    this.context.fillRect( xPosition, yPosition, width, height );
+    //this.context.fillStyle = this.foregroundColor;
+    //this.context.fillRect( xPosition, yPosition, width, height );
+  };
+
+  this.drawRectangle = function( canvas, xPosition, yPosition, width, height )
+  {
+    var canvasContext = GetCanvasContext2D( canvas );
+    canvasContext.fillStyle = this.foregroundColor;
+    canvasContext.fillRect( xPosition, yPosition, width, height );
   };
   
   /*this.getColorRgb = function( red, green, blue )
@@ -132,6 +102,6 @@ function VideoDisplay( width, height )
     return color;
   };*/
   
-  this.constructor( width, height );
+  this.constructor();
   return this;
 }
