@@ -67,12 +67,12 @@ function VideoSystem( width, height )
 
   this.processImageLoadQueue = function()
   {
-    var numberOfIDQueuedVideoImages = GlobalVideoSystem.videoImageLoadQueue.length;
+    var numberOfIDQueuedVideoImages = this.videoImageLoadQueue.length;
     var index;
     var videoImage;
     for( index = 0; index < numberOfIDQueuedVideoImages; index++ )
     {
-      videoImage = GlobalVideoSystem.videoImageLoadQueue[index];
+      videoImage = this.videoImageLoadQueue[index];
       videoImage.image.src = videoImage.filename;
     }
   };

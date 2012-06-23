@@ -17,6 +17,7 @@ puzLInclude( "puzl/video/VideoSystem.js" );
 
 puzLInclude( "puzl/audio/AudioSystem.js" );
 
+puzLInclude( "puzl/utility/Operation.js" );
 puzLInclude( "puzl/utility/Button.js" );
 
 puzLInclude( "puzl/core/GameShell.js" );
