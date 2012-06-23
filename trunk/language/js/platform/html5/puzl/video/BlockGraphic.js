@@ -110,6 +110,23 @@ BlockGraphic.prototype.print = function( drawObject, text )
       hasAlpha = false;
     }
 
+    var width;
+    var height;
+    var xScale;
+    var yScale;
+    if( drawObject.display == null )
+    {
+      width  = this.width;
+      height = this.height;
+    }
+    else
+    {
+      xScale = drawObject.display.xScale;
+      yScale = drawObject.display.yScale;
+      width  = this.width  * xScale;
+      height = this.height * yScale;
+    }
+    
     for( var index = 0; index < length; index++ )
     {
       charCode = text.charCodeAt( index ) - 32; // TODO: The offset value should be eliminated with prebuilt rectangle array.
@@ -121,12 +138,23 @@ BlockGraphic.prototype.print = function( drawObject, text )
       cellX = ( cellX * ( this.cellWidth  + 1 ) ) + 1;
       cellY = ( cellY * ( this.cellHeight + 1 ) ) + 1;
 
-      DrawWithNearestScale( this, drawObject,
-                                 cellX, cellY,
-                                 this.cellWidth, this.cellHeight,
-                                 this.xPosition, this.yPosition,
-                                 this.width, this.height );
-
+      if( drawObject.display == null )
+      {
+        DrawWithNearestScale( this, drawObject,
+                              cellX, cellY,
+                              this.cellWidth, this.cellHeight,
+                              this.xPosition, this.yPosition,
+                              width, height );
+      }
+      else
+      {
+        DrawWithNearestScale( this, drawObject,
+                              cellX, cellY,
+                              this.cellWidth, this.cellHeight,
+                              this.xPosition * xScale, this.yPosition * yScale,
+                              width, height );
+      }
+      
       this.xPosition += this.width;
     }
 
