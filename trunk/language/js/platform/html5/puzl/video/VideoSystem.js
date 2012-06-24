@@ -60,7 +60,8 @@ function VideoSystem( width, height )
     videoImage.image = new Image();
 
     videoImage.image.videoImageID = videoImage.id;
-    videoImage.image.addEventListener( "load", ProcessVideoImageLoad, false );
+    //videoImage.image.addEventListener( "load", ProcessVideoImageLoad, false );
+    videoImage.image.onload = ProcessVideoImageLoad;
 
     videoImage.filename = filename;
   };
@@ -81,6 +82,7 @@ function VideoSystem( width, height )
 function ProcessVideoImageLoad( loadEvent )
 {
   var id = loadEvent.target.videoImageID;
+  //var id = this.videoImageID;
 
   var numberOfIDQueuedVideoImages = GlobalVideoSystem.videoImageLoadQueue.length;
   var index;
@@ -90,12 +92,29 @@ function ProcessVideoImageLoad( loadEvent )
     videoImage = GlobalVideoSystem.videoImageLoadQueue[index];
     if( id == videoImage.id )
     {
+      if( ( videoImage.image.width === 0 ) && ( videoImage.image.height === 0 ) )
+      {
+        // Trash image and retry with a new one; something went wrong.
+        // NOTE: This is a hack for webkit browsers running the load event before
+        // the image object has valid data (width, height, etc).
+        // TODO: Find a better solution?
+        videoImage.image = null;
+        videoImage.image = new Image();
+        videoImage.image.videoImageID = id;
+        videoImage.image.onload = ProcessVideoImageLoad;
+        videoImage.image.src = videoImage.filename;
+        return;
+      }
+      
       videoImage.setRealDimensions( videoImage.image.width, videoImage.image.height );
-      //SetCanvasDimensions( videoImage.getCanvas(), videoImage.image.width, videoImage.image.height );
+      //console.log( this.width );
+      //console.log( this.height );
       videoImage.getContext().drawImage( videoImage.image, 0, 0 );
       
       GlobalVideoSystem.videoImageLoadQueue.splice( index, 1 );
-      videoImage.image.src = null; // NOTE: Should this be nulled here?
+      //videoImage.image.src = null; // NOTE: Should this be nulled here?
+
+      console.log( "ProcessVideoImageLoad(): Loaded " + videoImage.filename + "." );
       break;
     }
   }
