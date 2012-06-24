@@ -114,7 +114,7 @@ function ProcessVideoImageLoad( loadEvent )
       GlobalVideoSystem.videoImageLoadQueue.splice( index, 1 );
       //videoImage.image.src = null; // NOTE: Should this be nulled here?
 
-      console.log( "ProcessVideoImageLoad(): Loaded " + videoImage.filename + "." );
+      //console.log( "ProcessVideoImageLoad(): Loaded " + videoImage.filename + "." );
       break;
     }
   }
