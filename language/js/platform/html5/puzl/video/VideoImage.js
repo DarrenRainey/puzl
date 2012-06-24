@@ -32,8 +32,9 @@ function VideoImage()
 
     this.filename = "";
 
-    this.width  = 1;
-    this.height = 1;
+    this.setRealDimensions( 1, 1 );
+    //this.width  = 1;
+    //this.height = 1;
   };
 
   this.setRealDimensions = function( width, height )
