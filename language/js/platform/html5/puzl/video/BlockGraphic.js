@@ -1,30 +1,32 @@
-function BlockGraphic( drawObject, cellWidth, cellHeight )
+function BlockGraphic( videoObject, cellWidth, cellHeight )
 {
-  //console.log( cellHeight );
-  this.image = drawObject.getCanvas();
-  //this.image = image;
+  this.sourceVideoObject = videoObject;
+  var sourceVideoObjectCanvas = this.sourceVideoObject.getCanvas();
 
   this.cellWidth  = cellWidth;
   this.cellHeight = cellHeight;
 
-  this.mapWidth  = Math.floor( this.image.width  / ( this.cellWidth  + 1 ) );
-  this.mapHeight = Math.floor( this.image.height / ( this.cellHeight + 1 ) );
+  this.mapWidth  = Math.floor( sourceVideoObjectCanvas.width  / ( this.cellWidth  + 1 ) );
+  this.mapHeight = Math.floor( sourceVideoObjectCanvas.height / ( this.cellHeight + 1 ) );
 
   this.setDimensions( this.cellWidth, this.cellHeight );
 
-  this.canvas = document.createElement( "canvas" );
-  this.canvas.width  = this.image.width;
-  this.canvas.height = this.image.height;
+  this.canvas = CreateOffScreenCanvas( null );
+  SetCanvasDimensions( this.canvas,
+                       sourceVideoObjectCanvas.width, sourceVideoObjectCanvas.height );
 
   this.xPosition = 0;
   this.yPosition = 0;
   this.absolutePosition = false;
+  this.positionGridCellWidth;
+  this.positionGridCellHeight;
+  this.setPositionGridCellDimensions( this.cellWidth, this.cellHeight );
 
   this.red   = -1;
   this.green = -1;
   this.blue  = -1;
-  //this.alpha = 1.0;
-  this.setColor( 255, 255, 255, 1.0 );
+  this.alpha;
+  this.setColor( 255, 255, 255, 0.0 );
 
   // TODO: Pre-calculate cell rectangles.
   this.numberOfCells = this.mapWidth * this.mapHeight;
@@ -33,9 +35,9 @@ function BlockGraphic( drawObject, cellWidth, cellHeight )
   //cellx = ( cellx * ( realWidth  + 1 ) ) + 1;
   //celly = ( celly * ( realHeight + 1 ) ) + 1;
 
-  /*for( var x = 0; x < this.image.width; ++x )
+  /*for( var x = 0; x < sourceVideoObjectCanvas.width; ++x )
   {
-    for( var y = 0; y < this.image.height; ++y )
+    for( var y = 0; y < sourceVideoObjectCanvas.height; ++y )
     {
 
     }
@@ -76,20 +78,27 @@ BlockGraphic.prototype.setColor = function( red, green, blue, alpha )
 
     this.color = BuildRgb( this.red, this.green, this.blue );
 
-    var canvasContext = this.canvas.getContext( "2d" );
-    canvasContext.drawImage( this.image, 0, 0 );
+    var sourceVideoObjectCanvas = this.sourceVideoObject.getCanvas();
+    var canvasContext = GetCanvasContext2D( this.canvas );
+    canvasContext.drawImage( sourceVideoObjectCanvas, 0, 0 );
     canvasContext.globalCompositeOperation = "source-atop";
     canvasContext.fillStyle = this.color;
-    canvasContext.fillRect( 0, 0, this.image.width, this.image.height );
+    canvasContext.fillRect( 0, 0, sourceVideoObjectCanvas.width, sourceVideoObjectCanvas.height );
   }
 }
 
-BlockGraphic.prototype.print = function( drawObject, text )
+BlockGraphic.prototype.setPositionGridCellDimensions = function( positionGridCellWidth, positionGridCellHeight )
 {
-  var context = drawObject.getContext();
+  this.positionGridCellWidth = positionGridCellWidth;
+  this.positionGridCellHeight = positionGridCellHeight;
+};
+
+BlockGraphic.prototype.print = function( videoObject, text )
+{
+  var context = videoObject.getContext();
   if( context == undefined )
   {
-    context = drawObject;
+    context = videoObject;
   }
   
   var length = text.length;
@@ -114,15 +123,15 @@ BlockGraphic.prototype.print = function( drawObject, text )
     var height;
     var xScale;
     var yScale;
-    if( drawObject.display == null )
+    if( videoObject.display == null )
     {
       width  = this.width;
       height = this.height;
     }
     else
     {
-      xScale = drawObject.display.xScale;
-      yScale = drawObject.display.yScale;
+      xScale = videoObject.display.xScale;
+      yScale = videoObject.display.yScale;
       width  = this.width  * xScale;
       height = this.height * yScale;
     }
@@ -138,9 +147,9 @@ BlockGraphic.prototype.print = function( drawObject, text )
       cellX = ( cellX * ( this.cellWidth  + 1 ) ) + 1;
       cellY = ( cellY * ( this.cellHeight + 1 ) ) + 1;
 
-      if( drawObject.display == null )
+      if( videoObject.display == null )
       {
-        DrawWithNearestScale( this, drawObject,
+        DrawWithNearestScale( this, videoObject,
                               cellX, cellY,
                               this.cellWidth, this.cellHeight,
                               this.xPosition, this.yPosition,
@@ -148,7 +157,7 @@ BlockGraphic.prototype.print = function( drawObject, text )
       }
       else
       {
-        DrawWithNearestScale( this, drawObject,
+        DrawWithNearestScale( this, videoObject,
                               cellX, cellY,
                               this.cellWidth, this.cellHeight,
                               this.xPosition * xScale, this.yPosition * yScale,
@@ -167,8 +176,8 @@ BlockGraphic.prototype.print = function( drawObject, text )
 
 BlockGraphic.prototype.setPosition = function( xPosition, yPosition )
 {
-  this.xPosition = this.width  * xPosition;
-  this.yPosition = this.height * yPosition;
+  this.xPosition = this.positionGridCellWidth  * xPosition;
+  this.yPosition = this.positionGridCellHeight * yPosition;
 }
 
 BlockGraphic.prototype.getCanvas = function()
