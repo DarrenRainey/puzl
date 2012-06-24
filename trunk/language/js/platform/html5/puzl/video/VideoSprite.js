@@ -1,77 +1,24 @@
 function VideoSprite( videoImage, cellWidth, cellHeight )
 {
-  //console.log( cellHeight );
-  this.image = videoImage.getCanvas();
+  var videoCellImage = new VideoCellImage( videoImage, cellWidth, cellHeight );
 
-  this.cellWidth  = cellWidth;
-  this.cellHeight = cellHeight;
+  videoCellImage.constructor   = this.constructor;
+  videoCellImage.draw          = this.draw;
+  videoCellImage.setPosition   = this.setPosition;
+  videoCellImage.loadAnimation = this.loadAnimation;
+  videoCellImage.animate       = this.animate;
 
-  this.mapWidth  = Math.floor( this.image.width  / ( this.cellWidth  + 1 ) );
-  this.mapHeight = Math.floor( this.image.height / ( this.cellHeight + 1 ) );
+  videoCellImage.constructor();
+  return videoCellImage;
+};
 
-  this.setDimensions( this.cellWidth, this.cellHeight );
-
-  this.canvas = document.createElement( "canvas" );
-  this.canvas.width  = this.image.width;
-  this.canvas.height = this.image.height;
-
+VideoSprite.prototype.constructor = function()
+{
   this.xPosition = 0;
   this.yPosition = 0;
-  this.absolutePosition = false;
-
-  this.red   = -1;
-  this.green = -1;
-  this.blue  = -1;
-  //this.alpha = 1.0;
-  this.setColor( 255, 255, 255, 1.0 );
-
-  // TODO: Pre-calculate cell rectangles.
-  this.numberOfCells = this.mapWidth * this.mapHeight;
-
+  
   this.animation = new Operation();
-}
-
-VideoSprite.prototype.setDimensions = function( width, height )
-{
-  this.width  = width;
-  this.height = height;
-}
-
-VideoSprite.prototype.setColor = function( red, green, blue, alpha )
-{
-  this.alpha = alpha;
-
-  var colorChangeDetected = false;
-  if( this.red != red )
-  {
-    colorChangeDetected = true;
-  }
-  else
-  if( this.green != green )
-  {
-    colorChangeDetected = true;
-  }
-  else
-  if( this.blue != blue )
-  {
-    colorChangeDetected = true;
-  }
-
-  if( colorChangeDetected )
-  {
-    this.red   = red;
-    this.green = green;
-    this.blue  = blue;
-
-    this.color = BuildRgb( this.red, this.green, this.blue );
-
-    var canvasContext = this.canvas.getContext( "2d" );
-    canvasContext.drawImage( this.image, 0, 0 );
-    canvasContext.globalCompositeOperation = "source-atop";
-    canvasContext.fillStyle = this.color;
-    canvasContext.fillRect( 0, 0, this.image.width, this.image.height );
-  }
-}
+};
 
 VideoSprite.prototype.draw = function( drawObject )
 {
@@ -129,21 +76,16 @@ VideoSprite.prototype.draw = function( drawObject )
 
 VideoSprite.prototype.setPosition = function( xPosition, yPosition )
 {
-  this.xPosition = this.width  * xPosition;
-  this.yPosition = this.height * yPosition;
-}
+  this.xPosition = xPosition;
+  this.yPosition = yPosition;
+};
 
 VideoSprite.prototype.loadAnimation = function( animation )
 {
   return this.animation.load( animation );
-}
+};
 
 VideoSprite.prototype.animate = function()
 {
   this.animation.read();
-}
-
-VideoSprite.prototype.getCanvas = function()
-{
-  return this.canvas;
-}
+};

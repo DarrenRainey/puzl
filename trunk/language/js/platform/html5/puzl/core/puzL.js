@@ -10,6 +10,7 @@ puzLInclude( "puzl/input/InputJoystick.js" );
 puzLInclude( "puzl/input/InputSystem.js" );
 
 puzLInclude( "puzl/video/BlockGraphic.js" );
+puzLInclude( "puzl/video/VideoCellImage.js" ) ;
 puzLInclude( "puzl/video/VideoSprite.js" );
 puzLInclude( "puzl/video/VideoImage.js" );
 puzLInclude( "puzl/video/VideoDisplay.js" );
