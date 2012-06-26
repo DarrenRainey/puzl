@@ -20,7 +20,15 @@ BlockGraphic.prototype.constructor = function()
   this.positionGridCellHeight;
   this.setPositionGridCellDimensions( this.cellWidth, this.cellHeight );
 
-  // TODO: Pre-calculate all cell rectangles.
+  // Pre-calculate all cell rectangles.
+  var numberOfCells = this.mapWidth * this.mapHeight;
+  for( var index = 0; index < numberOfCells; index++ )
+  {
+    cellX = index % this.mapWidth;
+    cellY = Math.floor( index / this.mapWidth );
+
+    this.loadCell( cellX, cellY, EXTRACT_MODE_CELL );
+  }
 };
 
 BlockGraphic.prototype.setPositionGridCellDimensions = function( positionGridCellWidth, positionGridCellHeight )
@@ -41,8 +49,7 @@ BlockGraphic.prototype.print = function( videoObject, text )
   if( length > 0 )
   {
     var charCode;
-    var cellX;
-    var cellY;
+    var cell;
 
     var hasAlpha; // TODO: Optimize. Could allocate this value once for each blockgraphic object.
     if( this.alpha != 1.0 )
@@ -75,18 +82,12 @@ BlockGraphic.prototype.print = function( videoObject, text )
     for( var index = 0; index < length; index++ )
     {
       charCode = text.charCodeAt( index ) - 32; // TODO: The offset value should be eliminated with prebuilt rectangle array.
-
-      // TODO: Optimize. Use prebuilt rectangles.
-      cellX = charCode % this.mapWidth;
-      cellY = Math.floor( charCode / this.mapWidth );
-
-      cellX = ( cellX * ( this.cellWidth  + 1 ) ) + 1;
-      cellY = ( cellY * ( this.cellHeight + 1 ) ) + 1;
-
+      cell = this.cellList[charCode];
+      
       if( videoObject.display == null )
       {
         DrawWithNearestScale( this, videoObject,
-                              cellX, cellY,
+                              cell[0], cell[1],
                               this.cellWidth, this.cellHeight,
                               this.xPosition, this.yPosition,
                               width, height );
@@ -94,7 +95,7 @@ BlockGraphic.prototype.print = function( videoObject, text )
       else
       {
         DrawWithNearestScale( this, videoObject,
-                              cellX, cellY,
+                              cell[0], cell[1],
                               this.cellWidth, this.cellHeight,
                               this.xPosition * xScale, this.yPosition * yScale,
                               width, height );
