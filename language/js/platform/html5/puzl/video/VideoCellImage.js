@@ -1,3 +1,6 @@
+var EXTRACT_MODE_CELL              = 0    // Mode to extract a cell from a bitmap for sprite
+var EXTRACT_MODE_ABS               = 1    // Mode to extract the bitmap for a sprite
+
 function VideoCellImage( videoObject, cellWidth, cellHeight )
 {
   this.sourceVideoObject = videoObject;
@@ -21,7 +24,7 @@ function VideoCellImage( videoObject, cellWidth, cellHeight )
   this.alpha;
   this.setColor( 255, 255, 255, 0.0 );
 
-  this.numberOfCells = this.mapWidth * this.mapHeight;
+  this.cellList = new Array();
 };
 
 VideoCellImage.prototype.setDimensions = function( width, height )
@@ -65,6 +68,24 @@ VideoCellImage.prototype.setColor = function( red, green, blue, alpha )
     canvasContext.fillStyle = this.color;
     canvasContext.fillRect( 0, 0, sourceVideoObjectCanvas.width, sourceVideoObjectCanvas.height );
   }
+};
+
+VideoCellImage.prototype.loadCell = function( xPosition, yPosition, mode )
+{
+  if( mode == EXTRACT_MODE_CELL )
+  {
+    xPosition = ( xPosition * ( this.cellWidth  + 1 ) ) + 1;
+    yPosition = ( yPosition * ( this.cellHeight + 1 ) ) + 1;
+  }
+
+  var cellIndex = this.cellList.length;
+  this.cellList[cellIndex] = new Array( xPosition, yPosition );
+  return cellIndex;
+};
+
+VideoCellImage.prototype.getNumberOfCells = function()
+{
+  return this.cellList.length;
 };
 
 VideoCellImage.prototype.getCanvas = function()
