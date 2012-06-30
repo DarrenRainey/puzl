@@ -97,7 +97,8 @@ BlockGraphic.prototype.print = function( videoObject, text )
         DrawWithNearestScale( this, videoObject,
                               cell[0], cell[1],
                               this.cellWidth, this.cellHeight,
-                              this.xPosition * xScale, this.yPosition * yScale,
+                              ( this.xPosition - videoObject.xPosition ) * xScale,
+                              ( this.yPosition - videoObject.yPosition ) * yScale,
                               width, height );
       }
 
