@@ -4,8 +4,6 @@ function VideoDisplay( width, height )
 {
   this.height;
   this.width;
-  //this.realWidth;
-  //this.realHeight;
   this.xScale;
   this.yScale;
   this.maintainAspectRatio;
@@ -13,6 +11,9 @@ function VideoDisplay( width, height )
   this.centerDisplay;
   this.xOffset;
   this.yOffset;
+
+  this.left;
+  this.top;
 
   this.videoImageList;
   
@@ -33,6 +34,10 @@ VideoDisplay.prototype.constructor = function( width, height )
 
   this.centerDisplay = true;
   this.maintainAspectRatio = true;
+
+  this.left = 0;
+  this.top  = 0;
+  
   this.setDimensions( width, height );
 
   this.setBackgroundColor( "rgb(0,0,0)" );
@@ -117,6 +122,8 @@ VideoDisplay.prototype.setDimensions = function( width, height )
       videoImage.setPosition( videoImage.getXPosition(), videoImage.getYPosition() );
     }
   }
+
+  this.determineTopLeft();
 };
 
 VideoDisplay.prototype.clear = function()
@@ -196,6 +203,8 @@ VideoDisplay.prototype.removeVideoImage = function( videoImage )
 
 VideoDisplay.prototype.determineTopLeft = function()
 {
+  // TODO: Allow top left to be defined by a particular video image in the
+  // videoImageList.
   var videoImage;
   var length = this.videoImageList.length;
   if( length < 1 )
@@ -204,13 +213,20 @@ VideoDisplay.prototype.determineTopLeft = function()
     this.left = 0;
     return;
   }
-  
-  this.top  = this.videoImageList[index].getYPosition();
-  this.left = this.videoImageList[index].getXPosition();
+
+  var index = 0;
+  videoImage = this.videoImageList[index];
+  this.top  = videoImage.getYPosition();
+  this.left = videoImage.getXPosition();
+
+  if( ++index >= length )
+  {
+    return;
+  }
 
   var currentTop;
   var currentLeft;
-  for( var index = 0; index < length; index++ )
+  for( ; index < length; index++ )
   {
     videoImage  = this.videoImageList[index];
     

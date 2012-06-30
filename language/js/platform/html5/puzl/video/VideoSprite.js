@@ -54,12 +54,12 @@ VideoSprite.prototype.constructor = function()
   this.animation = new Operation();
 };
 
-VideoSprite.prototype.draw = function( drawObject )
+VideoSprite.prototype.draw = function( videoObject )
 {
-  var context = drawObject.getContext();
+  var context = videoObject.getContext();
   if( context == undefined )
   {
-    context = drawObject;
+    context = videoObject;
   }
   
   var hasAlpha; // TODO: Optimize. Could allocate this value once for each blockgraphic object.
@@ -79,9 +79,9 @@ VideoSprite.prototype.draw = function( drawObject )
     return;
   }
 
-  if( drawObject.display == null )
+  if( videoObject.display == null )
   {
-    DrawWithNearestScale( this, drawObject,
+    DrawWithNearestScale( this, videoObject,
                           cell[0], cell[1],
                           this.cellWidth, this.cellHeight,
                           this.xPosition, this.yPosition,
@@ -89,13 +89,15 @@ VideoSprite.prototype.draw = function( drawObject )
   }
   else
   {
-    var xScale = drawObject.display.xScale;
-    var yScale = drawObject.display.yScale;
+    var videoObjectDisplay = videoObject.display;
+    var xScale = videoObjectDisplay.xScale;
+    var yScale = videoObjectDisplay.yScale;
     
-    DrawWithNearestScale( this, drawObject,
+    DrawWithNearestScale( this, videoObject,
                           cell[0], cell[1],
                           this.cellWidth, this.cellHeight,
-                          this.xPosition * xScale, this.yPosition * yScale,
+                          ( this.xPosition - videoObject.xPosition ) * xScale,
+                          ( this.yPosition - videoObject.yPosition ) * yScale,
                           this.width * xScale, this.height * yScale );
   }
   
