@@ -61,6 +61,8 @@ function GameShell( gameShellSettings )
     this.videoSystem = new VideoSystem( this.gameShellSettings.width, this.gameShellSettings.height );
     this.display     = this.videoSystem.getDisplay();
     GlobalVideoDisplay = this.display;
+
+    this.mouse.setDisplay( this.display );
     
     this.audioSystem = new AudioSystem();
     

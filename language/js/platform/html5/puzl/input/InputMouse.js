@@ -37,12 +37,17 @@ function InputMouse()
   inputDevice.mouseInput;
   inputDevice.xPosition;
   inputDevice.yPosition;
+  inputDevice.display;
 
   inputDevice.constructor        = this.constructor;
   inputDevice.checkButton        = this.checkButton;
   inputDevice.getButtonState     = this.getButtonState;
   inputDevice.setButtonState     = this.setButtonState;
   inputDevice.getLastButtonPress = this.getLastButtonPress;
+  inputDevice.getXPosition       = this.getXPosition;
+  inputDevice.getYPosition       = this.getYPosition;
+  
+  inputDevice.setDisplay         = this.setDisplay;
 
   inputDevice.constructor();
   return inputDevice;
@@ -70,6 +75,8 @@ InputMouse.prototype.constructor = function()
   this.stateChangeBufferSize = 10;
   this.stateChange = new Array( this.stateChangeBufferSize );
   this.numberOfStateChanges = 0;
+
+  this.setDisplay( null );
 };
 
 InputMouse.prototype.checkButton = function( buttonID )
@@ -107,4 +114,29 @@ InputMouse.prototype.setButtonState = function( buttonID, state )
 InputMouse.prototype.getLastButtonPress = function()
 {
   return this.getLastInputId();
+};
+
+InputMouse.prototype.getXPosition = function()
+{
+  if( this.display != null )
+  {
+    return ( ( this.xPosition - this.display.xOffset ) / this.display.xScale ) | 0;
+  }
+
+  return this.xPosition;
+};
+
+InputMouse.prototype.getYPosition = function()
+{
+  if( this.display != null )
+  {
+    return ( ( this.yPosition - this.display.yOffset ) / this.display.yScale ) | 0;
+  }
+
+  return this.yPosition;
+};
+
+InputMouse.prototype.setDisplay = function( display )
+{
+  this.display = display;
 };
