@@ -20,6 +20,9 @@ function VideoDisplay( width, height )
   this.fullScreen;
   
   this.foregroundColor;
+
+  this.eraseQueue;
+  this.numberOfEraseQueueObjects;
   
   this.constructor( width, height );
   return this;
@@ -29,6 +32,9 @@ VideoDisplay.prototype.constructor = function( width, height )
 {
   //GlobalVideoDisplay = this;
   this.videoImageList = new Array();
+
+  this.eraseQueue = new Array();
+  this.numberOfEraseQueueObjects = 0;
 
   this.setFullScreen( false );
 
@@ -242,4 +248,58 @@ VideoDisplay.prototype.determineTopLeft = function()
       this.left = currentLeft;
     }
   }
+};
+
+VideoDisplay.prototype.getNextEraseQueueObject = function()
+{
+  var numberOfEraseQueueObjects = ++this.numberOfEraseQueueObjects;
+
+  var eraseQueueObject;
+  var eraseQueueLength = this.eraseQueue.length;
+  if( numberOfEraseQueueObjects < eraseQueueLength )
+  {
+    eraseQueueObject = this.eraseQueue[numberOfEraseQueueObjects - 1];
+  }
+  else
+  {
+    eraseQueueObject = new EraseQueueObject();
+    this.eraseQueue[numberOfEraseQueueObjects - 1] = eraseQueueObject;
+  }
+
+  return eraseQueueObject;
+};
+
+VideoDisplay.prototype.processEraseQueue = function()
+{
+  var eraseQueueObject;
+  var lastCanvas    = null;
+  var currentCanvas = null;
+  var context;
+  var numberOfEraseQueueObjects = this.numberOfEraseQueueObjects;
+  for( var index = 0; index < numberOfEraseQueueObjects; index++ )
+  {
+    eraseQueueObject = this.eraseQueue[index];
+    currentCanvas = eraseQueueObject.targetVideoObject.getCanvas();
+    if( currentCanvas != lastCanvas )
+    {
+      context = GetCanvasContext2D( currentCanvas );
+      lastCanvas = currentCanvas;
+    }
+
+    context.clearRect( eraseQueueObject.xPosition,
+                       eraseQueueObject.yPosition,
+                       eraseQueueObject.width,
+                       eraseQueueObject.height );
+  }
+  
+  this.numberOfEraseQueueObjects = 0;
+};
+
+function EraseQueueObject()
+{
+  this.targetVideoObject;
+  this.xPosition;
+  this.yPosition;
+  this.width;
+  this.height;
 };

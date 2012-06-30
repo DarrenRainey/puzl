@@ -121,9 +121,17 @@ VideoImage.prototype.setPosition = function( xPosition, yPosition )
 
 VideoImage.prototype.fill = function( colorRgb )
 {
-  var context = GetCanvasContext2D( this.canvas );
+  var canvas = this.canvas;
+  var context = GetCanvasContext2D( canvas );
   context.fillStyle = colorRgb;
-  context.fillRect( 0, 0, this.canvas.width, this.canvas.height );
+  context.fillRect( 0, 0, canvas.width, canvas.height );
+};
+
+VideoImage.prototype.clear = function()
+{
+  var canvas = this.canvas;
+  var context = GetCanvasContext2D( canvas );
+  context.clearRect( 0, 0, canvas.width, canvas.height );
 };
 
 VideoImage.prototype.setDisplay = function( display )

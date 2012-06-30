@@ -27,6 +27,10 @@ function VideoSystem( width, height )
   this.draw = function()
   {
     //this.display.clear();
+    if( this.display.numberOfEraseQueueObjects > 0 )
+    {
+      this.display.processEraseQueue();
+    }
   };
   
   this.getDisplay = function()

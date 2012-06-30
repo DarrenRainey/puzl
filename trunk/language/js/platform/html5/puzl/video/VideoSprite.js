@@ -32,6 +32,8 @@ function VideoSprite( videoImage, cellWidth, cellHeight )
 
   videoCellImage.constructor        = this.constructor;
   videoCellImage.draw               = this.draw;
+  videoCellImage.erase              = this.erase;
+  videoCellImage.queueErase         = this.queueErase;
   videoCellImage.setPosition        = this.setPosition;
   videoCellImage.setAttributes      = this.setAttributes;
   videoCellImage.loadFrame          = this.loadFrame;
@@ -105,6 +107,51 @@ VideoSprite.prototype.draw = function( videoObject )
   {
     context.globalAlpha = 1.0;
   }
+};
+
+VideoSprite.prototype.erase = function( videoObject )
+{
+  var context = videoObject.getContext();
+  if( context == undefined )
+  {
+    context = videoObject;
+  }
+  
+  if( videoObject.display == null )
+  {
+    context.clearRect( this.xPosition, this.yPosition,
+                       this.width, this.height );
+  }
+  else
+  {
+    var videoObjectDisplay = videoObject.display;
+    var xScale = videoObjectDisplay.xScale;
+    var yScale = videoObjectDisplay.yScale;
+
+    context.clearRect( ( this.xPosition - videoObject.xPosition ) * xScale,
+                       ( this.yPosition - videoObject.yPosition ) * yScale,
+                       this.width * xScale, this.height * yScale );
+  }
+};
+
+VideoSprite.prototype.queueErase = function( videoObject )
+{
+  var videoObjectDisplay = videoObject.display;
+  if( videoObjectDisplay == null )
+  {
+    return;
+  }
+
+  var eraseQueueObject = videoObjectDisplay.getNextEraseQueueObject();
+  eraseQueueObject.targetVideoObject = videoObject;
+  
+  var xScale = videoObjectDisplay.xScale;
+  var yScale = videoObjectDisplay.yScale;
+
+  eraseQueueObject.xPosition = ( this.xPosition - videoObject.xPosition ) * xScale;
+  eraseQueueObject.yPosition = ( this.yPosition - videoObject.yPosition ) * yScale;
+  eraseQueueObject.width     = this.width  * xScale;
+  eraseQueueObject.height    = this.height * yScale;
 };
 
 VideoSprite.prototype.setPosition = function( xPosition, yPosition )
