@@ -26,7 +26,7 @@ function VideoSystem( width, height )
   
   this.draw = function()
   {
-    this.display.clear();
+    //this.display.clear();
   };
   
   this.getDisplay = function()
