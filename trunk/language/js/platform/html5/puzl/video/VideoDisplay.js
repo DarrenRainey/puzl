@@ -1,9 +1,11 @@
 // var GlobalVideoDisplay;
 
-function VideoDisplay()
+function VideoDisplay( width, height )
 {
-  this.realWidth;
-  this.realHeight;
+  this.height;
+  this.width;
+  //this.realWidth;
+  //this.realHeight;
   this.xScale;
   this.yScale;
   this.maintainAspectRatio;
@@ -18,23 +20,22 @@ function VideoDisplay()
   
   this.foregroundColor;
   
-  this.constructor();
+  this.constructor( width, height );
   return this;
 }
 
-VideoDisplay.prototype.constructor = function()
+VideoDisplay.prototype.constructor = function( width, height )
 {
   //GlobalVideoDisplay = this;
+  this.videoImageList = new Array();
 
   this.setFullScreen( false );
 
   this.centerDisplay = true;
   this.maintainAspectRatio = true;
-  this.setRealDimensions( this.getHeight(), this.getWidth() );
+  this.setDimensions( width, height );
 
   this.setBackgroundColor( "rgb(0,0,0)" );
-
-  this.videoImageList = new Array();
 };
 
 VideoDisplay.prototype.setFullScreen = function( fullScreen )
@@ -42,7 +43,7 @@ VideoDisplay.prototype.setFullScreen = function( fullScreen )
   this.fullScreen = fullScreen;
 };
 
-VideoDisplay.prototype.getHeight = function()
+VideoDisplay.prototype.getRealHeight = function()
 {
   //return document.height;
   /*console.log( document.body.scrollHeight +":"+ document.documentElement.scrollHeight+":"+
@@ -54,7 +55,7 @@ VideoDisplay.prototype.getHeight = function()
                     Math.max( document.body.clientHeight, document.documentElement.clientHeight ) );
 };
 
-VideoDisplay.prototype.getWidth = function()
+VideoDisplay.prototype.getRealWidth = function()
 {
   //return document.width;
   /*console.log( document.body.scrollWidth +":"+ document.documentElement.scrollWidth+":"+
@@ -66,19 +67,22 @@ VideoDisplay.prototype.getWidth = function()
                     Math.max( document.body.clientWidth, document.documentElement.clientWidth ) );
 };
 
-VideoDisplay.prototype.setRealDimensions = function( width, height )
+VideoDisplay.prototype.setDimensions = function( width, height )
 {
-  this.realWidth  = width;
-  this.realHeight = height;
+  this.width  = width;
+  this.height = height;
+
+  var realWidth  = this.getRealWidth();
+  var realHeight = this.getRealHeight();
 
   // Determine scale.
-  this.xScale = Math.floor( this.getWidth()  / this.realWidth );
+  this.xScale = ( realWidth  / this.width ) | 0;
   if( this.xScale <= 0 )
   {
     this.xScale = 1;
   }
 
-  this.yScale = Math.floor( this.getHeight() / this.realHeight );
+  this.yScale = ( realHeight / this.height ) | 0;
   if( this.yScale <= 0 )
   {
     this.yScale = 1;
@@ -92,13 +96,26 @@ VideoDisplay.prototype.setRealDimensions = function( width, height )
   // Determine position offset.
   if( this.centerDisplay )
   {
-    this.xOffset = Math.floor( ( this.getWidth()  - ( this.realWidth  * this.xScale ) ) / 2 );
-    this.yOffset = Math.floor( ( this.getHeight() - ( this.realHeight * this.yScale ) ) / 2 );
+    this.xOffset = ( ( realWidth  - ( this.width  * this.xScale ) ) / 2 ) | 0;
+    this.yOffset = ( ( realHeight - ( this.height * this.yScale ) ) / 2 ) | 0;
   }
   else
   {
     this.xOffset = 0;
     this.yOffset = 0;
+  }
+
+  // Scale and position all linked video images.
+  var videoImageListLength = this.videoImageList.length;
+  if( videoImageListLength > 0 )
+  {
+    var videoImage;
+    for( index = 0; index < videoImageListLength; index++ )
+    {
+      videoImage = this.videoImageList[index];
+      videoImage.setDimensions( videoImage.getWidth(), videoImage.getHeight() );
+      videoImage.setPosition( videoImage.getXPosition(), videoImage.getYPosition() );
+    }
   }
 };
 

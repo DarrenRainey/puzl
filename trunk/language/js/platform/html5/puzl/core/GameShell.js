@@ -107,11 +107,14 @@ function GameShell( gameShellSettings )
 
   this.documentBodyOnResize = function()
   {
-    /*if( this.fullScreen )
-    {
-      this.setDimensions( document.width, document.height );
-    }*/
-    //console.log( "body resize" );
+    this.shellResize();
+  };
+
+  this.shellResize = function()
+  {
+    this.display.setDimensions( this.display.width,
+                                this.display.height );
+
     this.resize();
   };
 
