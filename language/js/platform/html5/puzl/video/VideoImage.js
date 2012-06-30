@@ -110,11 +110,12 @@ VideoImage.prototype.setPosition = function( xPosition, yPosition )
   if( this.display != null )
   {
     //console.log( this.display.xOffset );
-    this.xPosition = ( xPosition * this.display.xScale ) + this.display.xOffset;
-    this.yPosition = ( yPosition * this.display.yScale ) + this.display.yOffset;
+    this.xPosition = xPosition;
+    this.yPosition = yPosition;
     
     SetCanvasPosition( this.canvas,
-                       this.xPosition, this.yPosition );
+                       ( xPosition * this.display.xScale ) + this.display.xOffset,
+                       ( yPosition * this.display.yScale ) + this.display.yOffset );
   }
 };
 

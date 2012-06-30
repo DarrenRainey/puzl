@@ -106,7 +106,7 @@ function ProcessVideoImageLoad( loadEvent )
         return;
       }
       
-      videoImage.setRealDimensions( videoImage.image.width, videoImage.image.height );
+      videoImage.setDimensions( videoImage.image.width, videoImage.image.height );
       //console.log( this.width );
       //console.log( this.height );
       videoImage.getContext().drawImage( videoImage.image, 0, 0 );
