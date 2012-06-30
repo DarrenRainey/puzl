@@ -86,6 +86,7 @@ function GameShell( gameShellSettings )
   {
     if( !this.quit )
     {
+      this.input();
       this.loop();
       this.inputSystem.update();
       
@@ -118,6 +119,7 @@ function GameShell( gameShellSettings )
     this.resize();
   };
 
+  this.input  = function(){};
   this.resize = function(){};
   this.postInitialize = function(){};
   
