@@ -21,4 +21,4 @@ puzLInclude( "puzl/audio/AudioSystem.js" );
 puzLInclude( "puzl/utility/Operation.js" );
 puzLInclude( "puzl/utility/Button.js" );
 
-puzLInclude( "puzl/core/GameShell.js" );
+puzLInclude( "puzl/utility/GameShell.js" );
