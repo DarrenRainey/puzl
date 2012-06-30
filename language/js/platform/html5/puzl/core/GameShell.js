@@ -55,6 +55,8 @@ function GameShell( gameShellSettings )
     //console.log( "GameShell::initialize()" );
     this.inputSystem = new InputSystem();
     this.keyboard    = this.inputSystem.getKeyboard( 0 );
+    this.mouse       = this.inputSystem.getMouse( 0 );
+    this.joysticks   = this.inputSystem.getJoysticks();
     
     this.videoSystem = new VideoSystem( this.gameShellSettings.width, this.gameShellSettings.height );
     this.display     = this.videoSystem.getDisplay();

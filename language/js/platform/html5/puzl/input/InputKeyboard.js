@@ -145,62 +145,71 @@ function InputKeyboard()
 {
   inputDevice = new InputDevice();
   
-  inputDevice.keyInput = new Array();
-  
-  inputDevice.constructor = function()
-  {
-    var index;
-    for( index = 0; index < NUM_KEY_CODES; index++ )
-    {
-      inputDevice.keyInput[index]       = new Input();
-      inputDevice.keyInput[index].id    = index;
-      inputDevice.keyInput[index].state = KEY_STATE_UP;
-      inputDevice.keyInput[index].type  = INPUT_TYPE_KEYBOARD_KEY;
-    }
-    
-    inputDevice.input = inputDevice.keyInput;
-    GlobalKeyboard = this;
-    
-    inputDevice.stateChangeBufferSize = 10;
-    inputDevice.stateChange = new Array( inputDevice.stateChangeBufferSize );
-    inputDevice.numberOfStateChanges = 0;
-  };
-  
-  inputDevice.checkKey = function( keyCode )
-  {
-    return inputDevice.check( keyCode );
-  };
-  
-  inputDevice.getKeyState = function( keyCode )
-  {
-    return inputDevice.getState( keyCode );
-  };
-  
-  inputDevice.setKeyState = function( keyCode, state )
-  {
-    inputDevice.setState( keyCode, state );
-  };
-  
-  inputDevice.getLastKeyPress = function()
-  {
-    return inputDevice.getLastInputId();
-  };
-  
-//   this.getCurrentKeyEvents = function()
-//   {
-//     
-//   };
-//   
-//   this.getNumberOfCurrentKeyEvents = function()
-//   {
-//     
-//   };
-  
-//   this.update = function( keyEvent )
-//   {
-//     
-//   };
+  inputDevice.keyInput;
+
+  inputDevice.constructor     = this.constructor;
+  inputDevice.checkKey        = this.checkKey;
+  inputDevice.getKeyState     = this.getKeyState;
+  inputDevice.setKeyState     = this.setKeyState;
+  inputDevice.getLastKeyPress = this.getLastKeyPress;
   
   inputDevice.constructor();
   return inputDevice;
 }
+
+InputKeyboard.prototype.constructor = function()
+{
+  this.keyInput = new Array();
+  
+  var index;
+  for( index = 0; index < NUM_KEY_CODES; index++ )
+  {
+    this.keyInput[index]       = new Input();
+    this.keyInput[index].id    = index;
+    this.keyInput[index].state = KEY_STATE_UP;
+    this.keyInput[index].type  = INPUT_TYPE_KEYBOARD_KEY;
+  }
+
+  this.input = this.keyInput;
+  GlobalKeyboard = this;
+
+  this.stateChangeBufferSize = 10;
+  this.stateChange = new Array( this.stateChangeBufferSize );
+  this.numberOfStateChanges = 0;
+};
+
+InputKeyboard.prototype.checkKey = function( keyCode )
+{
+  return this.check( keyCode );
+};
+
+InputKeyboard.prototype.getKeyState = function( keyCode )
+{
+  return this.getState( keyCode );
+};
+
+InputKeyboard.prototype.setKeyState = function( keyCode, state )
+{
+  this.setState( keyCode, state );
+};
+
+InputKeyboard.prototype.getLastKeyPress = function()
+{
+  return this.getLastInputId();
+};
+
+//   this.getCurrentKeyEvents = function()
+//   {
+//
+//   };
+//
+//   this.getNumberOfCurrentKeyEvents = function()
+//   {
+//
+//   };
+
+//   this.update = function( keyEvent )
+//   {
+//
+//   };
+

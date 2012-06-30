@@ -1,71 +1,110 @@
+var BUTTON_STATE_UP                   = INPUT_STATE_UP;
+var BUTTON_STATE_RELEASED             = INPUT_STATE_RELEASED;
+var BUTTON_STATE_DOWN                 = INPUT_STATE_DOWN;
+var BUTTON_STATE_PRESSED              = INPUT_STATE_PRESSED;
+
+var INPUT_TYPE_MOUSE_BUTTON = 1;
+var NUM_BUTTONS = 3;
+
+var GlobalMouse;
+
+function ProcessMouseDown( mouseEvent )
+{
+  GlobalMouse.setButtonState( mouseEvent.which, BUTTON_STATE_PRESSED );
+  //mouseEvent.preventDefault();
+}
+
+function ProcessMouseUp( mouseEvent )
+{
+  GlobalMouse.setButtonState( mouseEvent.which, BUTTON_STATE_RELEASED );
+  //mouseEvent.preventDefault();
+}
+
+function ProcessMouseMove( mouseEvent )
+{
+  GlobalMouse.xPosition = mouseEvent.pageX;
+  GlobalMouse.yPosition = mouseEvent.pageY;
+}
+
+document.addEventListener( "mousedown", ProcessMouseDown, false );
+document.addEventListener( "mouseup",   ProcessMouseUp,   false );
+document.addEventListener( "mousemove", ProcessMouseMove, false );
+
 function InputMouse()
 {
-  
+  inputDevice = new InputDevice();
+
+  inputDevice.mouseInput;
+  inputDevice.xPosition;
+  inputDevice.yPosition;
+
+  inputDevice.constructor        = this.constructor;
+  inputDevice.checkButton        = this.checkButton;
+  inputDevice.getButtonState     = this.getButtonState;
+  inputDevice.setButtonState     = this.setButtonState;
+  inputDevice.getLastButtonPress = this.getLastButtonPress;
+
+  inputDevice.constructor();
+  return inputDevice;
 }
 
-// event functions
-function mouseClicked( mouseEvent )
+InputMouse.prototype.constructor = function()
 {
-  mouseX = mouseEvent.pageX - TitleCanvas.offsetLeft;
-  mouseY = mouseEvent.pageY - TitleCanvas.offsetTop;
-}
+  this.mouseInput = new Array();
 
-/*
-function CheckKeyDown( e )
+  var index;
+  for( index = 0; index < NUM_BUTTONS; index++ )
+  {
+    this.mouseInput[index]       = new Input();
+    this.mouseInput[index].id    = index;
+    this.mouseInput[index].state = BUTTON_STATE_UP;
+    this.mouseInput[index].type  = INPUT_TYPE_MOUSE_BUTTON;
+  }
+
+  this.input = this.mouseInput;
+  GlobalMouse = this;
+
+  this.xPosition = 0;
+  this.yPosition = 0;
+
+  this.stateChangeBufferSize = 10;
+  this.stateChange = new Array( this.stateChangeBufferSize );
+  this.numberOfStateChanges = 0;
+};
+
+InputMouse.prototype.checkButton = function( buttonID )
 {
-    var keyID = e.keyCode || e.which;
-    if( keyID === 38 || keyID === 87 )
-    { //up arrow or W key
-        e.preventDefault();
-    }
+  if( buttonID < NUM_BUTTONS )
+  {
+    return this.check( buttonID );
+  }
+  else
+  {
+    return false;
+  }
+};
 
-    if( keyID === 39 || keyID === 68 )
-    { //right arrow or D key
-        e.preventDefault();
-    }
-
-    if( keyID === 40 || keyID === 83 )
-    { //down arrow or S key
-        e.preventDefault();
-    }
-
-    if( keyID === 37 || keyID === 65 )
-    { //left arrow or A key
-        e.preventDefault();
-    }
-
-    if( keyID === 32 )
-    { //spacebar
-        e.preventDefault();
-    }
-}
-
-function CheckKeyUp( e )
+InputMouse.prototype.getButtonState = function( buttonID )
 {
-    var keyID = e.keyCode || e.which;
-    if( keyID === 38 || keyID === 87 )
-    { //up arrow or W key
-        e.preventDefault();
-    }
+  if( buttonID < NUM_BUTTONS )
+  {
+    return this.getState( buttonID );
+  }
+  else
+  {
+    return BUTTON_STATE_UP;
+  }
+};
 
-    if( keyID === 39 || keyID === 68 )
-    { //right arrow or D key
-        e.preventDefault();
-    }
+InputMouse.prototype.setButtonState = function( buttonID, state )
+{
+  if( buttonID < NUM_BUTTONS )
+  {
+    this.setState( buttonID, state );
+  }
+};
 
-    if( keyID === 40 || keyID === 83 )
-    { //down arrow or S key
-        e.preventDefault();
-    }
-
-    if( keyID === 37 || keyID === 65 )
-    { //left arrow or A key
-        e.preventDefault();
-    }
-
-    if( keyID === 32 )
-    { //spacebar
-        e.preventDefault();
-    }
-}
-*/
+InputMouse.prototype.getLastButtonPress = function()
+{
+  return this.getLastInputId();
+};
