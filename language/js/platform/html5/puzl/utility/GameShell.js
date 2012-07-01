@@ -29,7 +29,7 @@ function GameShell( gameShellSettings )
   this.keyboard;
   this.display;
   
-  this.loop;
+  this.logic;
   
   this.constructor = function()
   {
@@ -87,7 +87,7 @@ function GameShell( gameShellSettings )
     if( !this.quit )
     {
       this.input();
-      this.loop();
+      this.logic();
       this.inputSystem.update();
       
       this.videoSystem.getRequestAnimFrame( VBlank );
