@@ -10,13 +10,13 @@ var GlobalMouse;
 
 function ProcessMouseDown( mouseEvent )
 {
-  GlobalMouse.setButtonState( mouseEvent.which, BUTTON_STATE_PRESSED );
+  GlobalMouse.setButtonState( mouseEvent.which - 1, BUTTON_STATE_PRESSED );
   //mouseEvent.preventDefault();
 }
 
 function ProcessMouseUp( mouseEvent )
 {
-  GlobalMouse.setButtonState( mouseEvent.which, BUTTON_STATE_RELEASED );
+  GlobalMouse.setButtonState( mouseEvent.which - 1, BUTTON_STATE_RELEASED );
   //mouseEvent.preventDefault();
 }
 
