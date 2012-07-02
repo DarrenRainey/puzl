@@ -34,7 +34,16 @@ function VideoSprite( videoImage, cellWidth, cellHeight )
   videoCellImage.draw               = this.draw;
   videoCellImage.erase              = this.erase;
   videoCellImage.queueErase         = this.queueErase;
+  
   videoCellImage.setPosition        = this.setPosition;
+  videoCellImage.setXPosition       = this.setXPosition;
+  videoCellImage.setYPosition       = this.setYPosition;
+  
+  videoCellImage.setVelocity        = this.setVelocity;
+  videoCellImage.setXVelocity       = this.setXVelocity;
+  videoCellImage.setYVelocity       = this.setYVelocity;
+  videoCellImage.move               = this.move;
+  
   videoCellImage.setAttributes      = this.setAttributes;
   videoCellImage.loadFrame          = this.loadFrame;
   videoCellImage.getNumberOfFrames  = this.getNumberOfFrames;
@@ -44,6 +53,9 @@ function VideoSprite( videoImage, cellWidth, cellHeight )
   videoCellImage.loadAnimation      = this.loadAnimation;
   videoCellImage.animate            = this.animate;
 
+  this.xVelocity;
+  this.yVelocity;
+
   videoCellImage.constructor();
   return videoCellImage;
 }
@@ -52,6 +64,8 @@ VideoSprite.prototype.constructor = function()
 {
   this.xPosition = 0;
   this.yPosition = 0;
+  this.xVelocity = 0;
+  this.yVelocity = 0;
   
   this.animation = new Operation();
 };
@@ -156,8 +170,47 @@ VideoSprite.prototype.queueErase = function( videoObject )
 
 VideoSprite.prototype.setPosition = function( xPosition, yPosition )
 {
+  this.setXPosition( xPosition );
+  this.setYPosition( yPosition );
+};
+
+VideoSprite.prototype.setXPosition = function( xPosition )
+{
   this.xPosition = xPosition;
+};
+
+VideoSprite.prototype.setYPosition = function( yPosition )
+{
   this.yPosition = yPosition;
+};
+
+VideoSprite.prototype.setXVelocity = function( xVelocity )
+{
+  this.xVelocity = xVelocity;
+};
+
+VideoSprite.prototype.setYVelocity = function( yVelocity )
+{
+  this.yVelocity = yVelocity;
+};
+
+VideoSprite.prototype.setVelocity = function( xVelocity, yVelocity )
+{
+  this.setXVelocity( xVelocity );
+  this.setYVelocity( yVelocity );
+};
+
+VideoSprite.prototype.move = function()
+{
+  if( this.xVelocity != 0 )
+  {
+    this.xPosition += this.xVelocity;
+  }
+
+  if( this.yVelocity != 0 )
+  {
+    this.yPosition += this.yVelocity;
+  }
 };
 
 VideoSprite.prototype.setAttributes = function( attributes )
