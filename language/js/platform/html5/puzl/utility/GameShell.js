@@ -16,6 +16,11 @@ document.body.onload   = DocumentBodyOnResize;
 document.body.onresize = DocumentBodyOnResize;
 //window.onresize        = DocumentBodyOnResize;
 
+function VBlank()
+{
+  GlobalGameShell.shellLoop();
+}
+
 function GameShell( gameShellSettings )
 {
   this.inputSystem;
@@ -31,103 +36,96 @@ function GameShell( gameShellSettings )
   
   this.logic;
   
-  this.constructor = function()
-  {
-    GlobalGameShell = this;
-    this.gameShellSettings = gameShellSettings;
-    this.quit = false;
-  };
-  
-  this.run = function()
-  {
-    //this.postInitialize();
-    
-    //if( this.videoSystem.videoImageLoadQueue.length == 0 )
-    //{
-      this.shellInitialize();
-      //this.postInitialize();
-      //this.shellLoop();
-    //}
-  };
-  
-  this.shellInitialize = function()
-  {
-    //console.log( "GameShell::initialize()" );
-    this.inputSystem = new InputSystem();
-    this.keyboard    = this.inputSystem.getKeyboard( 0 );
-    this.mouse       = this.inputSystem.getMouse( 0 );
-    this.joysticks   = this.inputSystem.getJoysticks();
-    
-    this.videoSystem = new VideoSystem( this.gameShellSettings.width, this.gameShellSettings.height );
-    this.display     = this.videoSystem.getDisplay();
-    GlobalVideoDisplay = this.display;
-
-    this.mouse.setDisplay( this.display );
-    
-    this.audioSystem = new AudioSystem();
-    
-    this.initialize();
-
-    this.videoSystem.processImageLoadQueue();
-  };
-
-  this.shellPostInitialize = function()
-  {
-    this.postInitialize();
-    this.shellLoop();
-  };
-
-  this.shellShutdown = function()
-  {
-    //console.log( "GameShell::shtudown()" );
-  };
-  
-  this.shellLoop = function()
-  {
-    if( !this.quit )
-    {
-      this.input();
-      this.logic();
-      this.inputSystem.update();
-      
-      this.videoSystem.getRequestAnimFrame( VBlank );
-      this.shellDraw();
-    }
-    else
-    {
-      this.shutdown();
-      this.shellShutdown();
-    }
-  };
-  
-  this.shellDraw = function()
-  {
-    this.videoSystem.draw();
-    this.draw();
-  };
-
-  this.documentBodyOnResize = function()
-  {
-    this.shellResize();
-  };
-
-  this.shellResize = function()
-  {
-    this.display.setDimensions( this.display.width,
-                                this.display.height );
-
-    this.resize();
-  };
-
-  this.input  = function(){};
-  this.resize = function(){};
-  this.postInitialize = function(){};
-  
   this.constructor( gameShellSettings );
   return this;
 }
 
-function VBlank()
+GameShell.prototype.constructor = function()
 {
-  GlobalGameShell.shellLoop();
-}
+  //console.log( "GameShell::constructor()" );
+  GlobalGameShell = this;
+  this.gameShellSettings = gameShellSettings;
+  this.quit = false;
+};
+
+GameShell.prototype.run = function()
+{
+  //console.log( "GameShell::run()" );
+  this.shellInitialize();
+};
+
+GameShell.prototype.shellInitialize = function()
+{
+  //console.log( "GameShell::initialize()" );
+  this.inputSystem = new InputSystem();
+  this.keyboard    = this.inputSystem.getKeyboard( 0 );
+  this.mouse       = this.inputSystem.getMouse( 0 );
+  this.joysticks   = this.inputSystem.getJoysticks();
+
+  this.videoSystem = new VideoSystem( this.gameShellSettings.width, this.gameShellSettings.height );
+  this.display     = this.videoSystem.getDisplay();
+  GlobalVideoDisplay = this.display;
+
+  this.mouse.setDisplay( this.display );
+
+  this.audioSystem = new AudioSystem();
+
+  this.initialize();
+
+  this.videoSystem.processImageLoadQueue();
+};
+
+GameShell.prototype.shellPostInitialize = function()
+{
+  //console.log( "GameShell::shellPostInitialize()" );
+  this.postInitialize();
+  this.shellLoop();
+};
+
+GameShell.prototype.shellShutdown = function()
+{
+  //console.log( "GameShell::shtudown()" );
+};
+
+GameShell.prototype.shellLoop = function()
+{
+  //console.log( "GameShell::shellLoop()" );
+  if( !this.quit )
+  {
+    this.input();
+    this.logic();
+    this.inputSystem.update();
+
+    this.videoSystem.getRequestAnimFrame( VBlank );
+    this.shellDraw();
+  }
+  else
+  {
+    this.shutdown();
+    this.shellShutdown();
+  }
+};
+
+GameShell.prototype.shellDraw = function()
+{
+  //console.log( "GameShell::shellDraw()" );
+  this.videoSystem.draw();
+  this.draw();
+};
+
+GameShell.prototype.documentBodyOnResize = function()
+{
+  this.shellResize();
+};
+
+GameShell.prototype.shellResize = function()
+{
+  this.display.setDimensions( this.display.width,
+                              this.display.height );
+
+  this.resize();
+};
+
+GameShell.prototype.input  = function(){};
+GameShell.prototype.resize = function(){};
+GameShell.prototype.postInitialize = function(){};
