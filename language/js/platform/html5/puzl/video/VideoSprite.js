@@ -70,13 +70,15 @@ VideoSprite.prototype.constructor = function()
   this.animation = new Operation();
 };
 
-VideoSprite.prototype.draw = function( videoObject )
+VideoSprite.prototype.draw = function()
 {
-  var context = videoObject.getContext();
-  if( context == undefined )
+  //var context = videoObject.getContext();
+  if( this.targetVideoObject == null )
   {
-    context = videoObject;
+    return;
   }
+  
+  var context = this.targetVideoObject.getContext();
   
   var hasAlpha; // TODO: Optimize. Could allocate this value once for each blockgraphic object.
   if( this.alpha != 1.0 )
@@ -95,9 +97,9 @@ VideoSprite.prototype.draw = function( videoObject )
     return;
   }
 
-  if( videoObject.display == null )
+  if( this.targetVideoObject.display == null )
   {
-    DrawWithNearestScale( this, videoObject,
+    DrawWithNearestScale( this, this.targetVideoObject,
                           cell[0], cell[1],
                           this.cellWidth, this.cellHeight,
                           this.xPosition, this.yPosition,
@@ -105,15 +107,15 @@ VideoSprite.prototype.draw = function( videoObject )
   }
   else
   {
-    var videoObjectDisplay = videoObject.display;
+    var videoObjectDisplay = this.targetVideoObject.display;
     var xScale = videoObjectDisplay.xScale;
     var yScale = videoObjectDisplay.yScale;
     
-    DrawWithNearestScale( this, videoObject,
+    DrawWithNearestScale( this, this.targetVideoObject,
                           cell[0], cell[1],
                           this.cellWidth, this.cellHeight,
-                          ( this.xPosition - videoObject.xPosition ) * xScale,
-                          ( this.yPosition - videoObject.yPosition ) * yScale,
+                          ( this.xPosition - this.targetVideoObject.xPosition ) * xScale,
+                          ( this.yPosition - this.targetVideoObject.yPosition ) * yScale,
                           this.width * xScale, this.height * yScale );
   }
   
@@ -123,47 +125,39 @@ VideoSprite.prototype.draw = function( videoObject )
   }
 };
 
-VideoSprite.prototype.erase = function( videoObject )
+VideoSprite.prototype.erase = function()
 {
-  var context = videoObject.getContext();
-  if( context == undefined )
-  {
-    context = videoObject;
-  }
+  var context = this.targetVideoObject.getContext();
   
-  if( videoObject.display == null )
+  if( this.targetVideoObject.display == null )
   {
     context.clearRect( this.xPosition, this.yPosition,
                        this.width, this.height );
   }
   else
   {
-    var videoObjectDisplay = videoObject.display;
+    var videoObjectDisplay = this.targetVideoObject.display;
     var xScale = videoObjectDisplay.xScale;
     var yScale = videoObjectDisplay.yScale;
 
-    context.clearRect( ( this.xPosition - videoObject.xPosition ) * xScale,
-                       ( this.yPosition - videoObject.yPosition ) * yScale,
+    context.clearRect( ( this.xPosition - this.targetVideoObject.xPosition ) * xScale,
+                       ( this.yPosition - this.targetVideoObject.yPosition ) * yScale,
                        this.width * xScale, this.height * yScale );
   }
 };
 
-VideoSprite.prototype.queueErase = function( videoObject )
+VideoSprite.prototype.queueErase = function()
 {
-  var videoObjectDisplay = videoObject.display;
-  if( videoObjectDisplay == null )
-  {
-    return;
-  }
+  var videoObjectDisplay = this.targetVideoObject.display;
 
   var eraseQueueObject = videoObjectDisplay.getNextEraseQueueObject();
-  eraseQueueObject.targetVideoObject = videoObject;
+  eraseQueueObject.targetVideoObject = this.targetVideoObject;
   
   var xScale = videoObjectDisplay.xScale;
   var yScale = videoObjectDisplay.yScale;
 
-  eraseQueueObject.xPosition = ( this.xPosition - videoObject.xPosition ) * xScale;
-  eraseQueueObject.yPosition = ( this.yPosition - videoObject.yPosition ) * yScale;
+  eraseQueueObject.xPosition = ( this.xPosition - this.targetVideoObject.xPosition ) * xScale;
+  eraseQueueObject.yPosition = ( this.yPosition - this.targetVideoObject.yPosition ) * yScale;
   eraseQueueObject.width     = this.width  * xScale;
   eraseQueueObject.height    = this.height * yScale;
 };
@@ -202,15 +196,24 @@ VideoSprite.prototype.setVelocity = function( xVelocity, yVelocity )
 
 VideoSprite.prototype.move = function()
 {
-  if( this.xVelocity != 0 )
+  if( ( this.xVelocity != 0 ) || ( this.yVelocity != 0 ) )
   {
-    this.xPosition += this.xVelocity;
+    this.queueErase();
+    
+    if( this.xVelocity != 0 )
+    {
+      this.xPosition += this.xVelocity;
+    }
+
+    if( this.yVelocity != 0 )
+    {
+      this.yPosition += this.yVelocity;
+    }
+    
+    return true;
   }
 
-  if( this.yVelocity != 0 )
-  {
-    this.yPosition += this.yVelocity;
-  }
+  return false;
 };
 
 VideoSprite.prototype.setAttributes = function( attributes )
@@ -252,5 +255,11 @@ VideoSprite.prototype.loadAnimation = function( animation )
 
 VideoSprite.prototype.animate = function()
 {
-  return this.animation.read();
+  var frameChanged = this.animation.read();
+  if( frameChanged )
+  {
+    this.queueErase();
+  }
+
+  return frameChanged;
 };
