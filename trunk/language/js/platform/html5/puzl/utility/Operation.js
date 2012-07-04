@@ -188,7 +188,7 @@ function Operation()
       // Set sequence state message to done (always because it never started)
       //this.state = OPERATION_STATE_DONE;
       this.state = OPERATION_STATE_RUNNING;
-      return this.state;
+      return false;
     }
     else
     if( this.attributes & OPERATION_ATTRIBUTE_MULTI_FRAME )
@@ -214,8 +214,10 @@ function Operation()
           this.state = OPERATION_STATE_RUNNING;
         }
 
-        return this.state;
+        return true;
       }
+
+      return false;
     }
     else
     if( this.attributes & OPERATION_ATTRIBUTE_MULTI_SEQUENCE )
@@ -233,7 +235,8 @@ function Operation()
         // Increment the animation frame index
         this.frameIndex++;
 
-        // Extract the next frame from sequence list
+        // Extract the next frame from sequence list.
+        var lastFrame = this.currentFrame;
         this.currentFrame = this.sequences[this.currentSequence][this.frameIndex];
 
         // Check for end sequence flag (-1)
@@ -262,13 +265,16 @@ function Operation()
             // Extract first sequence frame
             this.currentFrame = this.sequences[this.currentSequence][this.frameIndex];
           }
+        }
 
-          return this.state;
+        if( this.currentFrame != lastFrame )
+        {
+          return true;
         }
       }
-    }
 
-    return this.state;
+      return false;
+    }
   };
 
   this.constructor();

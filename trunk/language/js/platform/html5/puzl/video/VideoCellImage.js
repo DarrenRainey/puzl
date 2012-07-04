@@ -3,8 +3,37 @@ var EXTRACT_MODE_ABS               = 1    // Mode to extract the bitmap for a sp
 
 function VideoCellImage( videoObject, cellWidth, cellHeight )
 {
+  this.sourceVideoObject;
+  this.targetVideoObject;
+
+  this.cellWidth;
+  this.cellHeight;
+
+  this.mapWidth;
+  this.mapHeight;
+
+  this.width;
+  this.height;
+
+  this.canvas;
+
+  this.red;
+  this.green;
+  this.blue;
+  this.alpha;
+
+  this.cellList;
+  
+  this.constructor( videoObject, cellWidth, cellHeight );
+  return this;
+};
+
+VideoCellImage.prototype.constructor = function( videoObject, cellWidth, cellHeight )
+{
   this.sourceVideoObject = videoObject;
   var sourceVideoObjectCanvas = this.sourceVideoObject.getCanvas();
+
+  this.targetVideoObject = null;
 
   this.cellWidth  = cellWidth;
   this.cellHeight = cellHeight;
@@ -21,7 +50,6 @@ function VideoCellImage( videoObject, cellWidth, cellHeight )
   this.red   = -1;
   this.green = -1;
   this.blue  = -1;
-  this.alpha;
   this.setColor( 255, 255, 255, 0.0 );
 
   this.cellList = new Array();
@@ -86,6 +114,11 @@ VideoCellImage.prototype.loadCell = function( xPosition, yPosition, mode )
 VideoCellImage.prototype.getNumberOfCells = function()
 {
   return this.cellList.length;
+};
+
+VideoCellImage.prototype.setTarget = function( targetVideoObject )
+{
+  this.targetVideoObject = targetVideoObject;
 };
 
 VideoCellImage.prototype.getCanvas = function()
