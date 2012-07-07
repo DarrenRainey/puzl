@@ -3,29 +3,33 @@ var EXTRACT_MODE_ABS               = 1    // Mode to extract the bitmap for a sp
 
 function VideoCellImage( videoObject, cellWidth, cellHeight )
 {
-  this.sourceVideoObject;
-  this.targetVideoObject;
-
-  this.cellWidth;
-  this.cellHeight;
-
-  this.mapWidth;
-  this.mapHeight;
-
-  this.width;
-  this.height;
-
-  this.canvas;
-
-  this.red;
-  this.green;
-  this.blue;
-  this.alpha;
-
-  this.cellList;
+  var baseVideoObject = new VideoObject();
   
-  this.constructor( videoObject, cellWidth, cellHeight );
-  return this;
+  baseVideoObject.sourceVideoObject;
+
+  baseVideoObject.cellWidth;
+  baseVideoObject.cellHeight;
+
+  baseVideoObject.mapWidth;
+  baseVideoObject.mapHeight;
+
+  baseVideoObject.canvas;
+
+  baseVideoObject.red;
+  baseVideoObject.green;
+  baseVideoObject.blue;
+  baseVideoObject.alpha;
+
+  baseVideoObject.cellList;
+
+  baseVideoObject.constructor      = this.constructor;
+  baseVideoObject.setColor         = this.setColor;
+  baseVideoObject.loadCell         = this.loadCell;
+  baseVideoObject.getNumberOfCells = this.getNumberOfCells;
+  baseVideoObject.getCanvas        = this.getCanvas;
+  
+  baseVideoObject.constructor( videoObject, cellWidth, cellHeight );
+  return baseVideoObject;
 };
 
 VideoCellImage.prototype.constructor = function( videoObject, cellWidth, cellHeight )
@@ -33,13 +37,11 @@ VideoCellImage.prototype.constructor = function( videoObject, cellWidth, cellHei
   this.sourceVideoObject = videoObject;
   var sourceVideoObjectCanvas = this.sourceVideoObject.getCanvas();
 
-  this.targetVideoObject = null;
-
   this.cellWidth  = cellWidth;
   this.cellHeight = cellHeight;
 
-  this.mapWidth  = Math.floor( sourceVideoObjectCanvas.width  / ( this.cellWidth  + 1 ) );
-  this.mapHeight = Math.floor( sourceVideoObjectCanvas.height / ( this.cellHeight + 1 ) );
+  this.mapWidth  = ( sourceVideoObjectCanvas.width  / ( this.cellWidth  + 1 ) ) | 0;
+  this.mapHeight = ( sourceVideoObjectCanvas.height / ( this.cellHeight + 1 ) ) | 0;
 
   this.setDimensions( this.cellWidth, this.cellHeight );
 
@@ -53,12 +55,6 @@ VideoCellImage.prototype.constructor = function( videoObject, cellWidth, cellHei
   this.setColor( 255, 255, 255, 0.0 );
 
   this.cellList = new Array();
-};
-
-VideoCellImage.prototype.setDimensions = function( width, height )
-{
-  this.width  = width;
-  this.height = height;
 };
 
 VideoCellImage.prototype.setColor = function( red, green, blue, alpha )
@@ -114,11 +110,6 @@ VideoCellImage.prototype.loadCell = function( xPosition, yPosition, mode )
 VideoCellImage.prototype.getNumberOfCells = function()
 {
   return this.cellList.length;
-};
-
-VideoCellImage.prototype.setTarget = function( targetVideoObject )
-{
-  this.targetVideoObject = targetVideoObject;
 };
 
 VideoCellImage.prototype.getCanvas = function()

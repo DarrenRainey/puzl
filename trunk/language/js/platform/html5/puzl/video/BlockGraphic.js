@@ -21,6 +21,8 @@ BlockGraphic.prototype.constructor = function()
   this.setPositionGridCellDimensions( this.cellWidth, this.cellHeight );
 
   // Pre-calculate all cell rectangles.
+  var cellX;
+  var cellY;
   var numberOfCells = this.mapWidth * this.mapHeight;
   for( var index = 0; index < numberOfCells; index++ )
   {

@@ -2,36 +2,48 @@
 
 function VideoDisplay( width, height )
 {
-  this.height;
-  this.width;
-  this.xScale;
-  this.yScale;
-  this.maintainAspectRatio;
-
-  this.centerDisplay;
-  this.xOffset;
-  this.yOffset;
-
-  this.left;
-  this.top;
-
-  this.videoImageList;
+  var videoObject = new VideoObject();
   
-  this.fullScreen;
-  
-  this.foregroundColor;
+  videoObject.xScale;
+  videoObject.yScale;
+  videoObject.maintainAspectRatio;
 
-  this.eraseQueue;
-  this.numberOfEraseQueueObjects;
+  videoObject.centerDisplay;
+  videoObject.xOffset;
+  videoObject.yOffset;
+
+  videoObject.left;
+  videoObject.top;
   
-  this.constructor( width, height );
-  return this;
+  videoObject.fullScreen;
+  
+  videoObject.foregroundColor;
+
+  videoObject.eraseQueue;
+  videoObject.numberOfEraseQueueObjects;
+
+  videoObject.constructor             = this.constructor;
+  videoObject.setFullScreen           = this.setFullScreen;
+  videoObject.getRealHeight           = this.getRealHeight;
+  videoObject.getRealWidth            = this.getRealWidth;
+  videoObject.setDimensions           = this.setDimensions;
+  videoObject.clear                   = this.clear;
+  videoObject.setBackgroundColor      = this.setBackgroundColor;
+  videoObject.setForegroundColor      = this.setForegroundColor;
+  videoObject.drawRectangle           = this.drawRectangle;
+  videoObject.addVideoImage           = this.addVideoImage;
+  videoObject.removeVideoImage        = this.removeVideoImage;
+  videoObject.determineTopLeft        = this.determineTopLeft;
+  videoObject.getNextEraseQueueObject = this.getNextEraseQueueObject;
+  videoObject.processEraseQueue       = this.processEraseQueue;
+  
+  videoObject.constructor( width, height );
+  return videoObject;
 }
 
 VideoDisplay.prototype.constructor = function( width, height )
 {
   //GlobalVideoDisplay = this;
-  this.videoImageList = new Array();
 
   this.eraseQueue = new Array();
   this.numberOfEraseQueueObjects = 0;
@@ -117,13 +129,13 @@ VideoDisplay.prototype.setDimensions = function( width, height )
   }
 
   // Scale and position all linked video images.
-  var videoImageListLength = this.videoImageList.length;
-  if( videoImageListLength > 0 )
+  var videoObjectListLength = this.objectList.length;
+  if( videoObjectListLength > 0 )
   {
     var videoImage;
-    for( index = 0; index < videoImageListLength; index++ )
+    for( index = 0; index < videoObjectListLength; index++ )
     {
-      videoImage = this.videoImageList[index];
+      videoImage = this.objectList[index];
       videoImage.setDimensions( videoImage.getWidth(), videoImage.getHeight() );
       videoImage.setPosition( videoImage.getXPosition(), videoImage.getYPosition() );
     }
@@ -136,14 +148,14 @@ VideoDisplay.prototype.clear = function()
 {
   // Clear list of registered VideoObjects and null their links to
   // this display.
-  var length = this.videoImageList.length;
+  var length = this.objectList.length;
   var index;
   for( index = 0; index < length; index++ )
   {
-    this.videoImageList[index].setDisplay( null );
+    this.objectList[index].setDisplay( null );
   }
 
-  this.videoImageList = [];
+  this.objectList = [];
 };
 
 VideoDisplay.prototype.setBackgroundColor = function( color )
@@ -158,11 +170,11 @@ VideoDisplay.prototype.setForegroundColor = function( color )
   this.foregroundColor = color;
 };
 
-VideoDisplay.prototype.drawRectangle = function( xPosition, yPosition, width, height )
+/*VideoDisplay.prototype.drawRectangle = function( xPosition, yPosition, width, height )
 {
   //this.context.fillStyle = this.foregroundColor;
   //this.context.fillRect( xPosition, yPosition, width, height );
-};
+};*/
 
 VideoDisplay.prototype.drawRectangle = function( canvas, xPosition, yPosition, width, height )
 {
@@ -180,39 +192,22 @@ VideoDisplay.prototype.drawRectangle = function( canvas, xPosition, yPosition, w
 
 VideoDisplay.prototype.addVideoImage = function( videoImage )
 {
-  // TODO: Make sure videoImage is not already in the list.
   videoImage.setDisplay( this );
-  this.videoImageList[this.videoImageList.length] = videoImage;
-};
-
-VideoDisplay.prototype.addVideoImage = function( videoImage )
-{
-  // TODO: Make sure videoImage is not already in the list.
-  videoImage.setDisplay( this );
-  this.videoImageList[this.videoImageList.length] = videoImage;
+  this.addObject( videoImage );
 };
 
 VideoDisplay.prototype.removeVideoImage = function( videoImage )
 {
-  var length = this.videoImageList.length;
-  var index;
-  for( index = 0; index < length; index++ )
-  {
-    if( videoImage == this.videoImageList[index] )
-    {
-      videoImage.setDisplay( null );
-      this.videoImageList.splice( index, 1 );
-      return;
-    }
-  }
+  videoImage.setDisplay( null );
+  this.removeObject( videoImage );
 };
 
 VideoDisplay.prototype.determineTopLeft = function()
 {
   // TODO: Allow top left to be defined by a particular video image in the
-  // videoImageList.
+  // videoObjectList.
   var videoImage;
-  var length = this.videoImageList.length;
+  var length = this.objectList.length;
   if( length < 1 )
   {
     this.top  = 0;
@@ -221,7 +216,7 @@ VideoDisplay.prototype.determineTopLeft = function()
   }
 
   var index = 0;
-  videoImage = this.videoImageList[index];
+  videoImage = this.objectList[index];
   this.top  = videoImage.getYPosition();
   this.left = videoImage.getXPosition();
 
@@ -234,7 +229,7 @@ VideoDisplay.prototype.determineTopLeft = function()
   var currentLeft;
   for( ; index < length; index++ )
   {
-    videoImage  = this.videoImageList[index];
+    videoImage  = this.objectList[index];
     
     currentTop  = videoImage.getYPosition();
     if( currentTop < this.top )
