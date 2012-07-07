@@ -9,6 +9,7 @@ puzLInclude( "puzl/input/InputMouse.js" );
 puzLInclude( "puzl/input/InputJoystick.js" );
 puzLInclude( "puzl/input/InputSystem.js" );
 
+puzLInclude( "puzl/video/VideoObject.js" );
 puzLInclude( "puzl/video/BlockGraphic.js" );
 puzLInclude( "puzl/video/VideoCellImage.js" ) ;
 puzLInclude( "puzl/video/VideoSprite.js" );
@@ -18,6 +19,9 @@ puzLInclude( "puzl/video/VideoSystem.js" );
 
 puzLInclude( "puzl/audio/AudioSystem.js" );
 
+puzLInclude( "puzl/utility/2dUtil.js" );
+puzLInclude( "puzl/utility/Object2d.js" );
+puzLInclude( "puzl/utility/QuadTree.js" );
 puzLInclude( "puzl/utility/Operation.js" );
 puzLInclude( "puzl/utility/Button.js" );
 puzLInclude( "puzl/utility/GameScreen.js" );

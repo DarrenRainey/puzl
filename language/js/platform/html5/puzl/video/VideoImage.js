@@ -2,20 +2,33 @@ var CanvasIdCounter = -1;
 
 function VideoImage()
 {
-  this.canvasID;
-  this.canvas;
-  this.display;
+  var videoObject = new VideoObject();
+  
+  videoObject.canvasID;
+  videoObject.canvas;
+  videoObject.display;
 
-  this.filename;
+  videoObject.filename;
 
-  this.width;
-  this.height;
+  videoObject.constructor       = this.constructor;
+  videoObject.setRealDimensions = this.setRealDimensions;
+  videoObject.getRealWidth      = this.getRealWidth;
+  videoObject.getRealHeight     = this.getRealHeight;
 
-  this.xPosition;
-  this.yPosition;
+  videoObject.baseSetDimensions = videoObject.setDimensions;
+  videoObject.setDimensions     = this.setDimensions;
+  videoObject.baseSetPosition   = videoObject.setPosition;
+  videoObject.setPosition       = this.setPosition;
+  
+  videoObject.fill              = this.fill;
+  videoObject.clear             = this.clear;
+  videoObject.setDisplay        = this.setDisplay;
+  videoObject.load              = this.load;
+  videoObject.getCanvas         = this.getCanvas;
+  videoObject.getContext        = this.getContext;
 
-  this.constructor();
-  return this;
+  videoObject.constructor();
+  return videoObject;
 }
 
 VideoImage.prototype.constructor = function()
@@ -40,11 +53,6 @@ VideoImage.prototype.constructor = function()
   this.filename = "";
 
   this.setRealDimensions( 1, 1 );
-  //this.width  = 1;
-  //this.height = 1;
-
-  this.xPosition = 0;
-  this.yPosition = 0;
 };
 
 VideoImage.prototype.setRealDimensions = function( width, height )
@@ -70,6 +78,8 @@ VideoImage.prototype.getRealHeight = function()
 
 VideoImage.prototype.setDimensions = function( width, height )
 {
+  this.baseSetDimensions( width, height );
+   
   if( this.display == null )
   {
     this.setRealDimensions( width, height );
@@ -84,28 +94,10 @@ VideoImage.prototype.setDimensions = function( width, height )
   }
 };
 
-VideoImage.prototype.getWidth = function()
-{
-  return this.width;
-};
-
-VideoImage.prototype.getHeight = function()
-{
-  return this.height;
-};
-
-VideoImage.prototype.getXPosition = function()
-{
-  return this.xPosition;
-};
-
-VideoImage.prototype.getYPosition = function()
-{
-  return this.yPosition;
-};
-
 VideoImage.prototype.setPosition = function( xPosition, yPosition )
 {
+  this.baseSetPosition( xPosition, yPosition );
+  
   // NOTE: Should this only happen with a display.
   if( this.display != null )
   {
@@ -141,6 +133,9 @@ VideoImage.prototype.setDisplay = function( display )
   {
     return;
   }
+
+  // TODO: Maybe set target to display in the future.
+  this.setParent( display );
 
   if( display == null && this.display != null )
   {
