@@ -72,7 +72,14 @@ GameShell.prototype.shellInitialize = function()
 
   this.initialize();
 
-  this.videoSystem.processImageLoadQueue();
+  if( this.videoSystem.videoImageLoadQueue.length > 0 )
+  {
+    this.videoSystem.processImageLoadQueue();
+  }
+  else
+  {
+    this.shellPostInitialize();
+  }
 };
 
 GameShell.prototype.shellPostInitialize = function()
