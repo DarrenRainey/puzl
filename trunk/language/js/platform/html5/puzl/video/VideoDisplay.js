@@ -36,6 +36,8 @@ function VideoDisplay( width, height )
   videoObject.determineTopLeft        = this.determineTopLeft;
   videoObject.getNextEraseQueueObject = this.getNextEraseQueueObject;
   videoObject.processEraseQueue       = this.processEraseQueue;
+
+  videoObject.updateQuadTree          = this.updateQuadTree;
   
   videoObject.constructor( width, height );
   return videoObject;
@@ -55,6 +57,8 @@ VideoDisplay.prototype.constructor = function( width, height )
 
   this.left = 0;
   this.top  = 0;
+
+  this.quadTree = null;
   
   this.setDimensions( width, height );
 
@@ -200,6 +204,11 @@ VideoDisplay.prototype.removeVideoImage = function( videoImage )
 {
   videoImage.setDisplay( null );
   this.removeObject( videoImage );
+};
+
+VideoDisplay.prototype.updateQuadTree = function()
+{
+  // Do nothing, visible canvas are already managed.
 };
 
 VideoDisplay.prototype.determineTopLeft = function()

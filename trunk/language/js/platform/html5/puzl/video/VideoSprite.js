@@ -34,11 +34,9 @@ function VideoSprite( videoImage, cellWidth, cellHeight )
   videoCellImage.draw               = this.draw;
   videoCellImage.erase              = this.erase;
   videoCellImage.queueErase         = this.queueErase;
-  
-  videoCellImage.setPosition        = this.setPosition;
-  videoCellImage.setXPosition       = this.setXPosition;
-  videoCellImage.setYPosition       = this.setYPosition;
-  
+
+  videoCellImage.getXVelocity       = this.getXVelocity;
+  videoCellImage.getYVelocity       = this.getYVelocity;
   videoCellImage.setVelocity        = this.setVelocity;
   videoCellImage.setXVelocity       = this.setXVelocity;
   videoCellImage.setYVelocity       = this.setYVelocity;
@@ -100,7 +98,7 @@ VideoSprite.prototype.draw = function()
     DrawWithNearestScale( this, this.parentObject,
                           cell[0], cell[1],
                           this.cellWidth, this.cellHeight,
-                          this.xPosition, this.yPosition,
+                          this.position.x, this.position.y,
                           this.width, this.height );
   }
   else
@@ -112,8 +110,8 @@ VideoSprite.prototype.draw = function()
     DrawWithNearestScale( this, this.parentObject,
                           cell[0], cell[1],
                           this.cellWidth, this.cellHeight,
-                          ( this.xPosition - this.parentObject.xPosition ) * xScale,
-                          ( this.yPosition - this.parentObject.yPosition ) * yScale,
+                          ( this.position.x - this.parentObject.getXPosition() ) * xScale,
+                          ( this.position.y - this.parentObject.getYPosition() ) * yScale,
                           this.width * xScale, this.height * yScale );
   }
   
@@ -129,7 +127,7 @@ VideoSprite.prototype.erase = function()
   
   if( this.parentObject.display == null )
   {
-    context.clearRect( this.xPosition, this.yPosition,
+    context.clearRect( this.position.x, this.position.y,
                        this.width, this.height );
   }
   else
@@ -138,8 +136,8 @@ VideoSprite.prototype.erase = function()
     var xScale = videoObjectDisplay.xScale;
     var yScale = videoObjectDisplay.yScale;
 
-    context.clearRect( ( this.xPosition - this.parentObject.xPosition ) * xScale,
-                       ( this.yPosition - this.parentObject.yPosition ) * yScale,
+    context.clearRect( ( this.position.x - this.parentObject.getXPosition() ) * xScale,
+                       ( this.position.y - this.parentObject.getYPosition() ) * yScale,
                        this.width * xScale, this.height * yScale );
   }
 };
@@ -154,26 +152,20 @@ VideoSprite.prototype.queueErase = function()
   var xScale = videoObjectDisplay.xScale;
   var yScale = videoObjectDisplay.yScale;
 
-  eraseQueueObject.xPosition = ( this.xPosition - this.parentObject.xPosition ) * xScale;
-  eraseQueueObject.yPosition = ( this.yPosition - this.parentObject.yPosition ) * yScale;
+  eraseQueueObject.xPosition = ( this.position.x - this.parentObject.getXPosition() ) * xScale;
+  eraseQueueObject.yPosition = ( this.position.y - this.parentObject.getYPosition() ) * yScale;
   eraseQueueObject.width     = this.width  * xScale;
   eraseQueueObject.height    = this.height * yScale;
 };
 
-VideoSprite.prototype.setPosition = function( xPosition, yPosition )
+VideoSprite.prototype.getXVelocity = function()
 {
-  this.setXPosition( xPosition );
-  this.setYPosition( yPosition );
+  return this.xVelocity;
 };
 
-VideoSprite.prototype.setXPosition = function( xPosition )
+VideoSprite.prototype.getYVelocity = function()
 {
-  this.xPosition = xPosition;
-};
-
-VideoSprite.prototype.setYPosition = function( yPosition )
-{
-  this.yPosition = yPosition;
+  return this.yVelocity;
 };
 
 VideoSprite.prototype.setXVelocity = function( xVelocity )
@@ -197,16 +189,10 @@ VideoSprite.prototype.move = function()
   if( ( this.xVelocity != 0 ) || ( this.yVelocity != 0 ) )
   {
     this.queueErase();
-    
-    if( this.xVelocity != 0 )
-    {
-      this.xPosition += this.xVelocity;
-    }
 
-    if( this.yVelocity != 0 )
-    {
-      this.yPosition += this.yVelocity;
-    }
+    var position = this.position;
+    this.setPosition( position.x + this.xVelocity,
+                      position.y + this.yVelocity );
     
     return true;
   }

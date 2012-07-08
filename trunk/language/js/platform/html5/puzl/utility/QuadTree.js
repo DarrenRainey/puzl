@@ -23,7 +23,11 @@ QuadTree.prototype.constructor = function()
 QuadTree.prototype.setObject2d = function( object2d )
 {
   this.object2d = object2d;
-  this.updateRectangle();
+  if( object2d != null )
+  {
+    this.setRectangle( 0, 0,
+                       object2d.getWidth() - 1, object2d.getHeight() - 1 );
+  }
 };
 
 QuadTree.prototype.updateRectangle = function()
@@ -31,8 +35,16 @@ QuadTree.prototype.updateRectangle = function()
   object2d = this.object2d;
   if( object2d != null )
   {
-    this.setRectangle( object2d.getXPosition(), object2d.getYPosition(),
-                       object2d.getWidth(),     object2d.getHeight() );
+    var rectangle = this.rectangle;
+    var point = rectangle.pointList[1];
+
+    var newX = object2d.getWidth()  - 1;
+    var newY = object2d.getHeight() - 1;
+
+    if( ( point.x != newX ) || ( point.y != newY ) )
+    {
+      this.setRectangle( 0, 0, newX, newY );
+    }
   }
 };
 
@@ -82,64 +94,97 @@ QuadTreeNode.prototype.createSubNode = function( subNodeIndex )
     subNode = new QuadTreeNode( this, subNodeIndex );
     subNode.updateRectangle();
 
-    this.subNodeList[subNodeList] = subNode;
+    this.subNodeList[subNodeIndex] = subNode;
+    return subNode;
   }
 };
 
-QuadTreeNode.prototype.setRectangle = function( xPosition, yPosition, width, height )
+QuadTreeNode.prototype.setRectangle = function( xPosition0, yPosition0, xPosition1, yPosition1 )
 {
-  var xPosition1 = xPosition + width  - 1;
-  var yPosition1 = yPosition + height - 1;
-
   var rectanglePointList = this.rectangle.pointList;
   var rectanglePoint0    = rectanglePointList[0];
   var rectanglePoint1    = rectanglePointList[1];
   
-  rectanglePoint0.x = xPosition;
-  rectanglePoint0.y = yPosition;
+  rectanglePoint0.x = xPosition0;
+  rectanglePoint0.y = yPosition0;
   rectanglePoint1.x = xPosition1;
   rectanglePoint1.y = yPosition1;
 
-  //console.log( xPosition+ ":" +yPosition+ ":" +width+ ":" +height );
+  //console.log( xPosition0+ ":" +yPosition0+ ":" +width+ ":" +height );
 
   // TODO: Only do if there are any subnodes.
 
-  // Midpoint is +1 (start of next rectangle).
-  var midXPosition = xPosition1 + ( width  >> 1 );
-  var midYPosition = yPosition1 + ( height >> 1 );
+  var width  = xPosition1 - xPosition0 + 1;
+  var height = yPosition1 - yPosition0 + 1;
+
+  // Midpoint is the first location in the SE quadrant.
+  var midXPosition = xPosition0 + ( width  >> 1 ) + 1;
+  var midYPosition = yPosition0 + ( height >> 1 ) + 1;
 
   var midPoint = this.midPoint;
   midPoint.x = midXPosition;
   midPoint.y = midYPosition;
   
-  var currentNode; // subNodeList order: NW, NE, SW, SE.
-
-  // NW
-  currentNode = this.subNodeList[0];
-  if( currentNode != null )
+  var currentNode;
+  for( var index = 0; index < 4; index++ )
   {
-    currentNode.setRectangle( xPosition, yPosition, midXPosition, midYPosition );
+    currentNode = this.subNodeList[index];
+    if( currentNode != null )
+    {
+      currentNode.updateRectangle();
+    }
+  }
+};
+
+QuadTreeNode.prototype.updateRectangle = function()
+{
+  var parentNode = this.parentNode;
+  if( parentNode == null )
+  {
+    return;
   }
 
-  // NE
-  currentNode = this.subNodeList[1];
-  if( currentNode != null )
-  {
-    currentNode.setRectangle( midXPosition, yPosition, xPosition1, midYPosition );
-  }
+  var rectangle = parentNode.rectangle;
 
-  // SW
-  currentNode = this.subNodeList[2];
-  if( currentNode != null )
+  // Order: NW, NE, SW, SE.
+  switch( this.nodeID )
   {
-    currentNode.setRectangle( xPosition, midYPosition, midXPosition, yPosition1 );
-  }
+    case 0:
+    {
+      //console.log( "midpoint: " + parentNode.midPoint.x + "," + parentNode.midPoint.y );
+      var point = rectangle.pointList[0];
+      this.setRectangle( point.x, point.y,
+                         parentNode.midPoint.x - 1, parentNode.midPoint.y - 1 );
+      break;
+    }
 
-  // SE
-  currentNode = this.subNodeList[3];
-  if( currentNode != null )
-  {
-    currentNode.setRectangle( midXPosition, midYPosition, xPosition1, yPosition1 );
+    case 1:
+    {
+      var pointList  = rectangle.pointList;
+      var yPosition  = pointList[0].y;
+      var xPosition1 = pointList[1].x;
+      this.setRectangle( parentNode.midPoint.x, yPosition,
+                         xPosition1, parentNode.midPoint.y - 1 );
+      break;
+    }
+
+    case 2:
+    {
+      var pointList  = rectangle.pointList;
+      var xPosition  = pointList[0].x;
+      var yPosition1 = pointList[1].y;
+      this.setRectangle( xPosition, parentNode.midPoint.y,
+                         parentNode.midPoint.x - 1, yPosition1 );
+      break;
+    }
+
+    case 3:
+    {
+      var endPoint = rectangle.pointList[1];
+      this.setRectangle( parentNode.midPoint.x, parentNode.midPoint.y,
+                         endPoint.x, endPoint.y );
+      break;
+    }
   }
 };
 
@@ -174,13 +219,19 @@ QuadTreeNode.prototype.getTotalNumberOfObjects = function()
 QuadTreeNode.prototype.insert = function( object2d )
 {
   var numberOfObjects = this.getNumberOfObjects();
-  //console.log( numberOfObjects );
-  if( numberOfObjects > QUAD_TREE_MAX_CAPACITY )
+  if( ( numberOfObjects > QUAD_TREE_MAX_CAPACITY ) &&
+      ( this.depthLevel <= QUAD_TREE_MAX_DEPTH_LEVEL ) )
   {
-    var point1QuadrantID;
-    var point1 = object2d.rectangle.pointList[1];
+    var targetSubNodeIndex;
+    
+    var pointList = object2d.rectangle.pointList;
 
-    if( point1.x < this.midPoint.x )
+    var midPoint = this.midPoint;
+    
+    var point1QuadrantID;
+    var point1 = pointList[1];
+
+    if( point1.x < midPoint.x )
     {
       // West.
       point1QuadrantID = 0;
@@ -191,19 +242,110 @@ QuadTreeNode.prototype.insert = function( object2d )
       point1QuadrantID = 1;
     }
 
-    if( point1.y >= this.midPoint.y )
+    if( point1.y >= midPoint.y )
     {
       // South.
       point1QuadrantID |= 2;
     }
+
+    if( point1QuadrantID == 0 )
+    {
+      // Checking if point1 (end point) is in the NW (0)
+      // quadrant is an optimization.
+      targetSubNodeIndex = point1QuadrantID;
+    }
+    else
+    {
+      var point0QuadrantID;
+      var point0 = pointList[0];
+
+      if( point0.x >= midPoint.x )
+      {
+        // East.
+        point0QuadrantID = 1;
+      }
+      else
+      {
+        // West.
+        point0QuadrantID = 0;
+      }
+
+      if( point0.y >= midPoint.y )
+      {
+        // South.
+        point0QuadrantID |= 2;
+      }
+
+      if( point0QuadrantID == 3 )
+      {
+        // Checking if point0 (start point) is in the SE (3)
+        // quadrant is an optimization.
+        targetSubNodeIndex = point0QuadrantID;
+      }
+      else
+      {
+        if( point0QuadrantID == point1QuadrantID )
+        {
+          targetSubNodeIndex = point0QuadrantID;
+        }
+        else
+        {
+          targetSubNodeIndex = -1;
+        }
+      }
+    }
+
+    if( targetSubNodeIndex != -1 )
+    {
+      //console.log( "new: " + targetSubNodeIndex );
+      var subNode = this.subNodeList[targetSubNodeIndex];
+      if( subNode == null )
+      {
+        //console.log( "new: " + targetSubNodeIndex );
+        subNode = this.createSubNode( targetSubNodeIndex );
+      }
+
+      subNode.insert( object2d );
+    }
   }
   else
   {
-    this.objectList[numberOfObjects] = object2d;
-    object2d.setQuadTreeNode( this );
+    targetSubNodeIndex = -1;
   }
+
+  //console.log( targetSubNodeIndex );
+
+  if( targetSubNodeIndex == -1 )
+  {
+    // Put it in this node.
+    var oldNode = object2d.quadTreeNode;
+    if( oldNode != this )
+    {
+      if( oldNode != null )
+      {
+        var oldNodeObjectList  = oldNode.objectList;
+        var oldnumberOfObjects = oldNode.getNumberOfObjects();
+        for( var index = 0; index < oldnumberOfObjects; index++ )
+        {
+          if( object2d == oldNodeObjectList[index] )
+          {
+            oldNodeObjectList.splice( index, 1 );
+            return;
+          }
+        }
+      }
+
+      //console.log( object2d );
+      object2d.quadTreeNode = this;
+      this.objectList[numberOfObjects] = object2d;
+    }
+  }
+};
+
+QuadTreeNode.prototype.query = function( rectangle, collisionList )
+{
   
-}
+};
 
 /*QuadTreeNode.prototype.populateCollisions = function( sourceObject2d )
 {
