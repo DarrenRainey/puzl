@@ -352,65 +352,37 @@ QuadTreeNode.prototype.query = function( rectangle, resultList )
   var numberOfObjects = this.getNumberOfObjects();
   if( numberOfObjects > 0 )
   {
-    targetSubNodeIndex = this.getQuadrantID( rectangle );
-    if( targetSubNodeIndex !== -1 )
+    var currentObject2d;
+    for( var index = 0; index < numberOfObjects; index++ )
     {
-      
+      currentObject2d = this.objectList[index];
+      if( currentObject2d.isBoxColliding( rectangle ) )
+      {
+        resultList[resultList.length] = currentObject2d;
+      }
     }
   }
 
-  var subNodeList = this.subNodeList;
-  var currentNode; // subNodeList order: NW, NE, SW, SE.
-  for( var index = 0; index < 4; index++ )
+  targetSubNodeIndex = this.getQuadrantID( rectangle );
+  if( targetSubNodeIndex !== -1 )
   {
-    currentNode = subNodeList[index];
+    var subNodeList = this.subNodeList;
+    var currentNode; // subNodeList order: NW, NE, SW, SE.
+    for( var index = 0; index < 4; index++ )
+    {
+      currentNode = subNodeList[index];
+      if( currentNode != null )
+      {
+        currentNode.query( rectangle, resultList );
+      }
+    }
+  }
+  else
+  {
+    var currentNode = this.subNodeList[targetSubNodeIndex];
     if( currentNode != null )
     {
       currentNode.query( rectangle, resultList );
     }
   }
 };
-
-/*QuadTreeNode.prototype.populateCollisions = function( sourceObject2d )
-{
-  var index;
-
-  var numberOfObjects = this.getNumberOfObjects();
-  var currentObject2d;
-  for( index = 0; index < numberOfObjects; index++ )
-  {
-    currentObject2d = this.objectList[index];
-    if( currentObject2d == sourceObject2d )
-    {
-      continue;
-    }
-
-    if( sourceObject2d.checkBBCollision( currentObject2d ) )
-    {
-      // TODO: Needs to make sure the object isn't inserted twice.
-      // Great place for a map?
-      sourceObject2d.collisionList[sourceObject2d.numberOfCollisions] = currentObject2d;
-    }
-  }
-
-  if( this.getNumberOfSubObjects() == 0 )
-  {
-    return;
-  }
-
-  var currentNode; // subNodeList order: NW, NE, SW, SE.
-  for( index = 0; index < 4; index++ )
-  {
-    currentNode = this.subNodeList[index];
-    if( currentNode == null )
-    {
-      continue;
-    }
-
-    if( currentNode.getTotalNumberOfObjects() > 0 )
-    {
-      currentNode.populateCollisions( sourceObject2d );
-    }
-  }
-};
-*/
