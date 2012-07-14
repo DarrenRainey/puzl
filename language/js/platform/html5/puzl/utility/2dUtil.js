@@ -84,3 +84,25 @@ Rectangle.prototype.isInsideRectangle = function( rectangle )
 
   return false;
 };
+
+Rectangle.prototype.isRectangleColliding = function( rectangle )
+{
+  var thisRectangle = this.rectangle;
+  var r1PointList   = thisRectangle.pointList;
+  var r1EndPoint    = r1PointList[1];
+
+  var r2PointList   = rectangle.pointList;
+  var r2StartPoint  = r2PointList[0];
+  
+  if( !( r2StartPoint.x > r1EndPoint.x ||
+         r2StartPoint.y > r1EndPoint.y ) )
+  {
+    return true;
+  }
+  
+  var r1StartPoint  = r1PointList[0];
+  var r2EndPoint    = r2PointList[1];
+
+  return !( r2EndPoint.x < r1StartPoint.x ||
+            r2EndPoint.y < r1StartPoint.y );
+};

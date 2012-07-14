@@ -173,8 +173,7 @@ Object2d.prototype.isInsideRectangle = function( rectangle )
   return this.rectangle.isInsideRectangle( rectangle );
 };
 
-/*Object2d.prototype.isBoxColliding = function( otherObject )
+Object2d.prototype.isBoxColliding = function( otherObject )
 {
-
+  return this.rectangle.isRectangleColliding( otherObject.rectangle );
 };
-*/
