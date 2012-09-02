@@ -32,11 +32,6 @@ GameScreen.prototype.setSubScreenIndex = function( subScreenIndex )
   
   this.subScreenIndex = subScreenIndex;
   this.subScreen      = this.subScreenList[this.subScreenIndex];
-  //this.initialize     = this.subScreen.initialize; // NOTE: Subscreens shouldn't have their own initialize?
-  //this.reset          = this.subScreen.reset;
-  //this.input          = this.subScreen.input;
-  //this.logic          = this.subScreen.logic;
-  //this.draw           = this.subScreen.draw;
 
   // NOTE: Kind of crappily needed for instance runs to recongize
   // this.parentScreen when running subscreen routines.
@@ -75,6 +70,7 @@ GameScreen.prototype.draw = function()
 
 GameScreen.prototype.resize = function()
 {
+  if( this.subScreen != null )
   if( this.subScreen.resize != undefined )
   {
     this.subScreen.resize();

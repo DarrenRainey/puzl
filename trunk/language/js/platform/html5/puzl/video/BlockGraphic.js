@@ -27,7 +27,7 @@ BlockGraphic.prototype.constructor = function()
   for( var index = 0; index < numberOfCells; index++ )
   {
     cellX = index % this.mapWidth;
-    cellY = Math.floor( index / this.mapWidth );
+    cellY = ( index / this.mapWidth ) | 0;
 
     this.loadCell( cellX, cellY, EXTRACT_MODE_CELL );
   }
@@ -68,15 +68,16 @@ BlockGraphic.prototype.print = function( videoObject, text )
     var height;
     var xScale;
     var yScale;
-    if( videoObject.display == null )
+    var videoObjectDisplay = videoObject.display;
+    if( videoObjectDisplay == null )
     {
       width  = this.width;
       height = this.height;
     }
     else
     {
-      xScale = videoObject.display.xScale;
-      yScale = videoObject.display.yScale;
+      xScale = videoObjectDisplay.xScale;
+      yScale = videoObjectDisplay.yScale;
       width  = this.width  * xScale;
       height = this.height * yScale;
     }
@@ -86,7 +87,7 @@ BlockGraphic.prototype.print = function( videoObject, text )
       charCode = text.charCodeAt( index ) - 32; // TODO: The offset value should be eliminated with prebuilt rectangle array.
       cell = this.cellList[charCode];
       
-      if( videoObject.display == null )
+      if( videoObjectDisplay == null )
       {
         DrawWithNearestScale( this, videoObject,
                               cell[0], cell[1],

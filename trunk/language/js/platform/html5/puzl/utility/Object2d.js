@@ -110,26 +110,27 @@ Object2d.prototype.setDimensions = function( width, height )
   this.updateQuadTree();
 };
 
-Object2d.prototype.setParent = function( parentObject )
-{
-  var oldParentObject = this.parentObject;
-  if( oldParentObject != parentObject )
-  {
-    //console.log( "sp, " + this.getWidth() );
-    if( oldParentObject != null )
-    {
-      oldParentObject.removeObject( this );
-      parentObject.addObject( this );
-    }
-    
-    this.parentObject = parentObject;
-  }
-};
-
 Object2d.prototype.addObject = function( object )
 {
+  //console.log( object.name );
   // TODO: Make sure object2d is not already in the list.
-  object.setParent( this );
+  if( this == object )
+  {
+    return;
+  }
+
+  if( object == null )
+  {
+    return;
+  }
+
+  var objectParentObject = object.parentObject;
+  if( objectParentObject != null )
+  {
+    objectParentObject.removeObject( object );
+  }
+  
+  object.parentObject = this;
   this.objectList[this.objectList.length] = object;
 
   // NOTE: Should this update the quad tree?
@@ -144,7 +145,7 @@ Object2d.prototype.removeObject = function( object )
   {
     if( object == this.objectList[index] )
     {
-      object.setParent( null );
+      object.parentObject = null;
       this.objectList.splice( index, 1 );
       return;
     }

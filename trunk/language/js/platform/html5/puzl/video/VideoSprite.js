@@ -119,6 +119,8 @@ VideoSprite.prototype.draw = function()
   {
     context.globalAlpha = 1.0;
   }
+
+  //this.needsRedraw = false;
 };
 
 VideoSprite.prototype.erase = function()
@@ -219,11 +221,13 @@ VideoSprite.prototype.getNumberOfFrames = function()
 
 VideoSprite.prototype.setCurrentSequence = function( currentSequence )
 {
+  this.needsRedraw = true;
   return this.animation.setCurrentSequence( currentSequence );
 };
 
 VideoSprite.prototype.setCurrentFrame = function( currentFrame )
 {
+  this.needsRedraw = true;
   return this.animation.setCurrentFrame( currentFrame );
 };
 
@@ -243,6 +247,7 @@ VideoSprite.prototype.animate = function()
   if( frameChanged )
   {
     this.queueErase();
+    this.needsRedraw = true;
   }
 
   return frameChanged;
