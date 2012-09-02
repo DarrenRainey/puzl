@@ -116,8 +116,8 @@ GameShell.prototype.shellLoop = function()
 GameShell.prototype.shellDraw = function()
 {
   //console.log( "GameShell::shellDraw()" );
-  this.videoSystem.draw();
-  this.draw();
+  this.videoSystem.update();
+  //this.draw();
 };
 
 GameShell.prototype.documentBodyOnResize = function()

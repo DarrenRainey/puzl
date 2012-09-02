@@ -19,9 +19,6 @@ function VideoDisplay( width, height )
   
   videoObject.foregroundColor;
 
-  videoObject.eraseQueue;
-  videoObject.numberOfEraseQueueObjects;
-
   videoObject.constructor             = this.constructor;
   videoObject.setFullScreen           = this.setFullScreen;
   videoObject.getRealHeight           = this.getRealHeight;
@@ -34,8 +31,6 @@ function VideoDisplay( width, height )
   videoObject.addVideoImage           = this.addVideoImage;
   videoObject.removeVideoImage        = this.removeVideoImage;
   videoObject.determineTopLeft        = this.determineTopLeft;
-  videoObject.getNextEraseQueueObject = this.getNextEraseQueueObject;
-  videoObject.processEraseQueue       = this.processEraseQueue;
 
   videoObject.updateQuadTree          = this.updateQuadTree;
   
@@ -46,9 +41,6 @@ function VideoDisplay( width, height )
 VideoDisplay.prototype.constructor = function( width, height )
 {
   //GlobalVideoDisplay = this;
-
-  this.eraseQueue = new Array();
-  this.numberOfEraseQueueObjects = 0;
 
   this.setFullScreen( false );
 
@@ -137,7 +129,7 @@ VideoDisplay.prototype.setDimensions = function( width, height )
   if( videoObjectListLength > 0 )
   {
     var videoImage;
-    for( index = 0; index < videoObjectListLength; index++ )
+    for( var index = 0; index < videoObjectListLength; index++ )
     {
       videoImage = this.objectList[index];
       videoImage.setDimensions( videoImage.getWidth(), videoImage.getHeight() );
@@ -252,58 +244,4 @@ VideoDisplay.prototype.determineTopLeft = function()
       this.left = currentLeft;
     }
   }
-};
-
-VideoDisplay.prototype.getNextEraseQueueObject = function()
-{
-  var numberOfEraseQueueObjects = ++this.numberOfEraseQueueObjects;
-
-  var eraseQueueObject;
-  var eraseQueueLength = this.eraseQueue.length;
-  if( numberOfEraseQueueObjects < eraseQueueLength )
-  {
-    eraseQueueObject = this.eraseQueue[numberOfEraseQueueObjects - 1];
-  }
-  else
-  {
-    eraseQueueObject = new EraseQueueObject();
-    this.eraseQueue[numberOfEraseQueueObjects - 1] = eraseQueueObject;
-  }
-
-  return eraseQueueObject;
-};
-
-VideoDisplay.prototype.processEraseQueue = function()
-{
-  var eraseQueueObject;
-  var lastCanvas    = null;
-  var currentCanvas = null;
-  var context;
-  var numberOfEraseQueueObjects = this.numberOfEraseQueueObjects;
-  for( var index = 0; index < numberOfEraseQueueObjects; index++ )
-  {
-    eraseQueueObject = this.eraseQueue[index];
-    currentCanvas = eraseQueueObject.targetVideoObject.getCanvas();
-    if( currentCanvas != lastCanvas )
-    {
-      context = GetCanvasContext2D( currentCanvas );
-      lastCanvas = currentCanvas;
-    }
-
-    context.clearRect( eraseQueueObject.xPosition,
-                       eraseQueueObject.yPosition,
-                       eraseQueueObject.width,
-                       eraseQueueObject.height );
-  }
-  
-  this.numberOfEraseQueueObjects = 0;
-};
-
-function EraseQueueObject()
-{
-  this.targetVideoObject;
-  this.xPosition;
-  this.yPosition;
-  this.width;
-  this.height;
 };

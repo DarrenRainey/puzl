@@ -24,13 +24,9 @@ function VideoSystem( width, height )
     return RequestAnimFrame( callback );
   };
   
-  this.draw = function()
+  this.update = function()
   {
-    //this.display.clear();
-    if( this.display.numberOfEraseQueueObjects > 0 )
-    {
-      this.display.processEraseQueue();
-    }
+    this.display.drawUpdate();
   };
   
   this.getDisplay = function()
