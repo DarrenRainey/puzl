@@ -25,7 +25,7 @@ GameScreen.prototype.constructor = function( gameShell, parentScreen )
 GameScreen.prototype.setSubScreenIndex = function( subScreenIndex )
 {
   //console.log( "GameScreen::setSubScreenIndex(" + subScreenIndex + ")" );
-  if( this.subScreenIndex == subScreenIndex )
+  if( this.subScreenIndex === subScreenIndex )
   {
     return;
   }
@@ -61,11 +61,6 @@ GameScreen.prototype.input = function()
 GameScreen.prototype.logic = function()
 {
   this.subScreen.logic();
-};
-
-GameScreen.prototype.draw = function()
-{
-  this.subScreen.draw();
 };
 
 GameScreen.prototype.resize = function()
