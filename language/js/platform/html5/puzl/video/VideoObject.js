@@ -56,6 +56,17 @@ VideoObject.prototype.setNeedsRedraw = function( needsRedraw, propagate )
 {
   this.needsRedraw = needsRedraw;
 
+  // Always back propagate, if necessary.
+  var parentObject = this.parentObject;
+  if( parentObject != null )
+  {
+    if( !parentObject.needsRedraw )
+    {
+      parentObject.setNeedsRedraw( true, false );
+    }
+  }
+  
+  // Forward propagate, if wanted.
   if( propagate )
   {
     var videoObjectListLength = this.objectList.length;
@@ -123,18 +134,21 @@ VideoObject.prototype.processEraseQueue = function()
   var lastCanvas    = null;
   var currentCanvas = null;
   var context;
+  var targetVideoObject;
   var numberOfEraseQueueObjects = this.numberOfEraseQueueObjects;
   for( var index = 0; index < numberOfEraseQueueObjects; index++ )
   {
     eraseQueueObject = this.eraseQueue[index];
-    currentCanvas = eraseQueueObject.targetVideoObject.getCanvas();
+    targetVideoObject = eraseQueueObject.targetVideoObject;
+    currentCanvas = targetVideoObject.getCanvas();
     if( currentCanvas != lastCanvas )
     {
       context = GetCanvasContext2D( currentCanvas );
       lastCanvas = currentCanvas;
     }
 
-    context.clearRect( eraseQueueObject.xPosition,
+    //context.fillStyle = targetVideoObject.backgroundColor;
+    context.fillRect( eraseQueueObject.xPosition,
                        eraseQueueObject.yPosition,
                        eraseQueueObject.width,
                        eraseQueueObject.height );
