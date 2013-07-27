@@ -1,16 +1,16 @@
-function Point( argument0, argument1 )
+function Point()
 {
-  if( arguments.length == 1 )
+  if( arguments.length === 1 )
   {
-    var point = argument0;
+    var point = arguments[0];
     this.x = point.x;
     this.y = point.y;
   }
   else
-  if( arguments.length == 2 )
+  if( arguments.length === 2 )
   {
-    this.x = argument0;
-    this.y = argument1;
+    this.x = arguments[0];
+    this.y = arguments[1];
   }
   else
   {
@@ -50,25 +50,36 @@ Point.prototype.isInsideRectangle = function( rectangle )
   return true;
 };
 
-function Rectangle( argument0, argument1, argument2, argument3 )
+function Rectangle()
 {
   this.pointList = new Array();
 
-  if( arguments.length == 1 )
+  if( arguments.length === 1 )
   {
-    this.pointList[0] = new Point( argument0.pointList[0] );
-    this.pointList[1] = new Point( argument0.pointList[1] );
+    // Rectangle.
+    var rectangle = arguments[0];
+    this.pointList.push( new Point( rectangle.pointList[0] ) );
+    this.pointList.push( new Point( rectangle.pointList[1] ) );
   }
   else
-  if( arguments.length == 2 )
+  if( arguments.length === 2 )
   {
-    this.pointList[0] = new Point( argument0.x, argument0.y );
-    this.pointList[1] = new Point( argument1.x, argument1.y );
+    // Two points.
+    var point0 = arguments[0];
+    var point1 = arguments[1];
+    this.pointList.push( new Point( point0.x, point0.y ) );
+    this.pointList.push( new Point( point1.x, point1.y ) );
+  }
+  else
+  if( arguments.length === 4 )
+  {
+    this.pointList.push( new Point( arguments[0], arguments[1] ) );
+    this.pointList.push( new Point( arguments[2], arguments[3] ) );
   }
   else
   {
-    this.pointList[0] = new Point();
-    this.pointList[1] = new Point();
+    this.pointList.push( new Point() );
+    this.pointList.push( new Point() );
   }
 
   return this;
