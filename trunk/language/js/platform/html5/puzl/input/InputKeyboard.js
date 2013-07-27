@@ -129,13 +129,15 @@ var GlobalKeyboard;
 function ProcessKeyDown( keyEvent )
 {
   GlobalKeyboard.setKeyState( keyEvent.keyCode || keyEvent.which, KEY_STATE_PRESSED );
-  //keyEvent.preventDefault();
+  keyEvent.stopPropagation();
+  keyEvent.preventDefault();
 }
 
 function ProcessKeyUp( keyEvent )
 {
   GlobalKeyboard.setKeyState( keyEvent.keyCode || keyEvent.which, KEY_STATE_RELEASED );
-  //keyEvent.preventDefault();
+  keyEvent.stopPropagation();
+  keyEvent.preventDefault();
 }
 
 document.addEventListener( "keydown", ProcessKeyDown, false );
