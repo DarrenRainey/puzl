@@ -90,7 +90,7 @@ InputJoystick.prototype.updateWithGamepad = function( gamepad )
   var index;
   for( index = 0; index < NUM_BUTTONS; index++ )
   {
-    this.setButtonState( index, gamepad.buttons[index] != 0 ? BUTTON_STATE_DOWN : BUTTON_STATE_UP );
+    this.setButtonState( index, gamepad.buttons[index] !== 0 ? BUTTON_STATE_DOWN : BUTTON_STATE_UP );
   }
   
 };
