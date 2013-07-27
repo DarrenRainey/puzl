@@ -1,6 +1,6 @@
-function BlockGraphic( videoObject, cellWidth, cellHeight )
+function BlockGraphic( videoObject, blockgraphicData )
 {
-  var videoCellImage = new VideoCellImage( videoObject, cellWidth, cellHeight );
+  var videoCellImage = new VideoCellImage( videoObject, blockgraphicData );
 
   videoCellImage.constructor                   = this.constructor;
   videoCellImage.setPositionGridCellDimensions = this.setPositionGridCellDimensions;
@@ -54,7 +54,7 @@ BlockGraphic.prototype.print = function( videoObject, text )
     var cell;
 
     var hasAlpha; // TODO: Optimize. Could allocate this value once for each blockgraphic object.
-    if( this.alpha != 1.0 )
+    if( this.alpha !== 1.0 )
     {
       hasAlpha = true;
       context.globalAlpha = this.alpha;

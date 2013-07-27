@@ -1,7 +1,11 @@
-var EXTRACT_MODE_CELL              = 0    // Mode to extract a cell from a bitmap for sprite
-var EXTRACT_MODE_ABS               = 1    // Mode to extract the bitmap for a sprite
+var EXTRACT_MODE_CELL              = 0    // Mode to extract a cell from a bitmap for cell image.
+var EXTRACT_MODE_ABS               = 1    // Mode to extract the bitmap for a cell image.
 
-function VideoCellImage( videoObject, cellWidth, cellHeight )
+var IMAGE_ATTRIBUTE_TRANSPARENCY  = 1024 // Indicates image with transparency.
+var IMAGE_ATTRIBUTE_ALPHABLEND    = 2048 // Indicates image with alpha/semi transparency.
+var IMAGE_ATTRIBUTE_COLOR         = 4096 // Indicates image with color modulation.
+
+function VideoCellImage( videoObject, videoCellImageData )
 {
   var baseVideoObject = new VideoObject();
   
@@ -15,30 +19,37 @@ function VideoCellImage( videoObject, cellWidth, cellHeight )
 
   baseVideoObject.canvas;
 
-  baseVideoObject.red;
-  baseVideoObject.green;
-  baseVideoObject.blue;
-  baseVideoObject.alpha;
+  baseVideoObject.attributes;
+
+//   baseVideoObject.red;
+//   baseVideoObject.green;
+//   baseVideoObject.blue;
+//   baseVideoObject.alpha;
+
+  baseVideoObject.color;
 
   baseVideoObject.cellList;
+  baseVideoObject.cellNameIndexHash;
 
   baseVideoObject.constructor      = this.constructor;
+  baseVideoObject.getAttributes    = this.getAttributes;
+  baseVideoObject.setAttributes    = this.setAttributes;
   baseVideoObject.setColor         = this.setColor;
   baseVideoObject.loadCell         = this.loadCell;
   baseVideoObject.getNumberOfCells = this.getNumberOfCells;
   baseVideoObject.getCanvas        = this.getCanvas;
   
-  baseVideoObject.constructor( videoObject, cellWidth, cellHeight );
+  baseVideoObject.constructor( videoObject, videoCellImageData );
   return baseVideoObject;
 };
 
-VideoCellImage.prototype.constructor = function( videoObject, cellWidth, cellHeight )
+VideoCellImage.prototype.constructor = function( videoObject, videoCellImageData )
 {
   this.sourceVideoObject = videoObject;
   var sourceVideoObjectCanvas = this.sourceVideoObject.getCanvas();
 
-  this.cellWidth  = cellWidth;
-  this.cellHeight = cellHeight;
+  this.cellWidth  = videoCellImageData["cellWidth"];
+  this.cellHeight = videoCellImageData["cellHeight"];
 
   this.mapWidth  = ( sourceVideoObjectCanvas.width  / ( this.cellWidth  + 1 ) ) | 0;
   this.mapHeight = ( sourceVideoObjectCanvas.height / ( this.cellHeight + 1 ) ) | 0;
@@ -49,54 +60,89 @@ VideoCellImage.prototype.constructor = function( videoObject, cellWidth, cellHei
   SetCanvasDimensions( this.canvas,
                        sourceVideoObjectCanvas.width, sourceVideoObjectCanvas.height );
 
-  this.red   = -1;
-  this.green = -1;
-  this.blue  = -1;
-  this.setColor( 255, 255, 255, 0.0 );
+  this.attributes &= ~IMAGE_ATTRIBUTE_COLOR;
+  this.color = new Color( 255, 255, 255, 1 );
 
   this.cellList = new Array();
+  this.cellNameIndexHash = new Array();
+
+  // Populate cells from videoCellImageData.
+  var frames = videoCellImageData["frames"];
+  var frame;
+  for( var frameName in frames )
+  {
+    //console.log( frameName );
+    frame = frames[frameName];
+    this.cellNameIndexHash[frameName] = this.loadCell( frame["x"], frame["y"] );
+  }
 };
 
-VideoCellImage.prototype.setColor = function( red, green, blue, alpha )
+VideoCellImage.prototype.getAttributes = function()
 {
-  this.alpha = alpha;
+  return this.attributes;
+}
 
-  var colorChangeDetected = false;
-  if( this.red != red )
-  {
-    colorChangeDetected = true;
-  }
-  else
-  if( this.green != green )
-  {
-    colorChangeDetected = true;
-  }
-  else
-  if( this.blue != blue )
-  {
-    colorChangeDetected = true;
-  }
+VideoCellImage.prototype.setAttributes = function( attributes )
+{
+  this.attributes = attributes;
+}
 
-  if( colorChangeDetected )
+VideoCellImage.prototype.setColor = function( color )
+{
+  if( !this.color.equals( color ) )
   {
-    this.red   = red;
-    this.green = green;
-    this.blue  = blue;
-
-    this.color = BuildRgb( this.red, this.green, this.blue );
+    this.queueErase();
+    this.needsRedraw = true;
+    
+    this.color.copy( color );
 
     var sourceVideoObjectCanvas = this.sourceVideoObject.getCanvas();
     var canvasContext = GetCanvasContext2D( this.canvas );
+
     canvasContext.drawImage( sourceVideoObjectCanvas, 0, 0 );
-    canvasContext.globalCompositeOperation = "source-atop";
-    canvasContext.fillStyle = this.color;
-    canvasContext.fillRect( 0, 0, sourceVideoObjectCanvas.width, sourceVideoObjectCanvas.height );
+    
+    //if( ( this.attributes & IMAGE_ATTRIBUTE_COLOR ) > 0 )
+    if( true )
+    {
+      var imageData = canvasContext.getImageData( 0, 0, sourceVideoObjectCanvas.width, sourceVideoObjectCanvas.height );
+      var data = imageData.data;
+
+      var red   = this.color.red;
+      var green = this.color.green;
+      var blue  = this.color.blue;
+      
+      var tintLevel = .125;
+      var tintLevelComplement = 1 - tintLevel;
+      for( var i = 0; i < data.length; i += 4 )
+      {
+        // red
+        data[i]     *= tintLevelComplement + ( red   * tintLevel );
+        // green
+        data[i + 1] *= tintLevelComplement + ( green * tintLevel );
+        // blue
+        data[i + 2] *= tintLevelComplement + ( blue  * tintLevel );
+      }
+
+      // overwrite original image
+      canvasContext.putImageData( imageData, 0, 0 );
+    }
+    else
+    {
+      canvasContext.globalCompositeOperation = "source-atop";
+      canvasContext.fillStyle = this.color.string;
+      canvasContext.fillRect( 0, 0, sourceVideoObjectCanvas.width, sourceVideoObjectCanvas.height );
+    }
   }
 };
 
 VideoCellImage.prototype.loadCell = function( xPosition, yPosition, mode )
 {
-  if( mode == EXTRACT_MODE_CELL )
+  if( mode == null )
+  {
+    mode = EXTRACT_MODE_ABS;
+  }
+  else
+  if( mode === EXTRACT_MODE_CELL )
   {
     xPosition = ( xPosition * ( this.cellWidth  + 1 ) ) + 1;
     yPosition = ( yPosition * ( this.cellHeight + 1 ) ) + 1;

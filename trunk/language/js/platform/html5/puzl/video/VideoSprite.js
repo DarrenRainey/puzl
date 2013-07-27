@@ -19,16 +19,16 @@ var SPRITE_ATTRIBUTE_WRAPAROUND    = 64   // Sprite wraps around edges
 var SPRITE_ATTRIBUTE_LOADED        = 128  // Sprite has been loaded
 var SPRITE_ATTRIBUTE_CLONE         = 256  // Sprite is a clone
 
-var SPRITE_ATTRIBUTE_TRANSPARENCY  = 512  // Indicates sprite with transparency
-var SPRITE_ATTRIBUTE_ALPHABLEND    = 1024 // Indicates sprite with alpha/semi transparency
-var SPRITE_ATTRIBUTE_COLOR         = 2048 // Indicates sprite with color modulation
+var SPRITE_ATTRIBUTE_TRANSPARENCY  = 1024 // Indicates sprite with transparency
+var SPRITE_ATTRIBUTE_ALPHABLEND    = 2048 // Indicates sprite with alpha/semi transparency
+var SPRITE_ATTRIBUTE_COLOR         = 4096 // Indicates sprite with color modulation
 
 var SPRITE_COLLISION_RECT          = 0    // Only check if two sprite rectangles intersect
 var SPRITE_COLLISION_PIXEL         = 1    // Also check if pixels from two sprite intersect
 
-function VideoSprite( videoImage, cellWidth, cellHeight )
+function VideoSprite( videoImage, videoSpriteData )
 {
-  var videoCellImage = new VideoCellImage( videoImage, cellWidth, cellHeight );
+  var videoCellImage = new VideoCellImage( videoImage, videoSpriteData );
 
   videoCellImage.constructor        = this.constructor;
   videoCellImage.draw               = this.draw;
@@ -44,9 +44,11 @@ function VideoSprite( videoImage, cellWidth, cellHeight )
   
   videoCellImage.setAttributes      = this.setAttributes;
   videoCellImage.loadFrame          = this.loadFrame;
+  videoCellImage.getCurrentSequence = this.getCurrentSequence;
   videoCellImage.getNumberOfFrames  = this.getNumberOfFrames;
   videoCellImage.setCurrentSequence = this.setCurrentSequence;
   videoCellImage.setCurrentFrame    = this.setCurrentFrame;
+  videoCellImage.setCurrentFrameByName = this.setCurrentFrameByName;
   videoCellImage.setAnimationSpeed  = this.setAnimationSpeed;
   videoCellImage.loadAnimation      = this.loadAnimation;
   videoCellImage.animate            = this.animate;
@@ -54,16 +56,42 @@ function VideoSprite( videoImage, cellWidth, cellHeight )
   videoCellImage.xVelocity;
   videoCellImage.yVelocity;
 
-  videoCellImage.constructor();
+  videoCellImage.animation;
+  videoCellImage.animationNameIndexHash;
+
+  videoCellImage.constructor( videoSpriteData );
   return videoCellImage;
 }
 
-VideoSprite.prototype.constructor = function()
+VideoSprite.prototype.constructor = function( videoSpriteData )
 {
   this.xVelocity = 0;
   this.yVelocity = 0;
-  
+
   this.animation = new Operation();
+  this.animationNameIndexHash = new Array();
+
+  // Load animations from videoSpriteData.
+  var animations = videoSpriteData["animations"];
+  var animation;
+  for( var animationName in animations )
+  {
+    //console.log( animationName );
+    animation = animations[animationName];
+
+    // TODO: Optimize...
+    var indexedAnimation = new Array();
+    var animationIndex;
+    for( animationIndex in animation )
+    {
+      var animationFrameName = animation[animationIndex];
+      indexedAnimation[animationIndex] = this.cellNameIndexHash[animationFrameName];
+      //console.log( animationIndex );
+    }
+    indexedAnimation[++animationIndex] = -1;
+
+    this.animationNameIndexHash[animationName] = this.loadAnimation( indexedAnimation );
+  }
 };
 
 VideoSprite.prototype.draw = function()
@@ -77,7 +105,7 @@ VideoSprite.prototype.draw = function()
   var context = this.parentObject.getContext();
   
   var hasAlpha; // TODO: Optimize. Could allocate this value once for each blockgraphic object.
-  if( this.alpha != 1.0 )
+  if( this.alpha !== 1.0 )
   {
     hasAlpha = true;
     context.globalAlpha = this.alpha;
@@ -88,7 +116,7 @@ VideoSprite.prototype.draw = function()
   }
   
   var cell = this.cellList[this.animation.getCurrentFrame()];
-  if( cell === null )
+  if( cell == null )
   {
     return;
   }
@@ -188,7 +216,7 @@ VideoSprite.prototype.setVelocity = function( xVelocity, yVelocity )
 
 VideoSprite.prototype.move = function()
 {
-  if( ( this.xVelocity != 0 ) || ( this.yVelocity != 0 ) )
+  if( ( this.xVelocity !== 0 ) || ( this.yVelocity !== 0 ) )
   {
     this.queueErase();
 
@@ -210,7 +238,6 @@ VideoSprite.prototype.setAttributes = function( attributes )
 VideoSprite.prototype.loadFrame = function( xPosition, yPosition, mode )
 {
   var frameIndex = this.loadCell( xPosition, yPosition, mode );
-  this.animation.setNumberOfFrames( this.getNumberOfFrames() );
   return frameIndex;
 };
 
@@ -219,16 +246,39 @@ VideoSprite.prototype.getNumberOfFrames = function()
   return this.getNumberOfCells();
 };
 
+VideoSprite.prototype.getCurrentSequence = function()
+{
+  return this.animation.currentSequence;
+};
+
 VideoSprite.prototype.setCurrentSequence = function( currentSequence )
 {
-  this.needsRedraw = true;
-  return this.animation.setCurrentSequence( currentSequence );
+  //console.log( currentSequence );
+  var previousFrame = this.animation.getCurrentFrame();
+  
+  this.animation.setCurrentSequence( currentSequence );
+  if( previousFrame !== this.animation.getCurrentFrame() )
+  {
+    this.queueErase();
+    this.needsRedraw = true;
+  }
 };
 
 VideoSprite.prototype.setCurrentFrame = function( currentFrame )
 {
-  this.needsRedraw = true;
-  return this.animation.setCurrentFrame( currentFrame );
+  if( currentFrame !== this.animation.getCurrentFrame() )
+  {
+    this.queueErase();
+    this.needsRedraw = true;
+  }
+  
+  this.animation.setCurrentFrame( currentFrame );
+};
+
+VideoSprite.prototype.setCurrentFrameByName = function( frameName )
+{
+  //console.log( "Frame index: " + this.cellNameIndexHash[frameName] );
+  this.setCurrentFrame( this.cellNameIndexHash[frameName] );
 };
 
 VideoSprite.prototype.setAnimationSpeed = function( animationSpeed )
