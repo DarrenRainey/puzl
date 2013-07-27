@@ -20,6 +20,7 @@ puzLInclude( "puzl/input/InputMouse.js" );
 puzLInclude( "puzl/input/InputJoystick.js" );
 puzLInclude( "puzl/input/InputSystem.js" );
 
+puzLInclude( "puzl/video/Color.js" );
 puzLInclude( "puzl/video/VideoObject.js" );
 puzLInclude( "puzl/video/BlockGraphic.js" );
 puzLInclude( "puzl/video/VideoCellImage.js" ) ;
