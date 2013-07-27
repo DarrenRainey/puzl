@@ -13,7 +13,6 @@ function Operation()
   this.attributes      = 0;
   this.state           = 0;
   this.currentFrame    = 0;
-  this.numberOfFrames  = 0;
   this.currentSequence = 0;
   this.counter         = 0;
   this.frameIndex      = 0;
@@ -25,7 +24,6 @@ function Operation()
     this.attributes      = OPERATION_ATTRIBUTE_MULTI_SEQUENCE;
     this.state           = OPERATION_STATE_RESET;
     this.currentFrame    = 0;
-    this.numberOfFrames  = 0;
     this.currentSequence = 0;
     this.counter         = 0;
     this.frameIndex      = 0;
@@ -99,15 +97,26 @@ function Operation()
   {
     // Set the animation index
     // ADD SOME SORT OF CHECK FOR AVAILABLE SEQUENCE #'s
-    this.currentSequence = sequenceIndex;
-
-    // Reset animation
-    this.frameIndex = 0;       // DESIGN ISSUE! (resets animation)
+    if( this.currentSequence !== sequenceIndex )
+    {
+      this.currentSequence = sequenceIndex;
+      
+      // Reset animation
+      this.frameIndex = 0;       // DESIGN ISSUE! (resets animation)
+    }
 
     // Set up reference frame for MULTI_SEQUENCE (fixes bad initial frame)
     if( this.attributes & OPERATION_ATTRIBUTE_MULTI_SEQUENCE )
     {
-      this.currentFrame = this.sequences[this.currentSequence][this.frameIndex];
+      if( ( this.sequences.length - 1 ) < this.currentSequence )
+      {
+        console.error( "Operation does not have currentSequence: " + this.currentSequence );
+      }
+      else
+      {
+        // TODO: Further error check this.
+        this.currentFrame = this.sequences[this.currentSequence][this.frameIndex];
+      }
     }
   };
 
@@ -120,7 +129,7 @@ function Operation()
   //--------------------------------------------------------------------------------
   this.setCurrentFrame = function( frameIndex )
   {
-    if( !( ( frameIndex < 0 ) || ( frameIndex > this.numberOfFrames - 1 ) ) )
+    if( frameIndex > -1 )
     {
       this.currentFrame = frameIndex;
     }
@@ -140,20 +149,9 @@ function Operation()
         ( this.attributes & OPERATION_ATTRIBUTE_ONE_SHOT ) )
     {
       this.frameIndex = frameIndex;
+      // TODO: Error check this.
       this.currentFrame = this.sequences[this.currentSequence][this.frameIndex];
     }
-  };
-
-  //--------------------------------------------------------------------------------
-  this.getNumberOfFrames = function()
-  {
-    return this.numberOfFrames;
-  };
-
-  //--------------------------------------------------------------------------------
-  this.setNumberOfFrames = function( numberOfFrames )
-  {
-    this.numberOfFrames = numberOfFrames;
   };
 
   //--------------------------------------------------------------------------------
@@ -191,7 +189,7 @@ function Operation()
       return false;
     }
     else
-    if( this.attributes & OPERATION_ATTRIBUTE_MULTI_FRAME )
+    /*if( this.attributes & OPERATION_ATTRIBUTE_MULTI_FRAME )
     {
       //cout << "OPERATION_ATTRIBUTE_MULTI_FRAME" << endl;
 
@@ -219,7 +217,7 @@ function Operation()
 
       return false;
     }
-    else
+    else*/
     if( this.attributes & OPERATION_ATTRIBUTE_MULTI_SEQUENCE )
     {
       // Look for next frame of sequence
@@ -240,7 +238,7 @@ function Operation()
         this.currentFrame = this.sequences[this.currentSequence][this.frameIndex];
 
         // Check for end sequence flag (-1)
-        if( this.currentFrame == -1 )
+        if( this.currentFrame === -1 )
         {
           // Test if animation is single shot
           if( this.attributes & OPERATION_ATTRIBUTE_ONE_SHOT )
@@ -267,7 +265,7 @@ function Operation()
           }
         }
 
-        if( this.currentFrame != lastFrame )
+        if( this.currentFrame !== lastFrame )
         {
           return true;
         }
