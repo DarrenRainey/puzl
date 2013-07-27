@@ -142,6 +142,8 @@ GameShell.prototype.shellLoop = function()
 
     lastUpdateTime = now;
   */
+
+    this.audioSystem.update();
   }
   else
   {
