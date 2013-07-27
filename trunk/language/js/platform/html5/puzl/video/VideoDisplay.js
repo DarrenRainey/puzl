@@ -16,7 +16,8 @@ function VideoDisplay( width, height )
   videoObject.top;
   
   videoObject.fullScreen;
-  
+
+  videoObject.backgroundColor;
   videoObject.foregroundColor;
 
   videoObject.constructor             = this.constructor;
@@ -54,7 +55,8 @@ VideoDisplay.prototype.constructor = function( width, height )
   
   this.setDimensions( width, height );
 
-  this.setBackgroundColor( "rgb(0,0,0)" );
+  this.backgroundColor = new Color( 0, 0, 0 );
+  this.foregroundColor = new Color( 255, 255, 255 );
 };
 
 VideoDisplay.prototype.setFullScreen = function( fullScreen )
@@ -156,35 +158,27 @@ VideoDisplay.prototype.clear = function()
 
 VideoDisplay.prototype.setBackgroundColor = function( color )
 {
-  //this.backgroundColor = "rgb(" + color.red + "," + color.green + "," + color.blue + ")";
-  document.body.style.backgroundColor = color;
+  this.backgroundColor.copy( color );
+  document.body.style.backgroundColor = color.string;
 };
 
 VideoDisplay.prototype.setForegroundColor = function( color )
 {
-  //this.foregroundColor = "rgb(" + color.red + "," + color.green + "," + color.blue + ")";
-  this.foregroundColor = color;
+  this.foregroundColor.copy( color );
 };
 
 /*VideoDisplay.prototype.drawRectangle = function( xPosition, yPosition, width, height )
 {
-  //this.context.fillStyle = this.foregroundColor;
+  //this.context.fillStyle = this.foregroundColor.color;
   //this.context.fillRect( xPosition, yPosition, width, height );
 };*/
 
 VideoDisplay.prototype.drawRectangle = function( canvas, xPosition, yPosition, width, height )
 {
   var canvasContext = GetCanvasContext2D( canvas );
-  canvasContext.fillStyle = this.foregroundColor;
+  canvasContext.fillStyle = this.foregroundColor.color;
   canvasContext.fillRect( xPosition, yPosition, width, height );
 };
-
-/*VideoDisplay.prototype.getColorRgb = function( red, green, blue )
-{
-  var color = new Color();
-  color.setRgb( red, green, blue );
-  return color;
-};*/
 
 VideoDisplay.prototype.addVideoImage = function( videoImage )
 {
