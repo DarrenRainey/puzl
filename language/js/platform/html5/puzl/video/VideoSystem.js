@@ -315,7 +315,16 @@ function BuildRgba( red, green, blue, alpha )
 
 function CreateOnScreenCanvas( id )
 {
-  document.write( "<canvas id=\"" + id + "\" style=\"position: absolute; left: 0; top: 0; z-index: 1;\">Canvas not supported.</canvas>" );
+  var canvas = CreateOffScreenCanvas( id );
+  canvas.style.position = "absolute";
+  canvas.style.left     = 0;
+  canvas.style.top      = 0
+  canvas.style.zIndex   = 1;
+
+  // TODO: Append text node that says 'canvas is not supported'?
+
+  document.body.appendChild( canvas );
+
   return GetCanvas( id );
 }
 
