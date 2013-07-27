@@ -35,17 +35,21 @@ function GameShell( gameShellSettings )
   this.display;
   
   this.logic;
+
+  this.xmlHttpRequestLoadQueue;
   
   this.constructor( gameShellSettings );
   return this;
 }
 
-GameShell.prototype.constructor = function()
+GameShell.prototype.constructor = function( gameShellSettings )
 {
   //console.log( "GameShell::constructor()" );
   GlobalGameShell = this;
   this.gameShellSettings = gameShellSettings;
   this.quit = false;
+
+  this.xmlHttpRequestLoadQueue = new Array();
 };
 
 GameShell.prototype.run = function()
@@ -71,28 +75,46 @@ GameShell.prototype.shellInitialize = function()
   this.audioSystem = new AudioSystem();
 
   this.initialize();
-
-  if( this.videoSystem.videoImageLoadQueue.length > 0 )
-  {
-    this.videoSystem.processImageLoadQueue();
-  }
-  else
-  {
-    this.shellPostInitialize();
-  }
+  this.shellPostInitialize();
 };
 
 GameShell.prototype.shellPostInitialize = function()
 {
   //console.log( "GameShell::shellPostInitialize()" );
-  this.postInitialize();
-  this.shellLoop();
+
+  // Make sure all initial resources, queued up previous to this point
+  // (during (pre)initialize), have been loaded and processed.
+  var ready = true;
+  
+  if( this.videoSystem.videoImageLoadQueue.length > 0 )
+  {
+    ready = false;
+    this.videoSystem.processImageLoadQueue();
+  }
+
+  if( this.xmlHttpRequestLoadQueue.length > 0 )
+  {
+    ready = false;
+    this.processXmlHttpRequestLoadQueue();
+  }
+  
+  if( ready )
+  {
+    // Continue with the game initialization and start main loop!
+    this.postInitialize();
+    this.shellLoop();
+  }
 };
 
 GameShell.prototype.shellShutdown = function()
 {
   //console.log( "GameShell::shtudown()" );
 };
+
+/*frame = 0;
+lastUpdateTime = Date.now();
+acDelta = 0;
+msPerFrame = 1000 / 60;*/
 
 GameShell.prototype.shellLoop = function()
 {
@@ -104,20 +126,28 @@ GameShell.prototype.shellLoop = function()
     this.inputSystem.update();
 
     this.videoSystem.getRequestAnimFrame( VBlank );
-    this.shellDraw();
+
+    /*var now = Date.now();
+    var delta = now - lastUpdateTime;
+    if( acDelta > msPerFrame )
+    {
+      acDelta = 0;
+      */
+      this.videoSystem.update();
+    /*}
+    else
+    {
+      acDelta += delta;
+    }
+
+    lastUpdateTime = now;
+  */
   }
   else
   {
     this.shutdown();
     this.shellShutdown();
   }
-};
-
-GameShell.prototype.shellDraw = function()
-{
-  //console.log( "GameShell::shellDraw()" );
-  this.videoSystem.update();
-  //this.draw();
 };
 
 GameShell.prototype.documentBodyOnResize = function()
@@ -136,3 +166,60 @@ GameShell.prototype.shellResize = function()
 GameShell.prototype.input  = function(){};
 GameShell.prototype.resize = function(){};
 GameShell.prototype.postInitialize = function(){};
+
+GameShell.prototype.queueXmlHttpRequest = function( resourceArray, filename )
+{
+  xmlHttpRequest = new XMLHttpRequest();
+  xmlHttpRequest.filename = filename;
+  xmlHttpRequest.resourceArray = resourceArray;
+  xmlHttpRequest.onload = ProcessXmlHttpRequestLoad;
+  
+  this.xmlHttpRequestLoadQueue[this.xmlHttpRequestLoadQueue.length] = xmlHttpRequest;
+};
+
+GameShell.prototype.processXmlHttpRequestLoadQueue = function()
+{
+  var numberOfIDQueuedXmlHttpRequests = this.xmlHttpRequestLoadQueue.length;
+  var index;
+  var xmlHttpRequest;
+  for( index = 0; index < numberOfIDQueuedXmlHttpRequests; index++ )
+  {
+    xmlHttpRequest = this.xmlHttpRequestLoadQueue[index];
+    xmlHttpRequest.open( "GET", xmlHttpRequest.filename, true );
+    xmlHttpRequest.send();
+  }
+};
+
+function ProcessXmlHttpRequestLoad( loadEvent )
+{
+  console.log( "ProcessXmlHttpRequestLoad" );
+  
+  var filename = loadEvent.target.filename;
+
+  var numberOfIDQueuedxmlHttpRequests = GlobalGameShell.xmlHttpRequestLoadQueue.length;
+  var index;
+  var xmlHttpRequest;
+  for( index = 0; index < numberOfIDQueuedxmlHttpRequests; index++ )
+  {
+    // TODO: Replace with a hash?
+    xmlHttpRequest = GlobalGameShell.xmlHttpRequestLoadQueue[index];
+    if( filename === xmlHttpRequest.filename )
+    {
+      //console.log( filename );
+      //if( ( xmlHttpRequest.xmlHttpResource === undefined ) )
+      //{
+      //
+      //}
+
+      xmlHttpRequest.resourceArray.push( xmlHttpRequest.response );
+      GlobalGameShell.xmlHttpRequestLoadQueue.splice( index, 1 );
+      break;
+    }
+  }
+
+  if( GlobalGameShell.xmlHttpRequestLoadQueue.length === 0 )
+  {
+    // Attempt game post initialize.
+    GlobalGameShell.shellPostInitialize();
+  }
+}
