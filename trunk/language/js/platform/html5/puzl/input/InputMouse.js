@@ -11,24 +11,105 @@ var GlobalMouse;
 function ProcessMouseDown( mouseEvent )
 {
   GlobalMouse.setButtonState( mouseEvent.which - 1, BUTTON_STATE_PRESSED );
-  //mouseEvent.preventDefault();
+  
+  mouseEvent.stopPropagation();
+  mouseEvent.preventDefault();
 }
 
 function ProcessMouseUp( mouseEvent )
 {
   GlobalMouse.setButtonState( mouseEvent.which - 1, BUTTON_STATE_RELEASED );
-  //mouseEvent.preventDefault();
+  
+  mouseEvent.stopPropagation();
+  mouseEvent.preventDefault();
 }
 
 function ProcessMouseMove( mouseEvent )
 {
   GlobalMouse.xPosition = mouseEvent.pageX;
   GlobalMouse.yPosition = mouseEvent.pageY;
+  
+  mouseEvent.stopPropagation();
+  mouseEvent.preventDefault();
 }
 
 document.addEventListener( "mousedown", ProcessMouseDown, false );
 document.addEventListener( "mouseup",   ProcessMouseUp,   false );
 document.addEventListener( "mousemove", ProcessMouseMove, false );
+
+// TODO: Move touch to own class.
+function IsTouchDevice()
+{
+  return ( 'ontouchstart' in document.documentElement );
+}
+
+function ProcessTouchStart( touchEvent )
+{
+  var targetTouch;
+  if( touchEvent.targetTouches.length > 0 )
+  {
+    targetTouch = touchEvent.targetTouches[0];
+  }
+  else
+  {
+    targetTouch = touchEvent.targetTouches;
+  }
+
+  GlobalMouse.xPosition = targetTouch.pageX;
+  GlobalMouse.yPosition = targetTouch.pageY;
+
+  GlobalMouse.setButtonState( 0, BUTTON_STATE_PRESSED );
+
+  touchEvent.stopPropagation();
+  touchEvent.preventDefault();
+}
+
+function ProcessTouchEnd( touchEvent )
+{
+  var targetTouch;
+  if( touchEvent.targetTouches.length > 0 )
+  {
+    targetTouch = touchEvent.targetTouches[0];
+  }
+  else
+  {
+    targetTouch = touchEvent.targetTouches;
+  }
+
+  GlobalMouse.xPosition = targetTouch.pageX;
+  GlobalMouse.yPosition = targetTouch.pageY;
+
+  GlobalMouse.setButtonState( 0, BUTTON_STATE_RELEASED );
+
+  touchEvent.stopPropagation();
+  touchEvent.preventDefault();
+}
+
+function ProcessTouchMove( touchEvent )
+{
+  var targetTouch;
+  if( touchEvent.targetTouches.length > 0 )
+  {
+    targetTouch = touchEvent.targetTouches[0];
+  }
+  else
+  {
+    targetTouch = touchEvent.targetTouches;
+  }
+  
+  GlobalMouse.xPosition = targetTouch.pageX;
+  GlobalMouse.yPosition = targetTouch.pageY;
+
+  touchEvent.stopPropagation();
+  touchEvent.preventDefault();
+}
+
+if( IsTouchDevice() )
+{
+  document.addEventListener( "touchstart", ProcessTouchStart, false );
+  document.addEventListener( "touchend",   ProcessTouchEnd,   false );
+  document.addEventListener( "touchmove",  ProcessTouchMove,  false );
+}
 
 function InputMouse()
 {
