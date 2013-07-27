@@ -159,7 +159,7 @@ Object2d.prototype.setQuadTreeNode = function( quadTreeNode )
   this.quadTreeNode = quadTreeNode;
 };
 
-Object2d.prototype.updateQuadTree = function( quadTreeNode )
+Object2d.prototype.updateQuadTree = function()
 {
   var parentObject = this.parentObject;
   if( ( parentObject != null ) &&
