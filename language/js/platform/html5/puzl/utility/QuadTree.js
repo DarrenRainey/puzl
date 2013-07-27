@@ -41,7 +41,7 @@ QuadTree.prototype.updateRectangle = function()
     var newX = object2d.getWidth()  - 1;
     var newY = object2d.getHeight() - 1;
 
-    if( ( point.x != newX ) || ( point.y != newY ) )
+    if( ( point.x !== newX ) || ( point.y !== newY ) )
     {
       this.setRectangle( 0, 0, newX, newY );
     }
@@ -241,7 +241,7 @@ QuadTreeNode.prototype.getQuadrantID = function( rectangle )
     point1QuadrantID |= 2;
   }
 
-  if( point1QuadrantID == 0 )
+  if( point1QuadrantID === 0 )
   {
     // Checking if point1 (end point) is in the NW (0)
     // quadrant is an optimization.
@@ -269,7 +269,7 @@ QuadTreeNode.prototype.getQuadrantID = function( rectangle )
       point0QuadrantID |= 2;
     }
 
-    if( point0QuadrantID == 3 )
+    if( point0QuadrantID === 3 )
     {
       // Checking if point0 (start point) is in the SE (3)
       // quadrant is an optimization.
