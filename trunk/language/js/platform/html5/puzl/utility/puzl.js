@@ -1,6 +1,17 @@
 function puzLInclude( path )
 {
-  document.write( "<script type=\"text/javascript\" src=\"" + path + "\"></script>" );
+  if( navigator.isCocoonJS !== undefined )
+  {
+    var script = document.createElement( "script" );
+    script.type = "text/javascript";
+    script.src  = path;
+    
+    document.body.appendChild( script );
+  }
+  else
+  {
+    document.write( "<script type=\"text/javascript\" src=\"" + path + "\"></script>" );
+  }
 }
 
 puzLInclude( "puzl/input/InputDevice.js" );
