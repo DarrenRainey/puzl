@@ -13,70 +13,80 @@ var GlobalVideoSystem;
 function VideoSystem( width, height )
 {
   GlobalVideoSystem = this;
+  
+  this.videoImageIDList;
+  this.videoImageLoadQueue;
 
+  this.display;
+
+  this.constructor( width, height );
+}
+
+VideoSystem.prototype.constructor = function( width, height )
+{
   this.videoImageIDList    = new Array();
   this.videoImageLoadQueue = new Array();
 
   this.display = new VideoDisplay( width, height );
-  
-  this.getRequestAnimFrame = function( callback )
-  {
-    return RequestAnimFrame( callback );
-  };
-  
-  this.update = function()
-  {
-    this.display.drawUpdate();
-  };
-  
-  this.getDisplay = function()
-  {
-    return this.display;
-  };
+}
 
-  this.getAvailableImageID = function()
+VideoSystem.prototype.getRequestAnimFrame = function( callback )
+{
+  return RequestAnimFrame( callback );
+}
+
+VideoSystem.prototype.update = function()
+{
+  this.display.drawUpdate();
+}
+
+VideoSystem.prototype.getDisplay = function()
+{
+  return this.display;
+}
+
+VideoSystem.prototype.getAvailableImageID = function()
+{
+  var numberOfIDSlots = this.videoImageIDList.length;
+  var index;
+  for( index = 0; index < numberOfIDSlots; index++ )
   {
-    var numberOfIDSlots = this.videoImageIDList.length;
-    var index;
-    for( index = 0; index < numberOfIDSlots; index++ )
+    if( this.videoImageIDList[index] == null )
     {
-      if( this.videoImageIDList[index] == null )
-      {
-        return index;
-      }
+      return index;
     }
+  }
 
-    return index;
-  };
+  return index;
+}
 
-  this.queueVideoImage = function( videoImage, filename )
+VideoSystem.prototype.queueVideoImage = function( videoImage, filename )
+{
+  var availableImageID = this.getAvailableImageID();
+
+  videoImage.videoSystem = this;
+  videoImage.id = availableImageID;
+
+  this.videoImageLoadQueue[this.videoImageLoadQueue.length] = videoImage;
+  videoImage.image = new Image();
+
+  videoImage.image.videoImageID = videoImage.id;
+  //videoImage.image.addEventListener( "load", ProcessVideoImageLoad, false );
+  videoImage.image.onload = ProcessVideoImageLoad;
+
+  videoImage.filename = filename;
+}
+
+VideoSystem.prototype.processImageLoadQueue = function()
+{
+  var numberOfIDQueuedVideoImages = this.videoImageLoadQueue.length;
+  var index;
+  var videoImage;
+  for( index = 0; index < numberOfIDQueuedVideoImages; index++ )
   {
-    var availableImageID = this.getAvailableImageID();
-
-    videoImage.videoSystem = this;
-    videoImage.id = availableImageID;
-
-    this.videoImageLoadQueue[this.videoImageLoadQueue.length] = videoImage;
-    videoImage.image = new Image();
-
-    videoImage.image.videoImageID = videoImage.id;
-    //videoImage.image.addEventListener( "load", ProcessVideoImageLoad, false );
-    videoImage.image.onload = ProcessVideoImageLoad;
-
-    videoImage.filename = filename;
-  };
-
-  this.processImageLoadQueue = function()
-  {
-    var numberOfIDQueuedVideoImages = this.videoImageLoadQueue.length;
-    var index;
-    var videoImage;
-    for( index = 0; index < numberOfIDQueuedVideoImages; index++ )
-    {
-      videoImage = this.videoImageLoadQueue[index];
-      videoImage.image.src = videoImage.filename;
-    }
-  };
+    videoImage = this.videoImageLoadQueue[index];
+    videoImage.image.src = videoImage.filename;
+  }
 }
 
 function ProcessVideoImageLoad( loadEvent )
@@ -121,6 +131,7 @@ function ProcessVideoImageLoad( loadEvent )
 
   if( GlobalVideoSystem.videoImageLoadQueue.length == 0 )
   {
+    // Attempt game post initialize.
     GlobalGameShell.shellPostInitialize();
   }
 }
@@ -312,7 +323,7 @@ function CreateOffScreenCanvas( id )
 {
   var canvas = document.createElement( "canvas" );
 
-  if( id != null || id != "" )
+  if( id != null || id !== "" )
   {
     canvas.id = id;
   }
