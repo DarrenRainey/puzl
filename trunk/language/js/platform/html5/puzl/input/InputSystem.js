@@ -69,7 +69,6 @@ InputSystem.prototype.constructor = function()
   this.supportsGamepads = ( navigator.getGamepads !== undefined ) ? true : false;
   if( this.supportsGamepads )
   {
-    // TODO: Make this code Firefox friendly.
     var gamepadList = navigator.getGamepads();
     if( gamepadList !== null )
     {
@@ -144,26 +143,39 @@ InputSystem.prototype.update = function()
     }
   }
 
-  if( this.numberOfJoysticks > 0 )
-  {
     for( index = 0; index < this.numberOfJoysticks; index++ )
     {
       this.joysticks[index].age();
     }
 
-    var gamepadList = navigator.getGamepads();
-    if( gamepadList != null )
+  var gamepadList = navigator.getGamepads();
+  if( gamepadList !== undefined )
+  {
+    var numberOfGamepads = gamepadList.length;
+    if( this.numberOfJoysticks < numberOfGamepads )
     {
-      var gamepad;
-      for( index = 0; index < gamepadList.length; index++ )
+      // Newly attached / detected gamepad.
+      // It needs to be registered into the input engine.
+      for( index = this.numberOfJoysticks - 1; index < numberOfGamepads; index++ )
       {
-        gamepad = gamepadList[index];
-        if( gamepad !== undefined )
-        {
-          // TODO: Only call this update when timestamp differs from last
-          // attempt?
-          this.joysticks[index].updateWithGamepad( gamepad );
-        }
+        this.joysticks[index] = new InputJoystick();
+      }
+
+      this.numberOfJoysticks = numberOfGamepads;
+    }
+
+    // NOTE: This code assumes joystick and corresponding gamepad indexes are the same.
+    // This notion needs to be investigated.
+    var gamepad;
+    for( index = 0; index < numberOfGamepads; index++ )
+    {
+      gamepad = gamepadList[index];
+      if( gamepad !== undefined )
+      {
+        // TODO: Only call this update when timestamp differs from last
+        // attempt?
+        console.log( index );
+        this.joysticks[index].updateWithGamepad( gamepad );
       }
     }
   }
