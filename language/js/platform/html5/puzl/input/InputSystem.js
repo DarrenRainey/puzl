@@ -36,32 +36,27 @@ InputSystem.prototype.constructor = function()
   // Gamepad support (with shim).
   if( navigator.getGamepads === undefined )
   {
-    alert( "getGamepads not defined." );
     navigator.getGamepads =
     (
       function()
       {
         if( "webkitGetGamepads" in navigator )
         {
-          alert( "webkitGetGamepads" );
           return navigator.webkitGetGamepads;
         }
 
         if( "mozGetGamepads" in navigator )
         {
-          alert( "mozGetGamepads" );
           return navigator.mozGetGamepads;
         }
 
         // Older outdated approach.
         if( "webkitGamepads" in navigator )
         {
-          alert( "webkitGamepads" );
           return function(){ return navigator.webkitGamepads; };
         }
         if( "mozGamepads" in navigator )
         {
-          alert( "mozGamepads" );
           return function(){ return navigator.mozGamepads; };
         }
 
@@ -78,7 +73,7 @@ InputSystem.prototype.constructor = function()
     var gamepadList = navigator.getGamepads();
     if( gamepadList !== null )
     {
-      console.log( gamepadList );
+      //console.log( gamepadList );
       
       // Determine actual number of valid / defined gamepads.
       this.numberOfJoysticks = 0;
