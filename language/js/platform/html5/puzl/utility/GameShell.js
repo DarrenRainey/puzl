@@ -32,6 +32,8 @@ function GameShell( gameShellSettings )
   this.quit;
   
   this.keyboard;
+  this.mouse;
+  
   this.display;
   
   this.logic;
