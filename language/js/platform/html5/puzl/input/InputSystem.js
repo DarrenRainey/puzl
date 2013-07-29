@@ -176,7 +176,6 @@ InputSystem.prototype.update = function()
         {
           // TODO: Only call this update when timestamp differs from last
           // attempt?
-          console.log( index );
           this.joysticks[index].updateWithGamepad( gamepad );
         }
       }
