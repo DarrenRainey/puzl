@@ -60,13 +60,13 @@ InputSystem.prototype.constructor = function()
           return function(){ return navigator.mozGamepads; };
         }
 
-        // Return undefined for no support.
-        return;
+        // Return empty array for for no support.
+        return function(){ return []; };
       }
     )();
   }
   
-  this.supportsGamepads = ( navigator.getGamepads !== undefined ) ? true : false;
+  this.supportsGamepads = !!navigator.getGamepads || navigator.webkitGetGamepads || !!navigator.mozGetGamepads;
   if( this.supportsGamepads )
   {
     var gamepadList = navigator.getGamepads();
@@ -143,39 +143,42 @@ InputSystem.prototype.update = function()
     }
   }
 
-    for( index = 0; index < this.numberOfJoysticks; index++ )
-    {
-      this.joysticks[index].age();
-    }
-
-  var gamepadList = navigator.getGamepads();
-  if( gamepadList !== undefined )
+  for( index = 0; index < this.numberOfJoysticks; index++ )
   {
-    var numberOfGamepads = gamepadList.length;
-    if( this.numberOfJoysticks < numberOfGamepads )
+    this.joysticks[index].age();
+  }
+
+  if( this.supportsGamepads )
+  {
+    var gamepadList = navigator.getGamepads();
+    if( gamepadList !== undefined )
     {
-      // Newly attached / detected gamepad.
-      // It needs to be registered into the input engine.
-      for( index = this.numberOfJoysticks - 1; index < numberOfGamepads; index++ )
+      var numberOfGamepads = gamepadList.length;
+      if( this.numberOfJoysticks < numberOfGamepads )
       {
-        this.joysticks[index] = new InputJoystick();
+        // Newly attached / detected gamepad.
+        // It needs to be registered into the input engine.
+        for( index = this.numberOfJoysticks - 1; index < numberOfGamepads; index++ )
+        {
+          this.joysticks[index] = new InputJoystick();
+        }
+
+        this.numberOfJoysticks = numberOfGamepads;
       }
 
-      this.numberOfJoysticks = numberOfGamepads;
-    }
-
-    // NOTE: This code assumes joystick and corresponding gamepad indexes are the same.
-    // This notion needs to be investigated.
-    var gamepad;
-    for( index = 0; index < numberOfGamepads; index++ )
-    {
-      gamepad = gamepadList[index];
-      if( gamepad !== undefined )
+      // NOTE: This code assumes joystick and corresponding gamepad indexes are the same.
+      // This notion needs to be investigated.
+      var gamepad;
+      for( index = 0; index < numberOfGamepads; index++ )
       {
-        // TODO: Only call this update when timestamp differs from last
-        // attempt?
-        console.log( index );
-        this.joysticks[index].updateWithGamepad( gamepad );
+        gamepad = gamepadList[index];
+        if( gamepad !== undefined )
+        {
+          // TODO: Only call this update when timestamp differs from last
+          // attempt?
+          console.log( index );
+          this.joysticks[index].updateWithGamepad( gamepad );
+        }
       }
     }
   }
