@@ -100,7 +100,7 @@ function ProcessVideoImageLoad( loadEvent )
   for( index = 0; index < numberOfIDQueuedVideoImages; index++ )
   {
     videoImage = GlobalVideoSystem.videoImageLoadQueue[index];
-    if( id == videoImage.id )
+    if( id === videoImage.id )
     {
       if( ( videoImage.image.width === 0 ) && ( videoImage.image.height === 0 ) )
       {
@@ -129,7 +129,7 @@ function ProcessVideoImageLoad( loadEvent )
     }
   }
 
-  if( GlobalVideoSystem.videoImageLoadQueue.length == 0 )
+  if( GlobalVideoSystem.videoImageLoadQueue.length === 0 )
   {
     // Attempt game post initialize.
     GlobalGameShell.shellPostInitialize();

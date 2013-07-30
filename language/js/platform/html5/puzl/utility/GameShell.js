@@ -86,26 +86,21 @@ GameShell.prototype.shellPostInitialize = function()
 
   // Make sure all initial resources, queued up previous to this point
   // (during (pre)initialize), have been loaded and processed.
-  var ready = true;
-  
   if( this.videoSystem.videoImageLoadQueue.length > 0 )
   {
-    ready = false;
     this.videoSystem.processImageLoadQueue();
+    return;
   }
 
   if( this.xmlHttpRequestLoadQueue.length > 0 )
   {
-    ready = false;
     this.processXmlHttpRequestLoadQueue();
+    return;
   }
   
-  if( ready )
-  {
-    // Continue with the game initialization and start main loop!
-    this.postInitialize();
-    this.shellLoop();
-  }
+  // Continue with the game initialization and start main loop!
+  this.postInitialize();
+  this.shellLoop();
 };
 
 GameShell.prototype.shellShutdown = function()
