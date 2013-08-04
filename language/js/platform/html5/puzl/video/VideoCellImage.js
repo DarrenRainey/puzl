@@ -56,7 +56,7 @@ VideoCellImage.prototype.constructor = function( videoObject, videoCellImageData
 
   this.setDimensions( this.cellWidth, this.cellHeight );
 
-  this.canvas = CreateOffScreenCanvas( null );
+  this.canvas = CreateOffScreenCanvas();
   SetCanvasDimensions( this.canvas,
                        sourceVideoObjectCanvas.width, sourceVideoObjectCanvas.height );
 

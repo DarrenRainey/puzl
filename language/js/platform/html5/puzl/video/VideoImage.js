@@ -1,10 +1,7 @@
-var CanvasIdCounter = -1;
-
 function VideoImage()
 {
   var videoObject = new VideoObject();
   
-  videoObject.canvasID;
   videoObject.canvas;
   videoObject.display;
 
@@ -27,6 +24,8 @@ function VideoImage()
   videoObject.getCanvas         = this.getCanvas;
   videoObject.getContext        = this.getContext;
 
+  videoObject.draw              = this.draw;
+
   videoObject.constructor();
   return videoObject;
 }
@@ -46,9 +45,8 @@ VideoImage.prototype.constructor = function()
 
   }
 
-  this.canvasID = ++CanvasIdCounter + "canvas";
-  this.canvas   = CreateOffScreenCanvas( this.canvasID );
-  this.display  = null;
+  this.canvas = CreateOffScreenCanvas();
+  //this.display  = null;
 
   this.filename = "";
 
@@ -58,12 +56,8 @@ VideoImage.prototype.constructor = function()
 VideoImage.prototype.setRealDimensions = function( width, height )
 {
   SetCanvasDimensions( this.canvas, width, height );
-
-  if( this.display == null )
-  {
-    this.width  = width;
-    this.height = height;
-  }
+  this.width  = width;
+  this.height = height;
 };
 
 VideoImage.prototype.getRealWidth = function()
@@ -80,18 +74,18 @@ VideoImage.prototype.setDimensions = function( width, height )
 {
   this.baseVideoObjectSetDimensions( width, height );
    
-  if( this.display == null )
+  //if( this.display == null )
   {
     this.setRealDimensions( width, height );
   }
-  else
+  /*else
   {
     this.width  = width;
     this.height = height;
 
     this.setRealDimensions( width  * this.display.xScale,
                             height * this.display.yScale );
-  }
+  }*/
 };
 
 VideoImage.prototype.setPosition = function( xPosition, yPosition )
@@ -99,15 +93,15 @@ VideoImage.prototype.setPosition = function( xPosition, yPosition )
   this.baseVideoObjectSetPosition( xPosition, yPosition );
   
   // NOTE: Should this only happen with a display.
-  if( this.display != null )
+  //if( this.display != null )
   {
     //console.log( this.display.xOffset );
-    this.xPosition = xPosition;
-    this.yPosition = yPosition;
+    //this.xPosition = xPosition;
+    //this.yPosition = yPosition;
     
-    SetCanvasPosition( this.canvas,
-                       ( xPosition * this.display.xScale ) + this.display.xOffset,
-                       ( yPosition * this.display.yScale ) + this.display.yOffset );
+    //SetCanvasPosition( this.canvas,
+    //                   ( xPosition * this.display.xScale ) + this.display.xOffset,
+    //                   ( yPosition * this.display.yScale ) + this.display.yOffset );
   }
 };
 
@@ -129,7 +123,7 @@ VideoImage.prototype.clear = function()
 VideoImage.prototype.setDisplay = function( display )
 {
   //console.log( "VideoImage::setDisplay()" );
-  if( display == this.display )
+  /*if( display == this.display )
   {
     return;
   }
@@ -155,7 +149,7 @@ VideoImage.prototype.setDisplay = function( display )
 
     this.canvas = OffScreenToOnScreenCanvas( this.canvas );
     this.display = display;
-  }
+  }*/
 };
 
 VideoImage.prototype.load = function( filename )
@@ -163,6 +157,22 @@ VideoImage.prototype.load = function( filename )
   //console.log( "VideoImage::load()" );
   this.filename = filename;
   GlobalVideoSystem.queueVideoImage( this, this.filename );
+};
+
+VideoImage.prototype.draw = function()
+{
+  console.log( "VideoImage::draw()" );
+  
+  var parentObject = this.getParentObject();
+  if( parentObject !== null )
+  {
+    var canvas = parentObject.getCanvas();
+    DrawWithNearestScale( this, parentObject,
+                          0, 0,
+                          this.width, this.height,
+                          this.position.x, this.position.y,
+                          this.width, this.height );
+  }
 };
 
 // Temporary?

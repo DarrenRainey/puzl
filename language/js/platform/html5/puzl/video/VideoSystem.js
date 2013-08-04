@@ -1,3 +1,5 @@
+CanvasIdCounter = -1;
+
 RequestAnimFrame = window.requestAnimationFrame       ||
                    window.webkitRequestAnimationFrame ||
                    window.mozRequestAnimationFrame    ||
@@ -210,43 +212,37 @@ function DrawWithNearestScale( image, context, xPosition, yPosition, width, heig
   //document.destroyElement( "OffscreenCanvas" );
 }
 
-var offscreenCanvas        = document.createElement( "canvas" );
-var offscreenCanvasContext = offscreenCanvas.getContext( "2d" );
+//var offscreenCanvas        = document.createElement( "canvas" );
+//var offscreenCanvasContext = offscreenCanvas.getContext( "2d" );
 
 function DrawWithNearestScale( sourceDrawObject, targetDrawObject, sourceXPosition, sourceYPosition, sourceWidth, sourceHeight, xPosition, yPosition, width, height )
 {
   var image = sourceDrawObject.getCanvas();
-  if( image == undefined )
+  if( image === undefined )
   {
     image = sourceDrawObject;
   }
-  var context = targetDrawObject.getContext();
+  
+  var canvas = targetDrawObject.getCanvas();
+  var context = GetCanvasContext2D( canvas );
   
   context.mozImageSmoothingEnabled    = false;
   context.webkitImageSmoothingEnabled = false;
   context.drawImage( image, sourceXPosition, sourceYPosition, sourceWidth, sourceHeight, xPosition, yPosition, width, height );
   return;
 
-  if( ( sourceHeight == height ) && ( sourceWidth == width ) )
+  /*if( ( sourceHeight == height ) && ( sourceWidth == width ) )
   {
     // Just draw image the regular way.
     context.drawImage( image, sourceXPosition, sourceYPosition, sourceWidth, sourceHeight, xPosition, yPosition, width, height );
   }
 
   // Create an offscreen canvas, draw an image to it, and fetch the pixels
-  //var offscreenCanvasContext = document.createElement( "canvas" ).getContext( "2d" );
   offscreenCanvasContext.width  = sourceWidth;
   offscreenCanvasContext.height = sourceHeight;
-  //offscreenCanvasContext.globalCompositeOperation = "source-over";
-  //offscreenCanvasContext.fillStyle = "rgba(0,0,0,0.0)";
-  //offscreenCanvasContext.fillRect( 0, 0, sourceWidth, sourceHeight );
   offscreenCanvasContext.clearRect( 0, 0, sourceWidth, sourceHeight );
 
   offscreenCanvasContext.drawImage( image, sourceXPosition, sourceYPosition, sourceWidth, sourceHeight, 0, 0, sourceWidth, sourceHeight );
-
-  //offscreenCanvasContext.globalCompositeOperation = "source-atop";
-  //offscreenCanvasContext.fillStyle = BuildRgb( 32, 144, 223 );
-  //offscreenCanvasContext.fillRect( 0, 0, sourceWidth, sourceHeight );
 
   var imgData;
   try
@@ -295,7 +291,7 @@ function DrawWithNearestScale( sourceDrawObject, targetDrawObject, sourceXPositi
     }
   }
 
-  //document.destroyElement( "OffscreenCanvas" );
+  //document.destroyElement( "OffscreenCanvas" );*/
 }
 
 function BuildRgb( red, green, blue )
@@ -313,9 +309,9 @@ function BuildRgba( red, green, blue, alpha )
   return "rgba(" + red + "," + green + "," + blue + "," + ( alpha / 255 ) + ")";
 }
 
-function CreateOnScreenCanvas( id )
+function CreateOnScreenCanvas()
 {
-  var canvas = CreateOffScreenCanvas( id );
+  var canvas = CreateOffScreenCanvas();
   canvas.style.position = "absolute";
   canvas.style.left     = 0;
   canvas.style.top      = 0
@@ -325,17 +321,13 @@ function CreateOnScreenCanvas( id )
 
   document.body.appendChild( canvas );
 
-  return GetCanvas( id );
+  return canvas;
 }
 
-function CreateOffScreenCanvas( id )
+function CreateOffScreenCanvas()
 {
   var canvas = document.createElement( "canvas" );
-
-  if( id != null || id !== "" )
-  {
-    canvas.id = id;
-  }
+  canvas.id = ++CanvasIdCounter + "canvas";
 
   return canvas;
 }

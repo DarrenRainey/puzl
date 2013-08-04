@@ -1,8 +1,8 @@
-// var GlobalVideoDisplay;
-
 function VideoDisplay( width, height )
 {
   var videoObject = new VideoObject();
+
+  videoObject.canvas;
   
   videoObject.xScale;
   videoObject.yScale;
@@ -29,9 +29,9 @@ function VideoDisplay( width, height )
   videoObject.setBackgroundColor      = this.setBackgroundColor;
   videoObject.setForegroundColor      = this.setForegroundColor;
   videoObject.drawRectangle           = this.drawRectangle;
-  videoObject.addVideoImage           = this.addVideoImage;
-  videoObject.removeVideoImage        = this.removeVideoImage;
-  videoObject.determineTopLeft        = this.determineTopLeft;
+
+  videoObject.draw                    = this.draw; // TODO: Temp.
+  videoObject.getCanvas               = this.getCanvas;
 
   videoObject.updateQuadTree          = this.updateQuadTree;
   
@@ -50,6 +50,10 @@ VideoDisplay.prototype.constructor = function( width, height )
 
   this.left = 0;
   this.top  = 0;
+  
+  this.canvas = CreateOnScreenCanvas();
+  var context = GetCanvasContext2D( this.canvas );
+  context.save();
 
   this.quadTree = null;
   
@@ -66,26 +70,18 @@ VideoDisplay.prototype.setFullScreen = function( fullScreen )
 
 VideoDisplay.prototype.getRealHeight = function()
 {
-  //return document.height;
-  /*console.log( document.body.scrollHeight +":"+ document.documentElement.scrollHeight+":"+
-                    document.body.offsetHeight+":"+document.documentElement.offsetHeight+":"+
-                    document.body.clientHeight+":"+document.documentElement.clientHeight );*/
+  return Math.max( Math.max( document.body.offsetHeight, document.documentElement.offsetHeight ),
+                   Math.max( document.body.clientHeight, document.documentElement.clientHeight ) );
 
-  return Math.max( /*Math.max( document.body.scrollHeight, document.documentElement.scrollHeight ),*/
-                    Math.max( document.body.offsetHeight, document.documentElement.offsetHeight ),
-                    Math.max( document.body.clientHeight, document.documentElement.clientHeight ) );
+  return this.height;
 };
 
 VideoDisplay.prototype.getRealWidth = function()
 {
-  //return document.width;
-  /*console.log( document.body.scrollWidth +":"+ document.documentElement.scrollWidth+":"+
-                    document.body.offsetWidth+":"+document.documentElement.offsetWidth+":"+
-                    document.body.clientWidth+":"+document.documentElement.clientWidth );*/
+  return Math.max( Math.max( document.body.offsetWidth, document.documentElement.offsetWidth ),
+                   Math.max( document.body.clientWidth, document.documentElement.clientWidth ) );
 
-  return Math.max( /*Math.max( document.body.scrollWidth, document.documentElement.scrollWidth ),*/
-                    Math.max( document.body.offsetWidth, document.documentElement.offsetWidth ),
-                    Math.max( document.body.clientWidth, document.documentElement.clientWidth ) );
+  return this.width;
 };
 
 VideoDisplay.prototype.setDimensions = function( width, height )
@@ -125,41 +121,47 @@ VideoDisplay.prototype.setDimensions = function( width, height )
     this.xOffset = 0;
     this.yOffset = 0;
   }
-
-  // Scale and position all linked video images.
-  var videoObjectListLength = this.objectList.length;
-  if( videoObjectListLength > 0 )
-  {
-    var videoImage;
-    for( var index = 0; index < videoObjectListLength; index++ )
-    {
-      videoImage = this.objectList[index];
-      videoImage.setDimensions( videoImage.getWidth(), videoImage.getHeight() );
-      videoImage.setPosition( videoImage.getXPosition(), videoImage.getYPosition() );
-    }
-  }
-
-  this.determineTopLeft();
-};
-
-VideoDisplay.prototype.clear = function()
-{
-  // Clear list of registered VideoObjects and null their links to
-  // this display.
+  
+  SetCanvasDimensions( this.canvas, this.width * this.xScale, this.height * this.yScale );
+  
+  var context = GetCanvasContext2D( this.canvas );
+  context.restore();
+  context.scale( this.xScale, this.yScale );
+  context.save();
+  
+  // TODO: Engine should not be concerned with positioning?
+  SetCanvasPosition( this.canvas, this.xOffset, this.yOffset );
+  
+  // TODO: Temporary first time draw.
+  this.clear();
+  
   var length = this.objectList.length;
   var index;
   for( index = 0; index < length; index++ )
   {
-    this.objectList[index].setDisplay( null );
+    this.objectList[index].setNeedsRedraw( true );
+  }
+};
+
+VideoDisplay.prototype.clear = function()
+{
+  var canvasContext = GetCanvasContext2D( this.canvas );
+  if( this.backgroundColor !== undefined )
+  {
+    canvasContext.fillStyle = this.backgroundColor.string;
+  }
+  else
+  {
+    canvasContext.fillStyle = "#000000";
   }
 
-  this.objectList = [];
+  canvasContext.fillRect( 0, 0, this.width, this.height );
 };
 
 VideoDisplay.prototype.setBackgroundColor = function( color )
 {
   this.backgroundColor.copy( color );
-  document.body.style.backgroundColor = color.string;
+  //document.body.style.backgroundColor = color.string;
 };
 
 VideoDisplay.prototype.setForegroundColor = function( color )
@@ -167,29 +169,17 @@ VideoDisplay.prototype.setForegroundColor = function( color )
   this.foregroundColor.copy( color );
 };
 
-/*VideoDisplay.prototype.drawRectangle = function( xPosition, yPosition, width, height )
+VideoDisplay.prototype.drawRectangle = function( xPosition, yPosition, width, height )
 {
-  //this.context.fillStyle = this.foregroundColor.color;
-  //this.context.fillRect( xPosition, yPosition, width, height );
-};*/
-
-VideoDisplay.prototype.drawRectangle = function( canvas, xPosition, yPosition, width, height )
-{
+  var canvas = this.getCanvas();
+  if( canvas === null )
+  {
+    return;
+  }
+  
   var canvasContext = GetCanvasContext2D( canvas );
-  canvasContext.fillStyle = this.foregroundColor.color;
+  canvasContext.fillStyle = this.foregroundColor.string;
   canvasContext.fillRect( xPosition, yPosition, width, height );
-};
-
-VideoDisplay.prototype.addVideoImage = function( videoImage )
-{
-  videoImage.setDisplay( this );
-  this.addObject( videoImage );
-};
-
-VideoDisplay.prototype.removeVideoImage = function( videoImage )
-{
-  videoImage.setDisplay( null );
-  this.removeObject( videoImage );
 };
 
 VideoDisplay.prototype.updateQuadTree = function()
@@ -197,45 +187,14 @@ VideoDisplay.prototype.updateQuadTree = function()
   // Do nothing, visible canvas are already managed.
 };
 
-VideoDisplay.prototype.determineTopLeft = function()
+VideoDisplay.prototype.getCanvas = function()
 {
-  // TODO: Allow top left to be defined by a particular video image in the
-  // videoObjectList.
-  var videoImage;
-  var length = this.objectList.length;
-  if( length < 1 )
-  {
-    this.top  = 0;
-    this.left = 0;
-    return;
-  }
+  return this.canvas;
+};
 
-  var index = 0;
-  videoImage = this.objectList[index];
-  this.top  = videoImage.getYPosition();
-  this.left = videoImage.getXPosition();
-
-  if( ++index >= length )
-  {
-    return;
-  }
-
-  var currentTop;
-  var currentLeft;
-  for( ; index < length; index++ )
-  {
-    videoImage  = this.objectList[index];
-    
-    currentTop  = videoImage.getYPosition();
-    if( currentTop < this.top )
-    {
-      this.top = currentTop;
-    }
-
-    currentLeft = videoImage.getXPosition();
-    if( currentLeft < this.left )
-    {
-      this.left = currentLeft;
-    }
-  }
+VideoDisplay.prototype.draw = function()
+{
+  var canvasContext = GetCanvasContext2D( this.canvas );
+  canvasContext.fillStyle = this.backgroundColor.string;
+  //canvasContext.fillRect( 0, 0, this.width, this.height );
 };
