@@ -102,12 +102,22 @@ Object2d.prototype.setDimensions = function( width, height )
   point.x  += this.width  - width;
   point.y  += this.height - height;
 
-  if( this.quadTree != null )
+  if( this.quadTree !== null )
   {
     this.quadTree.updateRectangle();
   }
 
   this.updateQuadTree();
+};
+
+Object2d.prototype.getParentObject = function()
+{
+  return this.parentObject;
+};
+
+Object2d.prototype.setParentObject = function( parentObject )
+{
+  this.parentObject = parentObject;
 };
 
 Object2d.prototype.addObject = function( object )
@@ -119,18 +129,18 @@ Object2d.prototype.addObject = function( object )
     return;
   }
 
-  if( object == null )
+  if( object === null )
   {
     return;
   }
 
-  var objectParentObject = object.parentObject;
-  if( objectParentObject != null )
+  var objectParentObject = object.getParentObject();
+  if( objectParentObject !== null )
   {
     objectParentObject.removeObject( object );
   }
   
-  object.parentObject = this;
+  object.setParentObject( this );
   this.objectList[this.objectList.length] = object;
 
   // NOTE: Should this update the quad tree?
@@ -145,13 +155,25 @@ Object2d.prototype.removeObject = function( object )
   {
     if( object == this.objectList[index] )
     {
-      object.parentObject = null;
+      object.setParentObject( null );
       this.objectList.splice( index, 1 );
       return;
     }
   }
 
   // NOTE: Should this update the quad tree?
+};
+
+Object2d.prototype.clearObjects = function()
+{
+  var length = this.objectList.length;
+  var index;
+  for( index = 0; index < length; index++ )
+  {
+    this.objectList[index].setParentObject( null );
+  }
+
+  this.objectList = [];
 };
 
 Object2d.prototype.setQuadTreeNode = function( quadTreeNode )
@@ -161,12 +183,12 @@ Object2d.prototype.setQuadTreeNode = function( quadTreeNode )
 
 Object2d.prototype.updateQuadTree = function()
 {
-  var parentObject = this.parentObject;
-  if( ( parentObject != null ) &&
-      ( parentObject.quadTree != null ) )
+  var parentObject = this.getParentObject();
+  /*if( ( parentObject !== null ) &&
+      ( parentObject.quadTree !== null ) )
   {
     parentObject.quadTree.insert( this );
-  }
+  }*/
 };
 
 Object2d.prototype.isInsideRectangle = function( rectangle )

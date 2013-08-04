@@ -96,13 +96,14 @@ VideoSprite.prototype.constructor = function( videoSpriteData )
 
 VideoSprite.prototype.draw = function()
 {
-  //var context = videoObject.getContext();
-  if( this.parentObject == null )
+  var parentObject = this.getParentObject();
+  if( parentObject === null )
   {
     return;
   }
-  
-  var context = this.parentObject.getContext();
+
+  var canvas = parentObject.getCanvas();
+  var context = GetCanvasContext2D( canvas );
   
   var hasAlpha; // TODO: Optimize. Could allocate this value once for each blockgraphic object.
   if( this.alpha !== 1.0 )
@@ -116,32 +117,16 @@ VideoSprite.prototype.draw = function()
   }
   
   var cell = this.cellList[this.animation.getCurrentFrame()];
-  if( cell == null )
+  if( cell === null )
   {
     return;
   }
-
-  if( this.parentObject.display == null )
-  {
-    DrawWithNearestScale( this, this.parentObject,
-                          cell[0], cell[1],
-                          this.cellWidth, this.cellHeight,
-                          this.position.x, this.position.y,
-                          this.width, this.height );
-  }
-  else
-  {
-    var videoObjectDisplay = this.parentObject.display;
-    var xScale = videoObjectDisplay.xScale;
-    var yScale = videoObjectDisplay.yScale;
-    
-    DrawWithNearestScale( this, this.parentObject,
-                          cell[0], cell[1],
-                          this.cellWidth, this.cellHeight,
-                          ( this.position.x - this.parentObject.getXPosition() ) * xScale,
-                          ( this.position.y - this.parentObject.getYPosition() ) * yScale,
-                          this.width * xScale, this.height * yScale );
-  }
+  
+  DrawWithNearestScale( this, parentObject,
+                        cell[0], cell[1],
+                        this.cellWidth, this.cellHeight,
+                        this.position.x, this.position.y,
+                        this.width, this.height );
   
   if( hasAlpha )
   {
@@ -153,39 +138,46 @@ VideoSprite.prototype.draw = function()
 
 VideoSprite.prototype.erase = function()
 {
-  var context = this.parentObject.getContext();
+  var parentObject = this.getParentObject();
+  if( parentObject === null )
+  {
+    return;
+  }
   
-  if( this.parentObject.display == null )
-  {
-    context.clearRect( this.position.x, this.position.y,
-                       this.width, this.height );
-  }
-  else
-  {
-    var videoObjectDisplay = this.parentObject.display;
-    var xScale = videoObjectDisplay.xScale;
-    var yScale = videoObjectDisplay.yScale;
-
-    context.clearRect( ( this.position.x - this.parentObject.getXPosition() ) * xScale,
-                       ( this.position.y - this.parentObject.getYPosition() ) * yScale,
-                       this.width * xScale, this.height * yScale );
-  }
+  var canvas = parentObject.getCanvas();
+  var context = GetCanvasContext2D( canvas );
+  
+  context.clearRect( this.position.x, this.position.y,
+                     this.width, this.height );
 };
 
 VideoSprite.prototype.queueErase = function()
 {
-  var videoObjectDisplay = this.parentObject.display;
+  /*var videoObjectDisplay = this.getDisplay();
+  if( videoObjectDisplay === undefined )
+  {
+    return;
+  }*/
 
-  var eraseQueueObject = videoObjectDisplay.getNextEraseQueueObject();
-  eraseQueueObject.targetVideoObject = this.parentObject; // NOTE: Fix! Could be a display, which has not canvas.
+  var parentObject = this.getParentObject();
+  if( parentObject === null )
+  {
+    return;
+  }
+
+  //var eraseQueueObject = videoObjectDisplay.getNextEraseQueueObject();
+  var eraseQueueObject = parentObject.getNextEraseQueueObject();
+  if( eraseQueueObject === undefined )
+  {
+    return;
+  }
   
-  var xScale = videoObjectDisplay.xScale;
-  var yScale = videoObjectDisplay.yScale;
-
-  eraseQueueObject.xPosition = ( this.position.x - this.parentObject.getXPosition() ) * xScale;
-  eraseQueueObject.yPosition = ( this.position.y - this.parentObject.getYPosition() ) * yScale;
-  eraseQueueObject.width     = this.width  * xScale;
-  eraseQueueObject.height    = this.height * yScale;
+  eraseQueueObject.targetVideoObject = parentObject; // NOTE: Fix! Could be a display, which has not canvas.
+  
+  eraseQueueObject.xPosition = this.position.x;
+  eraseQueueObject.yPosition = this.position.y;
+  eraseQueueObject.width     = this.width;
+  eraseQueueObject.height    = this.height;
 };
 
 VideoSprite.prototype.getXVelocity = function()

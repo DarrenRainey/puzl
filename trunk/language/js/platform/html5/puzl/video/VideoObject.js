@@ -19,6 +19,8 @@ function VideoObject()
   
   object2d.getCanvas = this.getCanvas;
 
+  //object2d.getDisplay = this.getDisplay;
+
   object2d.setNeedsRedraw = this.setNeedsRedraw;
   
   object2d.drawUpdate = this.drawUpdate;
@@ -52,13 +54,28 @@ VideoObject.prototype.getCanvas = function()
   return null;
 };
 
+/*VideoObject.prototype.getDisplay = function()
+{
+  if( GlobalDisplay === undefined )
+  {
+    return null;
+  }
+  
+  return GlobalDisplay; // TODO: Do this better?
+};
+
+VideoObject.prototype.setDisplay = function( display )
+{
+  return; // TODO: Do nothing for now?
+};*/
+
 VideoObject.prototype.setNeedsRedraw = function( needsRedraw, propagate )
 {
   this.needsRedraw = needsRedraw;
 
   // Always back propagate, if necessary.
-  var parentObject = this.parentObject;
-  if( parentObject != null )
+  var parentObject = this.getParentObject();
+  if( parentObject !== null )
   {
     if( !parentObject.needsRedraw )
     {
@@ -87,6 +104,12 @@ VideoObject.prototype.drawUpdate = function()
   {
     this.processEraseQueue();
   }
+
+  if( this.draw !== undefined )
+  {
+    this.draw();
+    this.setNeedsRedraw( false, false );
+  }
   
   var videoObjectListLength = this.objectList.length;
   if( videoObjectListLength > 0 )
@@ -100,12 +123,6 @@ VideoObject.prototype.drawUpdate = function()
         videoObject.drawUpdate();
       }
     }
-  }
-
-  if( this.draw != undefined )
-  {
-    this.draw();
-    this.setNeedsRedraw( false, false );
   }
 };
 
@@ -146,8 +163,8 @@ VideoObject.prototype.processEraseQueue = function()
       context = GetCanvasContext2D( currentCanvas );
       lastCanvas = currentCanvas;
     }
-
-    //context.fillStyle = targetVideoObject.backgroundColor;
+    
+    context.fillStyle = targetVideoObject.backgroundColor;
     context.fillRect( eraseQueueObject.xPosition,
                        eraseQueueObject.yPosition,
                        eraseQueueObject.width,
