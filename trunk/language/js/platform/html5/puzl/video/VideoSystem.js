@@ -226,6 +226,7 @@ function DrawWithNearestScale( sourceDrawObject, targetDrawObject, sourceXPositi
   var canvas = targetDrawObject.getCanvas();
   var context = GetCanvasContext2D( canvas );
   
+  context.smoothingEnabled = false;
   context.mozImageSmoothingEnabled    = false;
   context.webkitImageSmoothingEnabled = false;
   context.drawImage( image, sourceXPosition, sourceYPosition, sourceWidth, sourceHeight, xPosition, yPosition, width, height );
@@ -311,14 +312,29 @@ function BuildRgba( red, green, blue, alpha )
 
 function CreateOnScreenCanvas()
 {
-  var canvas = CreateOffScreenCanvas();
+  var canvas;
+  if( false )
+  //if( ( navigator.isCocoonJS !== undefined ) && ( CanvasIdCounter === -1 ) )
+  {
+    // Utilize CocoonJS screencanvas for very first canvas created.
+    console.log( "Creating a CocoonJS 'screencanvas'." );
+    canvas = document.createElement( "screencanvas" );
+    //canvas.screencanvas = "true";
+  }
+  else
+  {
+    canvas = document.createElement( "canvas" );
+    
+    // TODO: Append text node that says 'canvas is not supported'?
+  }
+  
+  canvas.id = ++CanvasIdCounter + "canvas";
+  
   canvas.style.position = "absolute";
   canvas.style.left     = 0;
   canvas.style.top      = 0
   canvas.style.zIndex   = 1;
-
-  // TODO: Append text node that says 'canvas is not supported'?
-
+    
   document.body.appendChild( canvas );
 
   return canvas;
@@ -335,8 +351,6 @@ function CreateOffScreenCanvas()
 function OffScreenToOnScreenCanvas( oldCanvas )
 {
   //document.write( oldCanvas.outerHTML );
-  //return GetCanvas( oldCanvas.id );
-
   var newCanvas = CreateOnScreenCanvas( oldCanvas.id );
   var context   = GetCanvasContext2D( newCanvas );
   context.drawImage( oldCanvas, 0, 0 );
@@ -365,15 +379,18 @@ function GetCanvas( id )
   return canvas;
 }
 
-function GetCanvasContext2D( canvas )
-{
-  return canvas.getContext( "2d" );
-  /*var context = canvas.getContext( "2d" );
-  if( !context || !context.drawImage )
+GetCanvasContext2D =
+(
+  function()
   {
-    console.error( "Failed to load 2D context from canvas." );
-    return;
+    if( navigator.isCocoonJS )
+    {
+      console.log( "Switching on CocoonJS GetCanvasContext2D." );
+      return function( canvas ){return canvas.getContext( "2d", {"antialias" : false} );};
+    }
+    else
+    {
+      return function( canvas ){return canvas.getContext( "2d" );};
+    }
   }
-
-  return context;*/
-}
+)();
