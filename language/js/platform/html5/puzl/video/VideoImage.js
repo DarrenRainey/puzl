@@ -161,8 +161,6 @@ VideoImage.prototype.load = function( filename )
 
 VideoImage.prototype.draw = function()
 {
-  console.log( "VideoImage::draw()" );
-  
   var parentObject = this.getParentObject();
   if( parentObject !== null )
   {
