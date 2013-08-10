@@ -104,7 +104,7 @@ Color.prototype.updateString = function()
   else
   {
     // Compute an rgba() string.
-    this.string = "rgba(" + this.red + "," + this.green + "," + this.blue + "," + this.alpha + ')';
+    this.string = this.getRgbaString();
   }
 }
 
@@ -118,10 +118,20 @@ Color.prototype.setRgb = function()
     if( string.charAt( 0 ) === '#' )
     {
       // It's a hex string.
-      this.red   = parseInt( string.substring( 1, 3 ), 16 );
-      this.blue  = parseInt( string.substring( 3, 5 ), 16 );
-      this.green = parseInt( string.substring( 5, 7 ), 16 );
-
+      if( string.length === 7 )
+      {
+        this.red   = parseInt( string.substring( 1, 3 ), 16 );
+        this.green = parseInt( string.substring( 3, 5 ), 16 );
+        this.blue  = parseInt( string.substring( 5, 7 ), 16 );
+      }
+      else
+      if( string.length === 4 )
+      {
+        this.red   = parseInt( string.substring( 1, 2 ), 16 ) * 16;
+        this.green = parseInt( string.substring( 2, 3 ), 16 ) * 16;
+        this.blue  = parseInt( string.substring( 3, 4 ), 16 ) * 16;
+      }
+      
       this.alpha = 1.0;
     }
     else
@@ -212,4 +222,9 @@ Color.prototype.setAlpha = function( alpha )
 {
   this.alpha = alpha;
   this.updateString();
+}
+
+Color.prototype.getRgbaString = function()
+{
+  return "rgba(" + this.red + "," + this.green  + "," + this.blue + "," + this.alpha + ")";
 }
