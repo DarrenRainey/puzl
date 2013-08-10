@@ -196,5 +196,5 @@ VideoDisplay.prototype.draw = function()
 {
   var canvasContext = GetCanvasContext2D( this.canvas );
   canvasContext.fillStyle = this.backgroundColor.string;
-  //canvasContext.fillRect( 0, 0, this.width, this.height );
+  canvasContext.fillRect( 0, 0, this.width, this.height );
 };

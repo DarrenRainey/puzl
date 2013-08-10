@@ -100,15 +100,15 @@ VideoObject.prototype.setNeedsRedraw = function( needsRedraw, propagate )
 
 VideoObject.prototype.drawUpdate = function()
 {
-  if( this.numberOfEraseQueueObjects > 0 )
+  /*if( this.numberOfEraseQueueObjects > 0 )
   {
     this.processEraseQueue();
-  }
+  }*/
 
   if( this.draw !== undefined )
   {
     this.draw();
-    this.setNeedsRedraw( false, false );
+    //this.setNeedsRedraw( false, false );
   }
   
   var videoObjectListLength = this.objectList.length;
