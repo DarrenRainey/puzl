@@ -33,10 +33,6 @@ function ProcessMouseMove( mouseEvent )
   mouseEvent.preventDefault();
 }
 
-document.addEventListener( "mousedown", ProcessMouseDown, false );
-document.addEventListener( "mouseup",   ProcessMouseUp,   false );
-document.addEventListener( "mousemove", ProcessMouseMove, false );
-
 // TODO: Move touch to own class.
 function IsTouchDevice()
 {
@@ -104,13 +100,6 @@ function ProcessTouchMove( touchEvent )
   touchEvent.preventDefault();
 }
 
-if( IsTouchDevice() )
-{
-  document.addEventListener( "touchstart", ProcessTouchStart, false );
-  document.addEventListener( "touchend",   ProcessTouchEnd,   false );
-  document.addEventListener( "touchmove",  ProcessTouchMove,  false );
-}
-
 function InputMouse()
 {
   inputDevice = new InputDevice();
@@ -149,6 +138,17 @@ InputMouse.prototype.constructor = function()
 
   this.input = this.mouseInput;
   GlobalMouse = this;
+  
+  document.addEventListener( "mousedown", ProcessMouseDown, false );
+  document.addEventListener( "mouseup",   ProcessMouseUp,   false );
+  document.addEventListener( "mousemove", ProcessMouseMove, false );
+  
+  if( IsTouchDevice() )
+  {
+    document.addEventListener( "touchstart", ProcessTouchStart, false );
+    document.addEventListener( "touchend",   ProcessTouchEnd,   false );
+    document.addEventListener( "touchmove",  ProcessTouchMove,  false );
+  }
 
   this.xPosition = 0;
   this.yPosition = 0;
