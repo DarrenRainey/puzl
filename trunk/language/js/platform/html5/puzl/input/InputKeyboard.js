@@ -140,9 +140,6 @@ function ProcessKeyUp( keyEvent )
   keyEvent.preventDefault();
 }
 
-document.addEventListener( "keydown", ProcessKeyDown, false );
-document.addEventListener( "keyup",   ProcessKeyUp,   false );
-
 function InputKeyboard()
 {
   inputDevice = new InputDevice();
@@ -174,6 +171,9 @@ InputKeyboard.prototype.constructor = function()
 
   this.input = this.keyInput;
   GlobalKeyboard = this;
+  
+  document.addEventListener( "keydown", ProcessKeyDown, false );
+  document.addEventListener( "keyup",   ProcessKeyUp,   false );
 
   this.stateChangeBufferSize = 10;
   this.stateChange = new Array( this.stateChangeBufferSize );
