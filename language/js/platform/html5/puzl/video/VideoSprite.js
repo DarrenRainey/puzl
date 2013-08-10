@@ -122,11 +122,16 @@ VideoSprite.prototype.draw = function()
     return;
   }
   
-  DrawWithNearestScale( this, parentObject,
-                        cell[0], cell[1],
-                        this.cellWidth, this.cellHeight,
-                        this.position.x, this.position.y,
-                        this.width, this.height );
+  var numberOfCanvases = this.canvas.length;
+  var index;
+  for( index = 0; index < numberOfCanvases; index++ )
+  {
+    DrawWithNearestScale( this.canvas[index], parentObject,
+                          cell[0], cell[1],
+                          this.cellWidth, this.cellHeight,
+                          this.position.x, this.position.y,
+                          this.width, this.height );
+  }
   
   if( hasAlpha )
   {
