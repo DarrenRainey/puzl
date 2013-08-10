@@ -217,10 +217,14 @@ function DrawWithNearestScale( image, context, xPosition, yPosition, width, heig
 
 function DrawWithNearestScale( sourceDrawObject, targetDrawObject, sourceXPosition, sourceYPosition, sourceWidth, sourceHeight, xPosition, yPosition, width, height )
 {
-  var image = sourceDrawObject.getCanvas();
-  if( image === undefined )
+  var image;
+  if( sourceDrawObject.getCanvas === undefined )
   {
     image = sourceDrawObject;
+  }
+  else
+  {
+    image = sourceDrawObject.getCanvas();
   }
   
   var canvas = targetDrawObject.getCanvas();
