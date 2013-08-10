@@ -48,7 +48,16 @@ GameShell.prototype.constructor = function( gameShellSettings )
 {
   //console.log( "GameShell::constructor()" );
   GlobalGameShell = this;
-  this.gameShellSettings = gameShellSettings;
+
+  if( gameShellSettings !== undefined )
+  {
+    this.gameShellSettings = gameShellSettings;
+  }
+  else
+  {
+    this.gameShellSettings = new GameShellSettings();
+  }
+  
   this.quit = false;
 
   this.xmlHttpRequestLoadQueue = new Array();
