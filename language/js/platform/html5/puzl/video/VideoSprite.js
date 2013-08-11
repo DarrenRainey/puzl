@@ -90,9 +90,8 @@ function VideoSprite( sourceVideoObject, videoSpriteData )
 
 extend( VideoSprite, VideoCellImage );
 
-VideoSprite.prototype.draw = function()
+VideoSprite.prototype.drawTo = function( targetVideoObject )
 {
-  var targetVideoObject = this.targetVideoObject;
   if( targetVideoObject === null )
   {
     return;

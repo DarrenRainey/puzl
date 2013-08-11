@@ -75,6 +75,23 @@ VideoObject.prototype.setNeedsRedraw = function( needsRedraw, propagate )
   }
 };
 
+VideoObject.prototype.drawTo = function( targetVideoObject )
+{
+  if( targetVideoObject !== null )
+  {
+    DrawWithNearestScale( this, targetVideoObject,
+                          0, 0,
+                          this.width, this.height,
+                          this.position.x, this.position.y,
+                          this.width, this.height );
+  }
+};
+
+VideoObject.prototype.draw = function()
+{
+  this.drawTo( this.targetVideoObject );
+};
+
 VideoObject.prototype.drawUpdate = function()
 {
   if( this.numberOfEraseQueueObjects > 0 )
@@ -82,11 +99,8 @@ VideoObject.prototype.drawUpdate = function()
     this.processEraseQueue();
   }
 
-  if( this.draw !== undefined )
-  {
-    this.draw();
-    //this.setNeedsRedraw( false, false );
-  }
+  this.draw();
+  //this.setNeedsRedraw( false, false );
   
   var videoObjectListLength = this.objectList.length;
   if( videoObjectListLength > 0 )
