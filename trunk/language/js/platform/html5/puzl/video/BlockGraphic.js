@@ -1,18 +1,9 @@
 function BlockGraphic( videoObject, blockgraphicData )
 {
-  var videoCellImage = new VideoCellImage( videoObject, blockgraphicData );
+  // console.log( "Creating BlockGraphic" );
+  VideoCellImage.call( this, videoObject, blockgraphicData );
 
-  videoCellImage.constructor                   = this.constructor;
-  videoCellImage.setPositionGridCellDimensions = this.setPositionGridCellDimensions;
-  videoCellImage.print                         = this.print;
-  videoCellImage.setPosition                   = this.setPosition;
-
-  videoCellImage.constructor();
-  return videoCellImage;
-};
-
-BlockGraphic.prototype.constructor = function()
-{
+  // Constructor.
   this.xPosition = 0;
   this.yPosition = 0;
   this.absolutePosition = false;
@@ -32,6 +23,8 @@ BlockGraphic.prototype.constructor = function()
     this.loadCell( cellX, cellY, EXTRACT_MODE_CELL );
   }
 };
+
+extend( BlockGraphic, VideoCellImage );
 
 BlockGraphic.prototype.setPositionGridCellDimensions = function( positionGridCellWidth, positionGridCellHeight )
 {

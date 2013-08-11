@@ -23,18 +23,13 @@ function InputDevice()
   this.lastInputId;
   this.lastInputType;
 
-  this.constructor();
-  return this;
-}
-
-InputDevice.prototype.constructor = function()
-{
+  // Constructor.
   this.stateChangeBufferSize = 0;
   this.numberOfStateChanges  = 0;
 
   this.lastInputId   = -1;
   this.lastInputType = 0;
-};
+}
 
 InputDevice.prototype.initialize = function()
 {

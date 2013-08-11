@@ -1,53 +1,6 @@
 var QUAD_TREE_MAX_CAPACITY    = 2;
 var QUAD_TREE_MAX_DEPTH_LEVEL = 4;
 
-function QuadTree()
-{
-  quadTreeNode = new QuadTreeNode( null, -1 );
-
-  quadTreeNode.object2d;
-
-  quadTreeNode.constructor     = this.constructor;
-  quadTreeNode.setObject2d     = this.setObject2d;
-  quadTreeNode.updateRectangle = this.updateRectangle;
-
-  quadTreeNode.constructor();
-  return quadTreeNode;
-}
-
-QuadTree.prototype.constructor = function()
-{
-  this.setObject2d( null );
-};
-
-QuadTree.prototype.setObject2d = function( object2d )
-{
-  this.object2d = object2d;
-  if( object2d != null )
-  {
-    this.setRectangle( 0, 0,
-                       object2d.getWidth() - 1, object2d.getHeight() - 1 );
-  }
-};
-
-QuadTree.prototype.updateRectangle = function()
-{
-  object2d = this.object2d;
-  if( object2d != null )
-  {
-    var rectangle = this.rectangle;
-    var point = rectangle.pointList[1];
-
-    var newX = object2d.getWidth()  - 1;
-    var newY = object2d.getHeight() - 1;
-
-    if( ( point.x !== newX ) || ( point.y !== newY ) )
-    {
-      this.setRectangle( 0, 0, newX, newY );
-    }
-  }
-};
-
 //-------------------------------------------------------------------------
 function QuadTreeNode( parentNode, nodeID )
 {
@@ -61,12 +14,7 @@ function QuadTreeNode( parentNode, nodeID )
   this.rectangle;
   this.midPoint;
   
-  this.constructor( parentNode, nodeID );
-  return this;
-}
-
-QuadTreeNode.prototype.constructor = function( parentNode, nodeID )
-{
+  // Constructor.
   this.parentNode = parentNode;
   if( parentNode == null )
   {
@@ -84,7 +32,7 @@ QuadTreeNode.prototype.constructor = function( parentNode, nodeID )
 
   this.objectList  = new Array();
   this.subNodeList = new Array( null, null, null, null );
-};
+}
 
 QuadTreeNode.prototype.createSubNode = function( subNodeIndex )
 {
@@ -386,3 +334,46 @@ QuadTreeNode.prototype.query = function( rectangle, resultList )
     }
   }
 };
+
+//-------------------------------------------------------------------------
+function QuadTree()
+{
+  QuadTreeNode.call( this, null, -1 );
+  //quadTreeNode = new QuadTreeNode( null, -1 );
+
+  this.object2d;
+
+  // Constructor.
+  this.setObject2d( null );
+}
+
+extend( QuadTree, QuadTreeNode );
+
+QuadTree.prototype.setObject2d = function( object2d )
+{
+  this.object2d = object2d;
+  if( object2d != null )
+  {
+    this.setRectangle( 0, 0,
+                       object2d.getWidth() - 1, object2d.getHeight() - 1 );
+  }
+};
+
+QuadTree.prototype.updateRectangle = function()
+{
+  object2d = this.object2d;
+  if( object2d != null )
+  {
+    var rectangle = this.rectangle;
+    var point = rectangle.pointList[1];
+
+    var newX = object2d.getWidth()  - 1;
+    var newY = object2d.getHeight() - 1;
+
+    if( ( point.x !== newX ) || ( point.y !== newY ) )
+    {
+      this.setRectangle( 0, 0, newX, newY );
+    }
+  }
+};
+

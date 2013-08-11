@@ -1,4 +1,3 @@
-
 function GameScreen( gameShell, parentScreen )
 {
   this.gameShell;
@@ -8,19 +7,14 @@ function GameScreen( gameShell, parentScreen )
   this.subScreen;
   this.subScreenList;
   
-  this.constructor( gameShell, parentScreen );
-  return this;
-}
-
-GameScreen.prototype.constructor = function( gameShell, parentScreen )
-{
+  // Constructor.
   this.gameShell    = gameShell;
   this.parentScreen = parentScreen; // TODO: Check for undefined.
-  
+
   this.subScreenIndex = -1;
   this.subScreen      = null;
   this.subScreenList  = new Array();
-};
+}
 
 GameScreen.prototype.setSubScreenIndex = function( subScreenIndex )
 {

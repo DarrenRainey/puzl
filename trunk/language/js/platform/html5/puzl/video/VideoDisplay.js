@@ -1,48 +1,27 @@
 function VideoDisplay( width, height )
 {
-  var videoObject = new VideoObject();
+  //console.log( "Creating VideoDisplay" );
+  VideoObject.call( this );
 
-  videoObject.canvas;
+  this.canvas;
   
-  videoObject.xScale;
-  videoObject.yScale;
-  videoObject.maintainAspectRatio;
+  this.xScale;
+  this.yScale;
+  this.maintainAspectRatio;
 
-  videoObject.centerDisplay;
-  videoObject.xOffset;
-  videoObject.yOffset;
+  this.centerDisplay;
+  this.xOffset;
+  this.yOffset;
 
-  videoObject.left;
-  videoObject.top;
+  this.left;
+  this.top;
   
-  videoObject.fullScreen;
+  this.fullScreen;
 
-  videoObject.backgroundColor;
-  videoObject.foregroundColor;
-
-  videoObject.constructor             = this.constructor;
-  videoObject.setFullScreen           = this.setFullScreen;
-  videoObject.getRealHeight           = this.getRealHeight;
-  videoObject.getRealWidth            = this.getRealWidth;
-  videoObject.setDimensions           = this.setDimensions;
-  videoObject.clear                   = this.clear;
-  videoObject.setBackgroundColor      = this.setBackgroundColor;
-  videoObject.setForegroundColor      = this.setForegroundColor;
-  videoObject.drawRectangle           = this.drawRectangle;
-
-  videoObject.draw                    = this.draw; // TODO: Temp.
-  videoObject.getCanvas               = this.getCanvas;
-
-  videoObject.updateQuadTree          = this.updateQuadTree;
+  this.backgroundColor;
+  this.foregroundColor;
   
-  videoObject.constructor( width, height );
-  return videoObject;
-}
-
-VideoDisplay.prototype.constructor = function( width, height )
-{
-  //GlobalVideoDisplay = this;
-
+  // Constructor.
   this.setFullScreen( false );
 
   this.centerDisplay = true;
@@ -61,7 +40,9 @@ VideoDisplay.prototype.constructor = function( width, height )
 
   this.backgroundColor = new Color( 0, 0, 0 );
   this.foregroundColor = new Color( 255, 255, 255 );
-};
+}
+
+extend( VideoDisplay, VideoObject );
 
 VideoDisplay.prototype.setFullScreen = function( fullScreen )
 {
@@ -121,19 +102,22 @@ VideoDisplay.prototype.setDimensions = function( width, height )
     this.xOffset = 0;
     this.yOffset = 0;
   }
-  
-  SetCanvasDimensions( this.canvas, this.width * this.xScale, this.height * this.yScale );
-  
-  var context = GetCanvasContext2D( this.canvas );
-  context.restore();
-  context.scale( this.xScale, this.yScale );
-  context.save();
-  
-  // TODO: Engine should not be concerned with positioning?
-  SetCanvasPosition( this.canvas, this.xOffset, this.yOffset );
-  
-  // TODO: Temporary first time draw.
-  this.clear();
+
+  if( this.canvas !== undefined )
+  {
+    SetCanvasDimensions( this.canvas, this.width * this.xScale, this.height * this.yScale );
+
+    var context = GetCanvasContext2D( this.canvas );
+    context.restore();
+    context.scale( this.xScale, this.yScale );
+    context.save();
+
+    // TODO: Engine should not be concerned with positioning?
+    SetCanvasPosition( this.canvas, this.xOffset, this.yOffset );
+
+    // TODO: Temporary first time draw.
+    this.clear();
+  }
   
   var length = this.objectList.length;
   var index;

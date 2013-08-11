@@ -1,5 +1,7 @@
 function Object2d()
 {
+  //console.log( "Creating Object2d" );
+  
   this.rectangle;
   this.position;
   this.width;
@@ -12,12 +14,7 @@ function Object2d()
   this.quadTree;
   this.quadTreeNode;
 
-  this.constructor();
-  return this;
-};
-
-Object2d.prototype.constructor = function()
-{
+  // Constructor.
   this.rectangle  = new Rectangle();
   this.objectList = new Array();
   this.quadTree   = new QuadTree();

@@ -142,22 +142,11 @@ function ProcessKeyUp( keyEvent )
 
 function InputKeyboard()
 {
-  inputDevice = new InputDevice();
+  InputDevice.call( this );
   
-  inputDevice.keyInput;
-
-  inputDevice.constructor     = this.constructor;
-  inputDevice.checkKey        = this.checkKey;
-  inputDevice.getKeyState     = this.getKeyState;
-  inputDevice.setKeyState     = this.setKeyState;
-  inputDevice.getLastKeyPress = this.getLastKeyPress;
+  this.keyInput;
   
-  inputDevice.constructor();
-  return inputDevice;
-}
-
-InputKeyboard.prototype.constructor = function()
-{
+  // Constructor.
   this.keyInput = new Array();
   
   var index;
@@ -178,7 +167,9 @@ InputKeyboard.prototype.constructor = function()
   this.stateChangeBufferSize = 10;
   this.stateChange = new Array( this.stateChangeBufferSize );
   this.numberOfStateChanges = 0;
-};
+}
+
+extend( InputKeyboard, InputDevice );
 
 InputKeyboard.prototype.checkKey = function( keyCode )
 {

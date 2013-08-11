@@ -8,25 +8,13 @@ var INPUT_TYPE_JOYSTICK_BUTTON = 2;
 
 function InputJoystick()
 {
-  inputDevice = new InputDevice();
+  InputDevice.call( this );
 
-  inputDevice.joystickInput;
-  inputDevice.xAxis;
-  inputDevice.yAxis;
+  this.joystickInput;
+  this.xAxis;
+  this.yAxis;
 
-  inputDevice.constructor        = this.constructor;
-  inputDevice.checkButton        = this.checkButton;
-  inputDevice.getButtonState     = this.getButtonState;
-  inputDevice.setButtonState     = this.setButtonState;
-  inputDevice.getLastButtonPress = this.getLastButtonPress;
-  inputDevice.updateWithGamepad  = this.updateWithGamepad;
-
-  inputDevice.constructor();
-  return inputDevice;
-}
-
-InputJoystick.prototype.constructor = function()
-{
+  // Constructor.
   this.joystickInput = new Array();
 
   var index;
@@ -43,7 +31,9 @@ InputJoystick.prototype.constructor = function()
   this.stateChangeBufferSize = 10;
   this.stateChange = new Array( this.stateChangeBufferSize );
   this.numberOfStateChanges = 0;
-};
+}
+
+extend( InputJoystick, InputDevice );
 
 InputJoystick.prototype.checkButton = function( buttonID )
 {

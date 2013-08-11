@@ -21,11 +21,7 @@ function VideoSystem( width, height )
 
   this.display;
 
-  this.constructor( width, height );
-}
-
-VideoSystem.prototype.constructor = function( width, height )
-{
+  // Constructor.
   this.videoImageIDList    = new Array();
   this.videoImageLoadQueue = new Array();
 

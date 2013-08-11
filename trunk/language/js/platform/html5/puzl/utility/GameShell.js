@@ -40,12 +40,7 @@ function GameShell( gameShellSettings )
 
   this.xmlHttpRequestLoadQueue;
   
-  this.constructor( gameShellSettings );
-  return this;
-}
-
-GameShell.prototype.constructor = function( gameShellSettings )
-{
+  // Constructor.
   //console.log( "GameShell::constructor()" );
   GlobalGameShell = this;
 
@@ -61,7 +56,7 @@ GameShell.prototype.constructor = function( gameShellSettings )
   this.quit = false;
 
   this.xmlHttpRequestLoadQueue = new Array();
-};
+}
 
 GameShell.prototype.run = function()
 {

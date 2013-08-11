@@ -1,37 +1,14 @@
 function VideoImage()
 {
-  var videoObject = new VideoObject();
+  //console.log( "Creating VideoImage" );
+  VideoObject.call( this );
   
-  videoObject.canvas;
-  videoObject.display;
+  this.canvas;
+  this.display;
 
-  videoObject.filename;
+  this.filename;
 
-  videoObject.constructor       = this.constructor;
-  videoObject.setRealDimensions = this.setRealDimensions;
-  videoObject.getRealWidth      = this.getRealWidth;
-  videoObject.getRealHeight     = this.getRealHeight;
-
-  videoObject.baseVideoObjectSetDimensions = videoObject.setDimensions;
-  videoObject.setDimensions                = this.setDimensions;
-  videoObject.baseVideoObjectSetPosition   = videoObject.setPosition;
-  videoObject.setPosition                  = this.setPosition;
-  
-  videoObject.fill              = this.fill;
-  videoObject.clear             = this.clear;
-  videoObject.setDisplay        = this.setDisplay;
-  videoObject.load              = this.load;
-  videoObject.getCanvas         = this.getCanvas;
-  videoObject.getContext        = this.getContext;
-
-  videoObject.draw              = this.draw;
-
-  videoObject.constructor();
-  return videoObject;
-}
-
-VideoImage.prototype.constructor = function()
-{
+  // Constructor.
   if( arguments.length > 0 )
   {
     if( arguments.length > 2 )
@@ -51,11 +28,17 @@ VideoImage.prototype.constructor = function()
   this.filename = "";
 
   this.setRealDimensions( 1, 1 );
-};
+}
+
+extend( VideoImage, VideoObject );
 
 VideoImage.prototype.setRealDimensions = function( width, height )
 {
-  SetCanvasDimensions( this.canvas, width, height );
+  if( this.canvas !== undefined )
+  {
+    SetCanvasDimensions( this.canvas, width, height );
+  }
+  
   this.width  = width;
   this.height = height;
 };
@@ -72,7 +55,7 @@ VideoImage.prototype.getRealHeight = function()
 
 VideoImage.prototype.setDimensions = function( width, height )
 {
-  this.baseVideoObjectSetDimensions( width, height );
+  VideoObject.prototype.setDimensions.call( this, width, height );
    
   //if( this.display == null )
   {
@@ -90,7 +73,7 @@ VideoImage.prototype.setDimensions = function( width, height )
 
 VideoImage.prototype.setPosition = function( xPosition, yPosition )
 {
-  this.baseVideoObjectSetPosition( xPosition, yPosition );
+  VideoObject.prototype.setPosition.call( this, xPosition, yPosition );
   
   // NOTE: Should this only happen with a display.
   //if( this.display != null )
