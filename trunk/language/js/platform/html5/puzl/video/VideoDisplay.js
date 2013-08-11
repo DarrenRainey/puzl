@@ -153,9 +153,14 @@ VideoDisplay.prototype.setForegroundColor = function( color )
   this.foregroundColor.copy( color );
 };
 
-VideoDisplay.prototype.drawRectangle = function( xPosition, yPosition, width, height )
+VideoDisplay.prototype.drawRectangleTo = function( targetVideoObject, xPosition, yPosition, width, height )
 {
-  var canvas = this.getCanvas();
+  if( targetVideoObject === null )
+  {
+    targetVideoObject = this;
+  }
+  
+  var canvas = targetVideoObject.getCanvas();
   if( canvas === null )
   {
     return;
@@ -164,6 +169,11 @@ VideoDisplay.prototype.drawRectangle = function( xPosition, yPosition, width, he
   var canvasContext = GetCanvasContext2D( canvas );
   canvasContext.fillStyle = this.foregroundColor.string;
   canvasContext.fillRect( xPosition, yPosition, width, height );
+};
+
+VideoDisplay.prototype.drawRectangle = function( xPosition, yPosition, width, height )
+{
+  this.drawToRectangleTo( null, xPosition, yPosition, width, height );
 };
 
 VideoDisplay.prototype.updateQuadTree = function()
