@@ -9,7 +9,7 @@ function VideoImage()
   this.filename;
 
   // Constructor.
-  if( arguments.length > 0 )
+  /*if( arguments.length > 0 )
   {
     if( arguments.length > 2 )
     {
@@ -20,14 +20,10 @@ function VideoImage()
   else
   {
 
-  }
+  }*/
 
   this.canvas = CreateOffScreenCanvas();
-  //this.display  = null;
-
   this.filename = "";
-
-  this.setRealDimensions( 1, 1 );
 }
 
 extend( VideoImage, VideoObject );
@@ -38,54 +34,26 @@ VideoImage.prototype.setRealDimensions = function( width, height )
   {
     SetCanvasDimensions( this.canvas, width, height );
   }
-  
-  this.width  = width;
-  this.height = height;
 };
 
 VideoImage.prototype.getRealWidth = function()
 {
+  if( this.canvas === undefined )
+  {
+    return -1;
+  }
+  
   return this.canvas.width;
 };
 
 VideoImage.prototype.getRealHeight = function()
 {
+  if( this.canvas === undefined )
+  {
+    return -1;
+  }
+
   return this.canvas.height;
-};
-
-VideoImage.prototype.setDimensions = function( width, height )
-{
-  VideoObject.prototype.setDimensions.call( this, width, height );
-   
-  //if( this.display == null )
-  {
-    this.setRealDimensions( width, height );
-  }
-  /*else
-  {
-    this.width  = width;
-    this.height = height;
-
-    this.setRealDimensions( width  * this.display.xScale,
-                            height * this.display.yScale );
-  }*/
-};
-
-VideoImage.prototype.setPosition = function( xPosition, yPosition )
-{
-  VideoObject.prototype.setPosition.call( this, xPosition, yPosition );
-  
-  // NOTE: Should this only happen with a display.
-  //if( this.display != null )
-  {
-    //console.log( this.display.xOffset );
-    //this.xPosition = xPosition;
-    //this.yPosition = yPosition;
-    
-    //SetCanvasPosition( this.canvas,
-    //                   ( xPosition * this.display.xScale ) + this.display.xOffset,
-    //                   ( yPosition * this.display.yScale ) + this.display.yOffset );
-  }
 };
 
 VideoImage.prototype.fill = function( colorRgb )
@@ -144,11 +112,10 @@ VideoImage.prototype.load = function( filename )
 
 VideoImage.prototype.draw = function()
 {
-  var parentObject = this.getParentObject();
-  if( parentObject !== null )
+  var targetVideoObject = this.targetVideoObject;
+  if( targetVideoObject !== null )
   {
-    var canvas = parentObject.getCanvas();
-    DrawWithNearestScale( this, parentObject,
+    DrawWithNearestScale( this, targetVideoObject,
                           0, 0,
                           this.width, this.height,
                           this.position.x, this.position.y,
