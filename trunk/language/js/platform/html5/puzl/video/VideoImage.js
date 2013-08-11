@@ -71,38 +71,6 @@ VideoImage.prototype.clear = function()
   context.clearRect( 0, 0, canvas.width, canvas.height );
 };
 
-VideoImage.prototype.setDisplay = function( display )
-{
-  //console.log( "VideoImage::setDisplay()" );
-  /*if( display == this.display )
-  {
-    return;
-  }
-
-  // TODO: Maybe set target to display in the future.
-  //this.setParent( display );
-
-  if( display == null && this.display != null )
-  {
-    // Turn this page anchored canvas to an offscreen canvas.
-    this.display = null;
-  }
-  else
-  {
-    // Turn this offscreen canvas to a page anchored canvas.
-    if( this.display != null )
-    {
-      // NOTE: Multiple displays are not really supported right now;
-      // so, just act like nothing happened.
-      //this.setDisplay( null );
-      return;
-    }
-
-    this.canvas = OffScreenToOnScreenCanvas( this.canvas );
-    this.display = display;
-  }*/
-};
-
 VideoImage.prototype.load = function( filename )
 {
   //console.log( "VideoImage::load()" );
