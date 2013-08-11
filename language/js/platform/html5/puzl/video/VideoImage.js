@@ -56,11 +56,11 @@ VideoImage.prototype.getRealHeight = function()
   return this.canvas.height;
 };
 
-VideoImage.prototype.fill = function( colorRgb )
+VideoImage.prototype.fill = function( color )
 {
   var canvas = this.canvas;
   var context = GetCanvasContext2D( canvas );
-  context.fillStyle = colorRgb;
+  context.fillStyle = color.string;
   context.fillRect( 0, 0, canvas.width, canvas.height );
 };
 
