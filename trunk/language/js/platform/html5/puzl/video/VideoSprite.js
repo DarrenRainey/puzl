@@ -71,13 +71,13 @@ extend( VideoSprite, VideoCellImage );
 
 VideoSprite.prototype.draw = function()
 {
-  var parentObject = this.getParentObject();
-  if( parentObject === null )
+  var targetVideoObject = this.targetVideoObject;
+  if( targetVideoObject === null )
   {
     return;
   }
 
-  var canvas = parentObject.getCanvas();
+  var canvas = targetVideoObject.getCanvas();
   var context = GetCanvasContext2D( canvas );
   
   var hasAlpha; // TODO: Optimize. Could allocate this value once for each blockgraphic object.
@@ -101,7 +101,7 @@ VideoSprite.prototype.draw = function()
   var index;
   for( index = 0; index < numberOfCanvases; index++ )
   {
-    DrawWithNearestScale( this.canvas[index], parentObject,
+    DrawWithNearestScale( this.canvas[index], targetVideoObject,
                           cell[0], cell[1],
                           this.cellWidth, this.cellHeight,
                           this.position.x, this.position.y,
@@ -114,50 +114,6 @@ VideoSprite.prototype.draw = function()
   }
 
   //this.needsRedraw = false;
-};
-
-VideoSprite.prototype.erase = function()
-{
-  var parentObject = this.getParentObject();
-  if( parentObject === null )
-  {
-    return;
-  }
-  
-  var canvas = parentObject.getCanvas();
-  var context = GetCanvasContext2D( canvas );
-  
-  context.clearRect( this.position.x, this.position.y,
-                     this.width, this.height );
-};
-
-VideoSprite.prototype.queueErase = function()
-{
-  /*var videoObjectDisplay = this.getDisplay();
-  if( videoObjectDisplay === undefined )
-  {
-    return;
-  }*/
-
-  var parentObject = this.getParentObject();
-  if( parentObject === null )
-  {
-    return;
-  }
-
-  //var eraseQueueObject = videoObjectDisplay.getNextEraseQueueObject();
-  var eraseQueueObject = parentObject.getNextEraseQueueObject();
-  if( eraseQueueObject === undefined )
-  {
-    return;
-  }
-  
-  eraseQueueObject.targetVideoObject = parentObject; // NOTE: Fix! Could be a display, which has not canvas.
-  
-  eraseQueueObject.xPosition = this.position.x;
-  eraseQueueObject.yPosition = this.position.y;
-  eraseQueueObject.width     = this.width;
-  eraseQueueObject.height    = this.height;
 };
 
 VideoSprite.prototype.getXVelocity = function()
