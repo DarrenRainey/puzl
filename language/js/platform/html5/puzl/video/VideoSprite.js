@@ -28,43 +28,16 @@ var SPRITE_COLLISION_PIXEL         = 1    // Also check if pixels from two sprit
 
 function VideoSprite( videoImage, videoSpriteData )
 {
-  var videoCellImage = new VideoCellImage( videoImage, videoSpriteData );
+  //console.log( "Creating VideoSprite" );
+  VideoCellImage.call( this, videoImage, videoSpriteData );
 
-  videoCellImage.constructor        = this.constructor;
-  videoCellImage.draw               = this.draw;
-  videoCellImage.erase              = this.erase;
-  videoCellImage.queueErase         = this.queueErase;
+  this.xVelocity;
+  this.yVelocity;
 
-  videoCellImage.getXVelocity       = this.getXVelocity;
-  videoCellImage.getYVelocity       = this.getYVelocity;
-  videoCellImage.setVelocity        = this.setVelocity;
-  videoCellImage.setXVelocity       = this.setXVelocity;
-  videoCellImage.setYVelocity       = this.setYVelocity;
-  videoCellImage.move               = this.move;
-  
-  videoCellImage.setAttributes      = this.setAttributes;
-  videoCellImage.loadFrame          = this.loadFrame;
-  videoCellImage.getCurrentSequence = this.getCurrentSequence;
-  videoCellImage.getNumberOfFrames  = this.getNumberOfFrames;
-  videoCellImage.setCurrentSequence = this.setCurrentSequence;
-  videoCellImage.setCurrentFrame    = this.setCurrentFrame;
-  videoCellImage.setCurrentFrameByName = this.setCurrentFrameByName;
-  videoCellImage.setAnimationSpeed  = this.setAnimationSpeed;
-  videoCellImage.loadAnimation      = this.loadAnimation;
-  videoCellImage.animate            = this.animate;
+  this.animation;
+  this.animationNameIndexHash;
 
-  videoCellImage.xVelocity;
-  videoCellImage.yVelocity;
-
-  videoCellImage.animation;
-  videoCellImage.animationNameIndexHash;
-
-  videoCellImage.constructor( videoSpriteData );
-  return videoCellImage;
-}
-
-VideoSprite.prototype.constructor = function( videoSpriteData )
-{
+  // Constructor.
   this.xVelocity = 0;
   this.yVelocity = 0;
 
@@ -92,7 +65,9 @@ VideoSprite.prototype.constructor = function( videoSpriteData )
 
     this.animationNameIndexHash[animationName] = this.loadAnimation( indexedAnimation );
   }
-};
+}
+
+extend( VideoSprite, VideoCellImage );
 
 VideoSprite.prototype.draw = function()
 {

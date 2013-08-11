@@ -1,51 +1,31 @@
 function VideoObject()
 {
-  var object2d = new Object2d();
+  //console.log( "Creating VideoObject" );
+  Object2d.call( this );
   
-  object2d.needsRedraw;
+  this.needsRedraw;
 
-  object2d.eraseQueue;
-  object2d.numberOfEraseQueueObjects;
+  this.eraseQueue;
+  this.numberOfEraseQueueObjects;
 
-  object2d.constructor = this.constructor;
-  
-  object2d.baseObject2dSetDimensions = object2d.setDimensions;
-  object2d.setDimensions             = this.setDimensions;
-  object2d.baseObject2dSetPosition   = object2d.setPosition;
-  object2d.setPosition               = this.setPosition;
-  
-  object2d.getNextEraseQueueObject = this.getNextEraseQueueObject;
-  object2d.processEraseQueue       = this.processEraseQueue;
-  
-  object2d.getCanvas = this.getCanvas;
-
-  //object2d.getDisplay = this.getDisplay;
-
-  object2d.setNeedsRedraw = this.setNeedsRedraw;
-  
-  object2d.drawUpdate = this.drawUpdate;
-
-  object2d.constructor();
-  return object2d;
-};
-
-VideoObject.prototype.constructor = function()
-{
+  // Constructor.
   this.needsRedraw = false;
 
   this.eraseQueue = new Array();
   this.numberOfEraseQueueObjects = 0;
 };
 
+extend( VideoObject, Object2d );
+
 VideoObject.prototype.setDimensions = function( width, height )
 {
-  this.baseObject2dSetDimensions( width, height );
+  Object2d.prototype.setDimensions.call( this, width, height );
   this.setNeedsRedraw( true, true );
 };
 
 VideoObject.prototype.setPosition = function( xPosition, yPosition )
 {
-  this.baseObject2dSetPosition( xPosition, yPosition );
+  Object2d.prototype.setPosition.call( this, xPosition, yPosition );
   this.setNeedsRedraw( true, false );
 };
 
@@ -75,7 +55,7 @@ VideoObject.prototype.setNeedsRedraw = function( needsRedraw, propagate )
 
   // Always back propagate, if necessary.
   var parentObject = this.getParentObject();
-  if( parentObject !== null )
+  if( parentObject !== undefined && parentObject !== null )
   {
     if( !parentObject.needsRedraw )
     {

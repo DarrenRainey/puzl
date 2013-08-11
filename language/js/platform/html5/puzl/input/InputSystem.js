@@ -10,12 +10,7 @@ function InputSystem()
   this.joysticks;
   this.supportsGamepads;
   
-  this.constructor();
-  return this;
-}
-
-InputSystem.prototype.constructor = function()
-{
+  // Constructor.
   this.numberOfKeyboards = 1;
   this.numberOfMice      = 1;
 
@@ -102,7 +97,7 @@ InputSystem.prototype.constructor = function()
       this.joysticks = new Array();
     }
   }
-};
+}
 
 InputSystem.prototype.getKeyboard = function( id )
 {

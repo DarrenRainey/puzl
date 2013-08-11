@@ -102,29 +102,14 @@ function ProcessTouchMove( touchEvent )
 
 function InputMouse()
 {
-  inputDevice = new InputDevice();
+  InputDevice.call( this );
 
-  inputDevice.mouseInput;
-  inputDevice.xPosition;
-  inputDevice.yPosition;
-  inputDevice.display;
+  this.mouseInput;
+  this.xPosition;
+  this.yPosition;
+  this.display;
 
-  inputDevice.constructor        = this.constructor;
-  inputDevice.checkButton        = this.checkButton;
-  inputDevice.getButtonState     = this.getButtonState;
-  inputDevice.setButtonState     = this.setButtonState;
-  inputDevice.getLastButtonPress = this.getLastButtonPress;
-  inputDevice.getXPosition       = this.getXPosition;
-  inputDevice.getYPosition       = this.getYPosition;
-  
-  inputDevice.setDisplay         = this.setDisplay;
-
-  inputDevice.constructor();
-  return inputDevice;
-}
-
-InputMouse.prototype.constructor = function()
-{
+  // Constructor.
   this.mouseInput = new Array();
 
   var index;
@@ -158,7 +143,9 @@ InputMouse.prototype.constructor = function()
   this.numberOfStateChanges = 0;
 
   this.setDisplay( null );
-};
+}
+
+extend( InputMouse, InputDevice );
 
 InputMouse.prototype.checkButton = function( buttonID )
 {

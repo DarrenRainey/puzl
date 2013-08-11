@@ -7,46 +7,28 @@ var IMAGE_ATTRIBUTE_COLOR         = 4096 // Indicates image with color modulatio
 
 function VideoCellImage( videoObject, videoCellImageData )
 {
-  var baseVideoObject = new VideoObject();
+  //console.log( "Creating VideoCellImage" );
+  VideoObject.call( this );
+
+  this.sourceVideoObject;
+
+  this.cellWidth;
+  this.cellHeight;
+
+  this.mapWidth;
+  this.mapHeight;
+
+  this.canvas;
+
+  this.attributes;
+
+  this.color;
+  this.colorKey;
+
+  this.cellList;
+  this.cellNameIndexHash;
   
-  baseVideoObject.sourceVideoObject;
-
-  baseVideoObject.cellWidth;
-  baseVideoObject.cellHeight;
-
-  baseVideoObject.mapWidth;
-  baseVideoObject.mapHeight;
-
-  baseVideoObject.canvas;
-
-  baseVideoObject.attributes;
-
-//   baseVideoObject.red;
-//   baseVideoObject.green;
-//   baseVideoObject.blue;
-//   baseVideoObject.alpha;
-
-  baseVideoObject.color;
-  baseVideoObject.colorKey;
-
-  baseVideoObject.cellList;
-  baseVideoObject.cellNameIndexHash;
-
-  baseVideoObject.constructor      = this.constructor;
-  baseVideoObject.getAttributes    = this.getAttributes;
-  baseVideoObject.setAttributes    = this.setAttributes;
-  baseVideoObject.getColor         = this.getColor;
-  baseVideoObject.setColor         = this.setColor;
-  baseVideoObject.loadCell         = this.loadCell;
-  baseVideoObject.getNumberOfCells = this.getNumberOfCells;
-  baseVideoObject.getCanvas        = this.getCanvas;
-  
-  baseVideoObject.constructor( videoObject, videoCellImageData );
-  return baseVideoObject;
-};
-
-VideoCellImage.prototype.constructor = function( videoObject, videoCellImageData )
-{
+  // Constructor.
   this.sourceVideoObject = videoObject;
   var sourceVideoObjectCanvas = this.sourceVideoObject.getCanvas();
 
@@ -101,6 +83,8 @@ VideoCellImage.prototype.constructor = function( videoObject, videoCellImageData
     }
   }
 };
+
+extend( VideoCellImage, VideoObject );
 
 VideoCellImage.prototype.getAttributes = function()
 {
