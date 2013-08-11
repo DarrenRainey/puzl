@@ -1,9 +1,23 @@
-function BlockGraphic( videoObject, blockgraphicData )
+function BlockGraphic( sourceVideoObject, blockgraphicData )
 {
   // console.log( "Creating BlockGraphic" );
-  VideoCellImage.call( this, videoObject, blockgraphicData );
+  VideoCellImage.call( this, sourceVideoObject, blockgraphicData );
 
   // Constructor.
+  if( sourceVideoObject === undefined )
+  {
+    // TODO: Allow for such in the future?
+    console.error( "Attempting to load BlockGraphic without source VideoObject." );
+    return null;
+  }
+
+  if( blockgraphicData === undefined )
+  {
+    // TODO: Allow for such in the future?
+    console.error( "Attempting to load BlockGraphic without driving data." );
+    return null;
+  }
+  
   this.xPosition = 0;
   this.yPosition = 0;
   this.absolutePosition = false;

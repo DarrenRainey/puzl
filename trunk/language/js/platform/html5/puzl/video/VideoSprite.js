@@ -26,10 +26,10 @@ var SPRITE_ATTRIBUTE_COLOR         = 4096 // Indicates sprite with color modulat
 var SPRITE_COLLISION_RECT          = 0    // Only check if two sprite rectangles intersect
 var SPRITE_COLLISION_PIXEL         = 1    // Also check if pixels from two sprite intersect
 
-function VideoSprite( videoImage, videoSpriteData )
+function VideoSprite( sourceVideoObject, videoSpriteData )
 {
   //console.log( "Creating VideoSprite" );
-  VideoCellImage.call( this, videoImage, videoSpriteData );
+  VideoCellImage.call( this, sourceVideoObject, videoSpriteData );
 
   this.xVelocity;
   this.yVelocity;
@@ -38,6 +38,20 @@ function VideoSprite( videoImage, videoSpriteData )
   this.animationNameIndexHash;
 
   // Constructor.
+  if( sourceVideoObject === undefined )
+  {
+    // TODO: Allow for such in the future?
+    console.error( "Attempting to load VideoSprite without source VideoObject." );
+    return null;
+  }
+
+  if( videoSpriteData === undefined )
+  {
+    // TODO: Allow for such in the future?
+    console.error( "Attempting to load VideoSprite without driving data." );
+    return null;
+  }
+  
   this.xVelocity = 0;
   this.yVelocity = 0;
 
@@ -46,24 +60,31 @@ function VideoSprite( videoImage, videoSpriteData )
 
   // Load animations from videoSpriteData.
   var animations = videoSpriteData["animations"];
-  var animation;
-  for( var animationName in animations )
+  if( animations !== undefined )
   {
-    //console.log( animationName );
-    animation = animations[animationName];
-
-    // TODO: Optimize...
-    var indexedAnimation = new Array();
-    var animationIndex;
-    for( animationIndex in animation )
+    var animation;
+    for( var animationName in animations )
     {
-      var animationFrameName = animation[animationIndex];
-      indexedAnimation[animationIndex] = this.cellNameIndexHash[animationFrameName];
-      //console.log( animationIndex );
-    }
-    indexedAnimation[++animationIndex] = -1;
+      //console.log( animationName );
+      animation = animations[animationName];
 
-    this.animationNameIndexHash[animationName] = this.loadAnimation( indexedAnimation );
+      // TODO: Optimize...
+      var indexedAnimation = new Array();
+      var animationIndex;
+      for( animationIndex in animation )
+      {
+        var animationFrameName = animation[animationIndex];
+        indexedAnimation[animationIndex] = this.cellNameIndexHash[animationFrameName];
+        //console.log( animationIndex );
+      }
+      indexedAnimation[++animationIndex] = -1;
+
+      this.animationNameIndexHash[animationName] = this.loadAnimation( indexedAnimation );
+    }
+  }
+  else
+  {
+    //console.warn( "Loading VideoSprite without animation information." );
   }
 }
 

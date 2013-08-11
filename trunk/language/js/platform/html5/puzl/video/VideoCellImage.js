@@ -5,7 +5,7 @@ var IMAGE_ATTRIBUTE_TRANSPARENCY  = 1024 // Indicates image with transparency.
 var IMAGE_ATTRIBUTE_ALPHABLEND    = 2048 // Indicates image with alpha/semi transparency.
 var IMAGE_ATTRIBUTE_COLOR         = 4096 // Indicates image with color modulation.
 
-function VideoCellImage( videoObject, videoCellImageData )
+function VideoCellImage( sourceVideoObject, videoCellImageData )
 {
   //console.log( "Creating VideoCellImage" );
   VideoObject.call( this );
@@ -29,7 +29,21 @@ function VideoCellImage( videoObject, videoCellImageData )
   this.cellNameIndexHash;
   
   // Constructor.
-  this.sourceVideoObject = videoObject;
+  if( sourceVideoObject === undefined )
+  {
+    // TODO: Allow for such in the future?
+    console.error( "Attempting to load VideoCellImage without source VideoObject." );
+    return null;
+  }
+
+  if( videoCellImageData === undefined )
+  {
+    // TODO: Allow for such in the future?
+    console.error( "Attempting to load VideoCellImage without driving data." );
+    return null;
+  }
+  
+  this.sourceVideoObject = sourceVideoObject;
   var sourceVideoObjectCanvas = this.sourceVideoObject.getCanvas();
 
   this.cellWidth  = videoCellImageData["cellWidth"];
@@ -43,44 +57,65 @@ function VideoCellImage( videoObject, videoCellImageData )
   // Populate cells from videoCellImageData.
   this.cellList = new Array();
   this.cellNameIndexHash = new Array();
+  
   var frames = videoCellImageData["frames"];
-  var frame;
-  for( var frameName in frames )
+  if( frames !== undefined )
   {
-    //console.log( frameName );
-    frame = frames[frameName];
-    this.cellNameIndexHash[frameName] = this.loadCell( frame["x"], frame["y"] );
+    var frame;
+    for( var frameName in frames )
+    {
+      //console.log( frameName );
+      frame = frames[frameName];
+      this.cellNameIndexHash[frameName] = this.loadCell( frame["x"], frame["y"] );
+    }
+  }
+  else
+  {
+    console.warn( "VideoCellImage driving data does not contain frame information." );
   }
 
   // Populate layer information.
-  var layers = videoCellImageData["layers"];
-  var numberOfLayers = layers.length;
   this.color = new Array();
   this.canvas = new Array();
   this.colorKey = new Array();
   
-  var layerIndex;
-  for( layerIndex = 0; layerIndex < numberOfLayers; layerIndex++ )
+  var layers = videoCellImageData["layers"];
+  if( layers !== undefined )
   {
-    var layer = layers[layerIndex];
-    //console.log( layer["name"] );
+    var numberOfLayers = layers.length;
+    var layerIndex;
+    for( layerIndex = 0; layerIndex < numberOfLayers; layerIndex++ )
+    {
+      var layer = layers[layerIndex];
+      //console.log( layer["name"] );
+      var canvas = CreateOffScreenCanvas();
+      SetCanvasDimensions( canvas, sourceVideoObjectCanvas.width, sourceVideoObjectCanvas.height );
+      this.canvas.push( canvas );
+
+      var colorKey = layer["colorKey"];
+      if( colorKey !== undefined )
+      {
+        colorKey = new Color( colorKey );
+        this.colorKey.push( colorKey );
+        this.setColor( colorKey, layerIndex );
+        //this.attributes &= ~IMAGE_ATTRIBUTE_COLOR;
+      }
+      else
+      {
+        this.colorKey.push( colorKey ); // Pushing an undefined instance?
+        this.color.push( new Color( 255, 255, 255, 1 ) );
+      }
+    }
+  }
+  else
+  {
+    console.warn( "VideoCellImage driving data does not contain layer information. Defaulting single layer." );
+
     var canvas = CreateOffScreenCanvas();
     SetCanvasDimensions( canvas, sourceVideoObjectCanvas.width, sourceVideoObjectCanvas.height );
     this.canvas.push( canvas );
-
-    var colorKey = layer["colorKey"];
-    if( colorKey !== undefined )
-    {
-      colorKey = new Color( colorKey );
-      this.colorKey.push( colorKey );
-      this.setColor( colorKey, layerIndex );
-      //this.attributes &= ~IMAGE_ATTRIBUTE_COLOR;
-    }
-    else
-    {
-      this.colorKey.push( colorKey ); // Pushing an undefined instance?
-      this.color.push( new Color( 255, 255, 255, 1 ) );
-    }
+    this.colorKey.push( undefined );
+    this.color.push( new Color( 255, 255, 255, 1 ) );
   }
 };
 
