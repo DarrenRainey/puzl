@@ -110,19 +110,6 @@ VideoImage.prototype.load = function( filename )
   GlobalVideoSystem.queueVideoImage( this, this.filename );
 };
 
-VideoImage.prototype.draw = function()
-{
-  var targetVideoObject = this.targetVideoObject;
-  if( targetVideoObject !== null )
-  {
-    DrawWithNearestScale( this, targetVideoObject,
-                          0, 0,
-                          this.width, this.height,
-                          this.position.x, this.position.y,
-                          this.width, this.height );
-  }
-};
-
 // Temporary?
 VideoImage.prototype.getCanvas = function()
 {
