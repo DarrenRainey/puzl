@@ -62,11 +62,11 @@ function VideoCellImage( sourceVideoObject, videoCellImageData )
   if( frames !== undefined )
   {
     var frame;
-    for( var frameName in frames )
+    for( var frameId in frames )
     {
-      //console.log( frameName );
-      frame = frames[frameName];
-      this.cellNameIndexHash[frameName] = this.loadCell( frame["x"], frame["y"] );
+      //console.log( frameId );
+      frame = frames[frameId];
+      this.cellNameIndexHash[frameId] = this.loadCell( frame["x"], frame["y"] );
     }
   }
   else
