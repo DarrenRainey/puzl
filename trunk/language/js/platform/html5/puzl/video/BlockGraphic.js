@@ -3,6 +3,10 @@ function BlockGraphic( sourceVideoObject, blockgraphicData )
   // console.log( "Creating BlockGraphic" );
   VideoCellImage.call( this, sourceVideoObject, blockgraphicData );
 
+  this.absolute;
+
+  this.codeToCellTable;
+  
   // Constructor.
   if( sourceVideoObject === undefined )
   {
@@ -17,113 +21,145 @@ function BlockGraphic( sourceVideoObject, blockgraphicData )
     console.error( "Attempting to load BlockGraphic without driving data." );
     return null;
   }
-  
-  this.xPosition = 0;
-  this.yPosition = 0;
-  this.absolutePosition = false;
-  this.positionGridCellWidth;
-  this.positionGridCellHeight;
-  this.setPositionGridCellDimensions( this.cellWidth, this.cellHeight );
 
-  // Pre-calculate all cell rectangles.
-  var cellX;
-  var cellY;
-  var numberOfCells = this.mapWidth * this.mapHeight;
-  for( var index = 0; index < numberOfCells; index++ )
+  this.absolute = false;
+  this.setPosition( 0, 0 );
+
+  // Populate character code to cell lookup table.
+  this.codeToCellTable = new Array();
+  var codeToFramePartitions = blockgraphicData["codeToFramePartitions"];
+  if( codeToFramePartitions !== undefined )
   {
-    cellX = index % this.mapWidth;
-    cellY = ( index / this.mapWidth ) | 0;
+    //this.cellNameIndexHash
+    var numberOfPartitions = codeToFramePartitions.length;
+    var partitionIndex;
+    for( partitionIndex = 0; partitionIndex < numberOfPartitions; partitionIndex++ )
+    {
+      var partition = codeToFramePartitions[partitionIndex];
+      var codeBase = partition["codeBase"];
 
-    this.loadCell( cellX, cellY, EXTRACT_MODE_CELL );
+      var frames = partition["frames"];
+      var numberOfFrames = frames.length;
+      var frameIndex;
+      for( frameIndex = 0; frameIndex < numberOfFrames; frameIndex++ )
+      {
+        var frameId = frames[frameIndex];
+        this.codeToCellTable[codeBase + frameIndex] = this.cellList[this.cellNameIndexHash[frameId]];
+
+        // NOTE: It's important to know that undefined elements are padded
+        // into the codeToCellTable array, if 'codeBase + frameIndex' is not equal
+        // to the current length of the array.
+      }
+    }
+  }
+  else
+  {
+    console.error( "Attempting to load BlockGraphic without code to frame data." );
+    return null;
   }
 };
 
 extend( BlockGraphic, VideoCellImage );
 
-BlockGraphic.prototype.setPositionGridCellDimensions = function( positionGridCellWidth, positionGridCellHeight )
+/*BlockGraphic.prototype.setPositionGridCellDimensions = function( positionGridCellWidth, positionGridCellHeight )
 {
   this.positionGridCellWidth  = positionGridCellWidth;
   this.positionGridCellHeight = positionGridCellHeight;
-};
+};*/
 
-BlockGraphic.prototype.print = function( videoObject, text )
+BlockGraphic.prototype.print = function( text )
 {
-  var context = videoObject.getContext();
-  if( context == undefined )
+  var length = text.length;
+  if( length < 1 )
   {
-    context = videoObject;
+    return;
+  }
+  
+  var canvas = this.targetVideoObject.getCanvas();
+  var context = GetCanvasContext2D( canvas );
+
+  var hasAlpha; // TODO: Optimize. Could allocate this value once for each blockgraphic object.
+  if( this.alpha !== 1.0 )
+  {
+    hasAlpha = true;
+    context.globalAlpha = this.alpha;
+  }
+  else
+  {
+    hasAlpha = false;
   }
 
-  var length = text.length;
-  if( length > 0 )
+  var xPosition = VideoCellImage.prototype.getXPosition.call( this );
+  var yPosition = VideoCellImage.prototype.getYPosition.call( this );
+
+  var character;
+  var characterCode;
+  var cell;
+  for( var index = 0; index < length; index++ )
   {
-    var charCode;
-    var cell;
+    character = text.charAt( index );
+    /*if( character === '\n' )
+    {
+      xPosition = 0;
+      yPosition += this.height;
+      continue;
+    }*/
 
-    var hasAlpha; // TODO: Optimize. Could allocate this value once for each blockgraphic object.
-    if( this.alpha !== 1.0 )
+    characterCode = character.charCodeAt( 0 );
+    
+    cell = this.codeToCellTable[characterCode];
+    if( cell !== undefined )
     {
-      hasAlpha = true;
-      context.globalAlpha = this.alpha;
-    }
-    else
-    {
-      hasAlpha = false;
-    }
-
-    var width;
-    var height;
-    var xScale;
-    var yScale;
-    var videoObjectDisplay = videoObject.display;
-    if( videoObjectDisplay == null )
-    {
-      width  = this.width;
-      height = this.height;
-    }
-    else
-    {
-      xScale = videoObjectDisplay.xScale;
-      yScale = videoObjectDisplay.yScale;
-      width  = this.width  * xScale;
-      height = this.height * yScale;
+      DrawWithNearestScale( this, this.targetVideoObject,
+                            cell[0], cell[1],
+                            this.cellWidth, this.cellHeight,
+                            xPosition, yPosition,
+                            this.width, this.height );
     }
 
-    for( var index = 0; index < length; index++ )
-    {
-      charCode = text.charCodeAt( index ) - 32; // TODO: The offset value should be eliminated with prebuilt rectangle array.
-      cell = this.cellList[charCode];
-      
-      if( videoObjectDisplay == null )
-      {
-        DrawWithNearestScale( this, videoObject,
-                              cell[0], cell[1],
-                              this.cellWidth, this.cellHeight,
-                              this.xPosition, this.yPosition,
-                              width, height );
-      }
-      else
-      {
-        DrawWithNearestScale( this, videoObject,
-                              cell[0], cell[1],
-                              this.cellWidth, this.cellHeight,
-                              ( this.xPosition - videoObject.xPosition ) * xScale,
-                              ( this.yPosition - videoObject.yPosition ) * yScale,
-                              width, height );
-      }
+    xPosition += this.width;
+  }
 
-      this.xPosition += this.width;
-    }
+  VideoCellImage.prototype.setPosition.call( this, xPosition, yPosition );
 
-    if( hasAlpha )
-    {
-      context.globalAlpha = 1.0;
-    }
+  if( hasAlpha )
+  {
+    context.globalAlpha = 1.0;
   }
 };
 
 BlockGraphic.prototype.setPosition = function( xPosition, yPosition )
 {
-  this.xPosition = this.positionGridCellWidth  * xPosition;
-  this.yPosition = this.positionGridCellHeight * yPosition;
+  if( this.absolute !== true )
+  {
+    xPosition = xPosition * this.cellWidth;
+    yPosition = yPosition * this.cellHeight;
+  }
+  
+  VideoCellImage.prototype.setPosition.call( this, xPosition, yPosition );
 };
+
+BlockGraphic.prototype.getXPosition = function()
+{
+  var xPosition = VideoCellImage.prototype.getXPosition.call( this );
+  
+  if( this.absolute === true )
+  {
+    return xPosition;
+  }
+
+  return ( xPosition / this.cellWidth ) | 0;
+};
+
+BlockGraphic.prototype.getYPosition = function()
+{
+  var yPosition = VideoCellImage.prototype.getYPosition.call( this );
+
+  if( this.absolute === true )
+  {
+    return yPosition;
+  }
+
+  return ( yPosition / this.cellHeight ) | 0;
+};
+
