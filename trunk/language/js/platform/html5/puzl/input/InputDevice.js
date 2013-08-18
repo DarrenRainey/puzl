@@ -53,11 +53,18 @@ InputDevice.prototype.getState = function( inputId )
 
 InputDevice.prototype.setState = function( inputId, state )
 {
-  this.input[inputId].state = state;
   if( state === INPUT_STATE_PRESSED )
   {
+    var currentState = this.input[inputId].state;
+    if( ( currentState & INPUT_STATE_DOWN ) > 0 )
+    {
+      return;
+    }
+
     this.lastInputId = inputId;
   }
+  
+  this.input[inputId].state = state;
 
   this.stateChange[this.numberOfStateChanges++] = this.input[inputId];
 };
