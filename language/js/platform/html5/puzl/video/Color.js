@@ -81,19 +81,52 @@ Color.prototype.updateString = function()
   if( this.alpha === 1 )
   {
     // Compute a hex string.
-    var rString = this.red.toString( 16 );
+    var red = this.red;
+    if( red < 0 )
+    {
+      red = 0;
+    }
+    else
+    if( red > 255 )
+    {
+      red = red % 256;
+    }
+    
+    var rString = red.toString( 16 );
     if( rString.length === 1 )
     {
       rString = '0' + rString;
     }
 
-    var gString = this.green.toString( 16 );
+    var green = this.green;
+    if( green < 0 )
+    {
+      green = 0;
+    }
+    else
+    if( green > 255 )
+    {
+      green = green % 256;
+    }
+
+    var gString = green.toString( 16 );
     if( gString.length === 1 )
     {
       gString = '0' + gString;
     }
 
-    var bString = this.blue.toString( 16 );
+    var blue = this.blue;
+    if( blue < 0 )
+    {
+      blue = 0;
+    }
+    else
+    if( blue > 255 )
+    {
+      blue = blue % 256;
+    }
+
+    var bString = blue.toString( 16 );
     if( bString.length === 1 )
     {
       bString = '0' + bString;
@@ -212,7 +245,7 @@ Color.prototype.setGreen = function( green )
   this.updateString();
 }
 
-Color.prototype.setBlue = function( green )
+Color.prototype.setBlue = function( blue )
 {
   this.blue = blue;
   this.updateString();
