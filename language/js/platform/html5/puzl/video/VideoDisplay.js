@@ -34,7 +34,7 @@ function VideoDisplay( width, height )
   var context = GetCanvasContext2D( this.canvas );
   context.save();
 
-  this.quadTree = null;
+  this.quadTree = new QuadTree();
   
   this.setDimensions( width, height );
 
@@ -173,7 +173,7 @@ VideoDisplay.prototype.drawRectangleTo = function( targetVideoObject, xPosition,
 
 VideoDisplay.prototype.drawRectangle = function( xPosition, yPosition, width, height )
 {
-  this.drawToRectangleTo( null, xPosition, yPosition, width, height );
+  this.drawRectangleTo( null, xPosition, yPosition, width, height );
 };
 
 VideoDisplay.prototype.updateQuadTree = function()
