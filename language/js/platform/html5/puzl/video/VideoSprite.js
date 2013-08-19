@@ -124,8 +124,8 @@ VideoSprite.prototype.drawTo = function( targetVideoObject )
     DrawWithNearestScale( this.canvas[index], targetVideoObject,
                           cell[0], cell[1],
                           this.cellWidth, this.cellHeight,
-                          this.position.x, this.position.y,
-                          this.width, this.height );
+                          this.startPoint.x, this.startPoint.y,
+                          this._width, this._height );
   }
   
   if( hasAlpha )
@@ -168,7 +168,7 @@ VideoSprite.prototype.move = function()
   {
     this.queueErase();
 
-    var position = this.position;
+    var position = this.startPoint;
     this.setPosition( position.x + this.xVelocity,
                       position.y + this.yVelocity );
     

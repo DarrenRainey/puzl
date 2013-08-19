@@ -26,8 +26,8 @@ function ProcessMouseUp( mouseEvent )
 
 function ProcessMouseMove( mouseEvent )
 {
-  GlobalMouse.xPosition = mouseEvent.pageX;
-  GlobalMouse.yPosition = mouseEvent.pageY;
+  GlobalMouse.xPosition = ( ( mouseEvent.pageX - GlobalMouse.xOffset ) / GlobalMouse.xScale ) | 0;
+  GlobalMouse.yPosition = ( ( mouseEvent.pageY - GlobalMouse.yOffset ) / GlobalMouse.yScale ) | 0;
   
   mouseEvent.stopPropagation();
   mouseEvent.preventDefault();
@@ -51,8 +51,8 @@ function ProcessTouchStart( touchEvent )
     targetTouch = touchEvent.targetTouches;
   }
 
-  GlobalMouse.xPosition = targetTouch.pageX;
-  GlobalMouse.yPosition = targetTouch.pageY;
+  GlobalMouse.xPosition = ( ( targetTouch.pageX - GlobalMouse.xOffset ) / GlobalMouse.xScale ) | 0;
+  GlobalMouse.yPosition = ( ( targetTouch.pageY - GlobalMouse.yOffset ) / GlobalMouse.yScale ) | 0;
 
   GlobalMouse.setButtonState( 0, BUTTON_STATE_PRESSED );
 
@@ -72,8 +72,8 @@ function ProcessTouchEnd( touchEvent )
     targetTouch = touchEvent.targetTouches;
   }
 
-  GlobalMouse.xPosition = targetTouch.pageX;
-  GlobalMouse.yPosition = targetTouch.pageY;
+  GlobalMouse.xPosition = ( ( targetTouch.pageX - GlobalMouse.xOffset ) / GlobalMouse.xScale ) | 0;
+  GlobalMouse.yPosition = ( ( targetTouch.pageY - GlobalMouse.yOffset ) / GlobalMouse.yScale ) | 0;
 
   GlobalMouse.setButtonState( 0, BUTTON_STATE_RELEASED );
 
@@ -93,8 +93,8 @@ function ProcessTouchMove( touchEvent )
     targetTouch = touchEvent.targetTouches;
   }
   
-  GlobalMouse.xPosition = targetTouch.pageX;
-  GlobalMouse.yPosition = targetTouch.pageY;
+  GlobalMouse.xPosition = ( ( targetTouch.pageX - GlobalMouse.xOffset ) / GlobalMouse.xScale ) | 0;
+  GlobalMouse.yPosition = ( ( targetTouch.pageY - GlobalMouse.yOffset ) / GlobalMouse.yScale ) | 0;
 
   touchEvent.stopPropagation();
   touchEvent.preventDefault();
@@ -107,7 +107,11 @@ function InputMouse()
   this.mouseInput;
   this.xPosition;
   this.yPosition;
-  this.display;
+  
+  this.xScale;
+  this.yScale;
+  this.xOffset;
+  this.yOffset;
 
   // Constructor.
   this.mouseInput = new Array();
@@ -142,7 +146,10 @@ function InputMouse()
   this.stateChange = new Array( this.stateChangeBufferSize );
   this.numberOfStateChanges = 0;
 
-  this.setDisplay( null );
+  this.xScale = 1;
+  this.yScale = 1;
+  this.xOffset = 0;
+  this.yOffset = 0;
 }
 
 extend( InputMouse, InputDevice );
@@ -186,25 +193,10 @@ InputMouse.prototype.getLastButtonPress = function()
 
 InputMouse.prototype.getXPosition = function()
 {
-  if( this.display != null )
-  {
-    return ( ( this.xPosition - this.display.xOffset ) / this.display.xScale ) | 0;
-  }
-
   return this.xPosition;
 };
 
 InputMouse.prototype.getYPosition = function()
 {
-  if( this.display != null )
-  {
-    return ( ( this.yPosition - this.display.yOffset ) / this.display.yScale ) | 0;
-  }
-
   return this.yPosition;
-};
-
-InputMouse.prototype.setDisplay = function( display )
-{
-  this.display = display;
 };

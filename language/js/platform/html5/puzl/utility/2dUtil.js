@@ -1,10 +1,15 @@
-function Point()
+// --------------------------------------------------------
+function Vector2d()
 {
+  this.x;
+  this.y;
+
+  // Constructor.
   if( arguments.length === 1 )
   {
-    var point = arguments[0];
-    this.x = point.x;
-    this.y = point.y;
+    var vector2d = arguments[0];
+    this.x = vector2d.x;
+    this.y = vector2d.y;
   }
   else
   if( arguments.length === 2 )
@@ -21,11 +26,10 @@ function Point()
   return this;
 }
 
-Point.prototype.isInsideRectangle = function( rectangle )
+// --------------------------------------------------------
+Vector2d.prototype.isInside = function( rectangle )
 {
-  var pointList = this.rectangle.pointList;
-  
-  var rectanglePoint = pointList[0];
+  var rectanglePoint = rectangle.startPoint;
   if( this.x < rectanglePoint.x )
   {
     return false;
@@ -36,7 +40,7 @@ Point.prototype.isInsideRectangle = function( rectangle )
     return false;
   }
   
-  rectanglePoint = pointList[1];
+  rectanglePoint = rectangle.endPoint;
   if( this.x > rectanglePoint.x )
   {
     return false;
@@ -50,45 +54,47 @@ Point.prototype.isInsideRectangle = function( rectangle )
   return true;
 };
 
+// --------------------------------------------------------
 function Rectangle()
 {
-  this.pointList = new Array();
+  this.startPoint;
+  this.endPoint;
 
+  // Constructor.
   if( arguments.length === 1 )
   {
     // Rectangle.
     var rectangle = arguments[0];
-    this.pointList.push( new Point( rectangle.pointList[0] ) );
-    this.pointList.push( new Point( rectangle.pointList[1] ) );
+    this.startPoint = new Vector2d( rectangle.startPoint );
+    this.endPoint = new Vector2d( rectangle.endPoint );
   }
   else
   if( arguments.length === 2 )
   {
     // Two points.
-    var point0 = arguments[0];
-    var point1 = arguments[1];
-    this.pointList.push( new Point( point0.x, point0.y ) );
-    this.pointList.push( new Point( point1.x, point1.y ) );
+    var startPoint = arguments[0];
+    var endPoint   = arguments[1];
+    this.startPoint = new Vector2d( startPoint.x, startPoint.y );
+    this.endPoint   = new Vector2d( endPoint.x, endPoint.y );
   }
   else
   if( arguments.length === 4 )
   {
-    this.pointList.push( new Point( arguments[0], arguments[1] ) );
-    this.pointList.push( new Point( arguments[2], arguments[3] ) );
+    // Two sets of point XYs.
+    this.startPoint = new Vector2d( arguments[0], arguments[1] );
+    this.endPoint   = new Vector2d( arguments[2], arguments[3] );
   }
   else
   {
-    this.pointList.push( new Point() );
-    this.pointList.push( new Point() );
+    this.startPoint = new Vector2d();
+    this.endPoint   = new Vector2d();
   }
-
-  return this;
 }
 
-Rectangle.prototype.isInsideRectangle = function( rectangle )
+Rectangle.prototype.isInside = function( rectangle )
 {
-  if( this.pointList[0].isInsideRectangle( rectangle ) &&
-      this.pointList[1].isInsideRectangle( rectangle ) )
+  if( this.startPoint.isInside( rectangle ) &&
+      this.endPoint.isInside( rectangle ) )
   {
     return true;
   }
@@ -96,24 +102,12 @@ Rectangle.prototype.isInsideRectangle = function( rectangle )
   return false;
 };
 
-Rectangle.prototype.isRectangleColliding = function( rectangle )
+Rectangle.prototype.isIntersecting = function( rectangle )
 {
-  var thisRectangle = this.rectangle;
-  var r1PointList   = thisRectangle.pointList;
-  var r1EndPoint    = r1PointList[1];
-
-  var r2PointList   = rectangle.pointList;
-  var r2StartPoint  = r2PointList[0];
-  
-  if( !( r2StartPoint.x > r1EndPoint.x ||
-         r2StartPoint.y > r1EndPoint.y ) )
-  {
-    return true;
-  }
-  
-  var r1StartPoint  = r1PointList[0];
-  var r2EndPoint    = r2PointList[1];
-
-  return !( r2EndPoint.x < r1StartPoint.x ||
-            r2EndPoint.y < r1StartPoint.y );
+  // TODO: Optimize to favor collision vertically, as most displays
+  // will be wider than they are tall.
+  return !( rectangle.startPoint.x > this.endPoint.x ||
+            rectangle.endPoint.x < this.startPoint.x ||
+            rectangle.startPoint.y > this.endPoint.y ||
+            rectangle.endPoint.y < this.startPoint.y );
 };

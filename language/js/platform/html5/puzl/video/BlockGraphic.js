@@ -114,10 +114,10 @@ BlockGraphic.prototype.print = function( text )
                             cell[0], cell[1],
                             this.cellWidth, this.cellHeight,
                             xPosition, yPosition,
-                            this.width, this.height );
+                            this._width, this._height );
     }
 
-    xPosition += this.width;
+    xPosition += this._width;
   }
 
   VideoCellImage.prototype.setPosition.call( this, xPosition, yPosition );

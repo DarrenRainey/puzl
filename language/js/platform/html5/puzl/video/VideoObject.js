@@ -81,9 +81,9 @@ VideoObject.prototype.drawTo = function( targetVideoObject )
   {
     DrawWithNearestScale( this, targetVideoObject,
                           0, 0,
-                          this.width, this.height,
-                          this.position.x, this.position.y,
-                          this.width, this.height );
+                          this._width, this._height,
+                          this.startPoint.x, this.startPoint.y,
+                          this._width, this._height );
   }
 };
 
@@ -178,8 +178,8 @@ VideoObject.prototype.erase = function()
   var canvas = targetVideoObject.getCanvas();
   var context = GetCanvasContext2D( canvas );
 
-  context.clearRect( this.position.x, this.position.y,
-                     this.width, this.height );
+  context.clearRect( this.startPoint.x, this.startPoint.y,
+                     this._width, this._height );
 };
 
 VideoObject.prototype.queueErase = function()
@@ -198,10 +198,10 @@ VideoObject.prototype.queueErase = function()
 
   eraseQueueObject.targetVideoObject = targetVideoObject;
 
-  eraseQueueObject.xPosition = this.position.x;
-  eraseQueueObject.yPosition = this.position.y;
-  eraseQueueObject.width     = this.width;
-  eraseQueueObject.height    = this.height;
+  eraseQueueObject.xPosition = this.startPoint.x;
+  eraseQueueObject.yPosition = this.startPoint.y;
+  eraseQueueObject.width     = this._width;
+  eraseQueueObject.height    = this._height;
 };
 
 function EraseQueueObject()

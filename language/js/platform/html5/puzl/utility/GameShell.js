@@ -74,9 +74,8 @@ GameShell.prototype.shellInitialize = function()
 
   this.videoSystem = new VideoSystem( this.gameShellSettings.width, this.gameShellSettings.height );
   this.display     = this.videoSystem.getDisplay();
+  this.clientScale();
   GlobalVideoDisplay = this.display;
-
-  this.mouse.setDisplay( this.display );
 
   this.audioSystem = new AudioSystem();
 
@@ -160,10 +159,63 @@ GameShell.prototype.documentBodyOnResize = function()
 
 GameShell.prototype.shellResize = function()
 {
-  this.display.setDimensions( this.display.width,
-                              this.display.height );
+  this.clientScale();
 
   this.resize();
+};
+
+GameShell.prototype.clientScale = function()
+{
+  var clientWidth = Math.max( Math.max( document.body.offsetWidth, document.documentElement.offsetWidth ),
+                              Math.max( document.body.clientWidth, document.documentElement.clientWidth ) );
+
+  var clientHeight = Math.max( Math.max( document.body.offsetHeight, document.documentElement.offsetHeight ),
+                               Math.max( document.body.clientHeight, document.documentElement.clientHeight ) );
+
+  var xScale = ( clientWidth  / this.display.getWidth() );
+  var yScale = ( clientHeight / this.display.getHeight() );
+
+  if( true )//fullScreen )
+  {
+    xScale |= 0;
+    yScale |= 0;
+
+    if( xScale <= 0 )
+    {
+      xScale = 1;
+    }
+
+    if( yScale <= 0 )
+    {
+      yScale = 1;
+    }
+
+    if( true )//maintainAspectRatio )
+    {
+      xScale = yScale = Math.min( xScale, yScale );
+    }
+  }
+  else
+  {
+    xScale = 1;
+    yScale = 1;
+  }
+
+  var width  = this.display.getWidth()  * xScale;
+  var height = this.display.getHeight() * yScale;
+  this.display.setRealDimensions( width, height );
+
+  // Center display (determine position offset).
+  var canvas = this.display.getCanvas();
+  var xOffset = ( ( clientWidth  - width  ) / 2 ) | 0;
+  var yOffset = ( ( clientHeight - height ) / 2 ) | 0;
+  SetCanvasPosition( canvas, xOffset, yOffset );
+
+  // Adjust mouse metrics to fit display on browser.
+  this.mouse.xScale = xScale;
+  this.mouse.yScale = yScale;
+  this.mouse.xOffset = xOffset;
+  this.mouse.yOffset = yOffset;
 };
 
 GameShell.prototype.input  = function(){};
