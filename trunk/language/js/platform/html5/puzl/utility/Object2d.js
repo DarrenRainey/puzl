@@ -1,107 +1,92 @@
 function Object2d()
 {
   //console.log( "Creating Object2d" );
-  
-  this.rectangle;
-  this.position;
-  this.width;
-  this.height;
+  Rectangle.call( this );
+  this._width;
+  this._height;
   
   this.parentObject;
 
   this.objectList;
 
-  this.quadTree;
-  this.quadTreeNode;
+  this.quadTree; // This Object2d's quad tree root.
+  this.quadTreeNode; // The quad tree node this object is contained in?
+                     // Used for quick reference of currently contained node.
 
   // Constructor.
-  this.rectangle  = new Rectangle();
   this.objectList = new Array();
-  this.quadTree   = new QuadTree();
-
-  this.parentObject = null;
-  
-  this.position  = this.rectangle.pointList[0];
-  //this.setPosition( 0, 0 );
-  
-  this.setDimensions( 1, 1 );
-
-  this.needsRedraw  = false;
 
   this.quadTreeNode = null;
-  this.quadTree.setObject2d( this );
+  this.quadTree = new QuadTree();
+
+  this.parentObject = null;
+  this.setDimensions( 1, 1 );
+
+  //this.quadTree.setObject2d( this );
+  this.quadTreeNode = null;
 };
+
+extend( Object2d, Rectangle );
 
 Object2d.prototype.getXPosition = function()
 {
-  return this.position.x;
+  return this.startPoint.x;
 };
 
 Object2d.prototype.getYPosition = function()
 {
-  return this.position.y;
+  return this.startPoint.y;
 };
 
 Object2d.prototype.setXPosition = function( xPosition )
 {
-  var point = this.position;
-  point.x   = xPosition;
-
-  point     = this.rectangle.pointList[1];
-  point.x   = xPosition + this.width  - 1;
+  this.startPoint.x = xPosition;
+  this.endPoint.x   = xPosition + this._width - 1;
 
   this.updateQuadTree();
 };
 
 Object2d.prototype.setYPosition = function( yPosition )
 {
-  var point = this.position;
-  point.y   = yPosition;
-
-  point     = this.rectangle.pointList[1];
-  point.y   = yPosition + this.height - 1;
+  this.startPoint.y = yPosition;
+  this.endPoint.y   = yPosition + this._height - 1;
 
   this.updateQuadTree();
 };
 
 Object2d.prototype.setPosition = function( xPosition, yPosition )
 {
-  var point = this.position;
-  point.x   = xPosition;
-  point.y   = yPosition;
+  this.startPoint.x = xPosition;
+  this.endPoint.x   = xPosition + this._width - 1;
 
-  point     = this.rectangle.pointList[1];
-  point.x   = xPosition + this.width  - 1;
-  point.y   = yPosition + this.height - 1;
+  this.startPoint.y = yPosition;
+  this.endPoint.y   = yPosition + this._height - 1;
 
   this.updateQuadTree();
 };
 
 Object2d.prototype.getWidth = function()
 {
-  return this.width;
+  return this._width;
 };
 
 Object2d.prototype.getHeight = function()
 {
-  return this.height;
+  return this._height;
 };
 
 Object2d.prototype.setDimensions = function( width, height )
 {
-  this.width  = width;
-  this.height = height;
+  this._width  = width;
+  this._height = height;
 
-  var point = this.rectangle.pointList[1];
-  //var position = this.position;
-  //point.x      = position.x + this.width  - 1;
-  //point.y      = position.y + this.height - 1;
-  point.x  += this.width  - width;
-  point.y  += this.height - height;
+  this.endPoint.x = this.startPoint.x + width  - 1;
+  this.endPoint.y = this.startPoint.y + height - 1;
 
-  if( this.quadTree !== null )
+  if( this.quadTree != null )
   {
-    this.quadTree.updateRectangle();
+    console.log( "Object2d::setDimensions, ( this.quadTree != null ), " + width + ":" + height );
+    this.quadTree.setRectangle( 0, 0, width - 1, height - 1 );
   }
 
   this.updateQuadTree();
@@ -116,13 +101,13 @@ Object2d.prototype.addObject = function( object )
     return;
   }
 
-  if( object === null )
+  if( object == null )
   {
     return;
   }
 
   var objectParentObject = object.parentObject;
-  if( objectParentObject !== null )
+  if( objectParentObject != null )
   {
     objectParentObject.removeObject( object );
   }
@@ -130,8 +115,7 @@ Object2d.prototype.addObject = function( object )
   object.parentObject = this;
   this.objectList[this.objectList.length] = object;
 
-  // NOTE: Should this update the quad tree?
-  //this.quadTree.insert( object );
+  this.quadTree.insert( object );
 };
 
 Object2d.prototype.removeObject = function( object )
@@ -160,30 +144,23 @@ Object2d.prototype.clearObjects = function()
     this.objectList[index].parentObject = null;
   }
 
-  this.objectList = [];
+  this.objectList = []; // NOTE: Bad. Should clear currently allocated Array object.
+
+  // NOTE: Should this update the quad tree?
 };
 
-Object2d.prototype.setQuadTreeNode = function( quadTreeNode )
+/*Object2d.prototype.setQuadTreeNode = function( quadTreeNode )
 {
   this.quadTreeNode = quadTreeNode;
-};
+};*/
 
 Object2d.prototype.updateQuadTree = function()
 {
+  //console.log( "Object2d::updateQuadTree" );
   /*var parentObject = this.parentObject;
-  if( ( parentObject !== null ) &&
-      ( parentObject.quadTree !== null ) )
+  if( ( parentObject != null ) &&
+      ( parentObject.quadTree != null ) )
   {
     parentObject.quadTree.insert( this );
   }*/
-};
-
-Object2d.prototype.isInsideRectangle = function( rectangle )
-{
-  return this.rectangle.isInsideRectangle( rectangle );
-};
-
-Object2d.prototype.isBoxColliding = function( otherObject )
-{
-  return this.rectangle.isRectangleColliding( otherObject.rectangle );
 };
