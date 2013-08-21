@@ -111,3 +111,18 @@ Rectangle.prototype.isIntersecting = function( rectangle )
             rectangle.startPoint.y > this.endPoint.y ||
             rectangle.endPoint.y < this.startPoint.y );
 };
+
+Rectangle.prototype.getIntersection = function( rectangle, intersectionRectangle )
+{
+  intersectionRectangle.startPoint.x =
+    ( this.startPoint.x > rectangle.startPoint.x ) ? this.startPoint.x : rectangle.startPoint.x;
+
+  intersectionRectangle.startPoint.y =
+    ( this.startPoint.y > rectangle.startPoint.y ) ? this.startPoint.y : rectangle.startPoint.y;
+
+  intersectionRectangle.endPoint.x =
+    ( this.endPoint.x < rectangle.endPoint.x ) ? this.endPoint.x : rectangle.endPoint.x;
+
+  intersectionRectangle.endPoint.y =
+    ( this.endPoint.y < rectangle.endPoint.y ) ? this.endPoint.y : rectangle.endPoint.y;
+};

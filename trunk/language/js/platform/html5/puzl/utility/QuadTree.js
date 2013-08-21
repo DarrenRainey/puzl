@@ -36,6 +36,7 @@ function QuadTreeNode( parentNode, nodeId )
 
 QuadTreeNode.prototype.createSubNode = function( subNodeIndex )
 {
+  //console.log( "QuadTreeNode::createSubNode,subNodeIndex = " + subNodeIndex );
   var subNode = this.subNodeList[subNodeIndex];
   if( subNode == null )
   {
@@ -43,8 +44,9 @@ QuadTreeNode.prototype.createSubNode = function( subNodeIndex )
     subNode.updateRectangle();
 
     this.subNodeList[subNodeIndex] = subNode;
-    return subNode;
   }
+
+  return subNode;
 };
 
 QuadTreeNode.prototype.setRectangle = function( xPosition0, yPosition0, xPosition1, yPosition1 )
@@ -130,11 +132,6 @@ QuadTreeNode.prototype.updateRectangle = function()
   }
 };
 
-QuadTreeNode.prototype.getNumberOfObjects = function()
-{
-  return this.objectList.length;
-};
-
 QuadTreeNode.prototype.getNumberOfSubObjects = function()
 {
   var numberOfSubObjects = 0;
@@ -155,7 +152,7 @@ QuadTreeNode.prototype.getNumberOfSubObjects = function()
 
 QuadTreeNode.prototype.getTotalNumberOfObjects = function()
 {
-  return this.getNumberOfObjects() + this.getNumberOfSubObjects();
+  return this.objectList.length + this.getNumberOfSubObjects();
 };
 
 QuadTreeNode.prototype.getQuadrantId = function( rectangle )
@@ -235,61 +232,37 @@ QuadTreeNode.prototype.insert = function( object2d )
 {
   var targetSubNodeIndex;
   
-  var numberOfObjects = this.getNumberOfObjects();
-  if( ( numberOfObjects > QUAD_TREE_MAX_CAPACITY ) &&
+  if( ( this.objectList.length > QUAD_TREE_MAX_CAPACITY ) &&
       ( this.depthLevel <= QUAD_TREE_MAX_DEPTH_LEVEL ) )
   {
     targetSubNodeIndex = this.getQuadrantId( object2d );
+    //console.log( "QuadTreeNode::insert, targetSubNodeIndex: " + targetSubNodeIndex );
     if( targetSubNodeIndex !== -1 )
     {
       //console.log( "new: " + targetSubNodeIndex );
       var subNode = this.subNodeList[targetSubNodeIndex];
-      if( subNode == null )
+      if( subNode === null )
       {
         //console.log( "new: " + targetSubNodeIndex );
         subNode = this.createSubNode( targetSubNodeIndex );
       }
 
       subNode.insert( object2d );
+      return;
     }
-  }
-  else
-  {
-    targetSubNodeIndex = -1;
   }
 
   //console.log( targetSubNodeIndex );
 
-  if( targetSubNodeIndex === -1 )
-  {
-    // Put it in this node.
-    var oldNode = object2d.quadTreeNode;
-    if( oldNode != this )
-    {
-      if( oldNode != null )
-      {
-        var oldNodeObjectList  = oldNode.objectList;
-        var oldnumberOfObjects = oldNode.getNumberOfObjects();
-        for( var index = 0; index < oldnumberOfObjects; index++ )
-        {
-          if( object2d == oldNodeObjectList[index] )
-          {
-            oldNodeObjectList.splice( index, 1 );
-            return;
-          }
-        }
-      }
-
-      //console.log( object2d );
-      object2d.quadTreeNode = this;
-      this.objectList[numberOfObjects] = object2d;
-    }
-  }
+  // Put it in this node.
+  //console.log( object2d );
+  object2d.quadTreeNode = this;
+  this.objectList.push( object2d );
 };
 
 QuadTreeNode.prototype.query = function( rectangle, resultList )
 {
-  var numberOfObjects = this.getNumberOfObjects();
+  var numberOfObjects = this.objectList.length;
   if( numberOfObjects > 0 )
   {
     var currentObject2d;
@@ -298,7 +271,7 @@ QuadTreeNode.prototype.query = function( rectangle, resultList )
       currentObject2d = this.objectList[index];
       if( currentObject2d.isIntersecting( rectangle ) )
       {
-        resultList[resultList.length] = currentObject2d;
+        resultList.push( currentObject2d );
       }
     }
   }
@@ -331,38 +304,6 @@ QuadTreeNode.prototype.query = function( rectangle, resultList )
 function QuadTree()
 {
   QuadTreeNode.call( this, null, -1 );
-  //quadTreeNode = new QuadTreeNode( null, -1 );
-
-  //this.object2d;
-
-  // Constructor.
-  //this.setObject2d( null );
 }
 
 extend( QuadTree, QuadTreeNode );
-
-/*QuadTree.prototype.setObject2d = function( object2d )
-{
-  this.object2d = object2d;
-  if( object2d != null )
-  {
-    this.setRectangle( 0, 0,
-                       object2d.getWidth() - 1, object2d.getHeight() - 1 );
-  }
-};
-
-QuadTree.prototype.updateRectangle = function()
-{
-  object2d = this.object2d;
-  if( object2d != null )
-  {
-    var newX = object2d.getWidth()  - 1;
-    var newY = object2d.getHeight() - 1;
-
-    if( ( this.rectangle.endPoint.x !== newX ) || ( this.rectangle.endPoint.y !== newY ) )
-    {
-      this.setRectangle( 0, 0, newX, newY );
-    }
-  }
-};*/
-

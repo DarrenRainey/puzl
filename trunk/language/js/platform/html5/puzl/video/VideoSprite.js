@@ -90,7 +90,7 @@ function VideoSprite( sourceVideoObject, videoSpriteData )
 
 extend( VideoSprite, VideoCellImage );
 
-VideoSprite.prototype.drawTo = function( targetVideoObject )
+VideoSprite.prototype.drawTo = function( targetVideoObject, rectangle )
 {
   if( targetVideoObject === null )
   {
@@ -116,16 +116,36 @@ VideoSprite.prototype.drawTo = function( targetVideoObject )
   {
     return;
   }
-  
-  var numberOfCanvases = this.canvas.length;
+
+  var rectangleStartPoint = rectangle.startPoint;
+  var rectangleStartX = rectangleStartPoint.x;
+  var rectangleStartY = rectangleStartPoint.y;
+  var xOffset = rectangle.startPoint.x - this.startPoint.x;
+  var yOffset = rectangle.startPoint.y - this.startPoint.y;
+  var rectangleWidth  = rectangle.endPoint.x - rectangleStartX + 1;
+  var rectangleHeight = rectangle.endPoint.y - rectangleStartY + 1;
+
+  var thisCanvas = this.canvas;
+  var numberOfCanvases = thisCanvas.length;
   var index;
   for( index = 0; index < numberOfCanvases; index++ )
   {
-    DrawWithNearestScale( this.canvas[index], targetVideoObject,
-                          cell[0], cell[1],
+    // TODO: Needs to factor in scaled dimensions.
+    DrawWithNearestScale( thisCanvas[index], targetVideoObject,
+                          cell[0] + xOffset, cell[1] + yOffset,
+                          
+                          rectangleWidth,
+                          rectangleHeight,
+                          
+                          rectangleStartX, rectangleStartY,
+
+                          rectangleWidth,
+                          rectangleHeight );
+    
+                          /*cell[0], cell[1],
                           this.cellWidth, this.cellHeight,
                           this.startPoint.x, this.startPoint.y,
-                          this._width, this._height );
+                          this._width, this._height );*/
   }
   
   if( hasAlpha )
@@ -166,8 +186,6 @@ VideoSprite.prototype.move = function()
 {
   if( ( this.xVelocity !== 0 ) || ( this.yVelocity !== 0 ) )
   {
-    this.queueErase();
-
     var position = this.startPoint;
     this.setPosition( position.x + this.xVelocity,
                       position.y + this.yVelocity );
@@ -207,8 +225,8 @@ VideoSprite.prototype.setCurrentSequence = function( currentSequence )
   this.animation.setCurrentSequence( currentSequence );
   if( previousFrame !== this.animation.getCurrentFrame() )
   {
-    this.queueErase();
-    this.needsRedraw = true;
+    //this.needsRedraw = true;
+    this.addDirtyRectangle();
   }
 };
 
@@ -216,8 +234,8 @@ VideoSprite.prototype.setCurrentFrame = function( currentFrame )
 {
   if( currentFrame !== this.animation.getCurrentFrame() )
   {
-    this.queueErase();
-    this.needsRedraw = true;
+    //this.needsRedraw = true;
+    this.addDirtyRectangle();
   }
   
   this.animation.setCurrentFrame( currentFrame );
@@ -244,8 +262,8 @@ VideoSprite.prototype.animate = function()
   var frameChanged = this.animation.read();
   if( frameChanged )
   {
-    this.queueErase();
-    this.needsRedraw = true;
+    //this.needsRedraw = true;
+    this.addDirtyRectangle();
   }
 
   return frameChanged;
