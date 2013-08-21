@@ -5,30 +5,36 @@ function VideoObject()
 
   this.targetVideoObject;
 
-  this.eraseQueue;
-  this.numberOfEraseQueueObjects;
+  this.dirtyRectangleList;
   this.needsRedraw;
 
   // Constructor.
   this.targetVideoObject = null;
   
-  this.eraseQueue = new Array();
-  this.numberOfEraseQueueObjects = this.eraseQueue.length;
   this.needsRedraw = false;
+  this.dirtyRectangleList = new Array();
 };
 
 extend( VideoObject, Object2d );
 
 VideoObject.prototype.setDimensions = function( width, height )
 {
+  this.addDirtyRectangle();
+  
   Object2d.prototype.setDimensions.call( this, width, height );
-  this.setNeedsRedraw( true, true );
+  
+  //this.setNeedsRedraw( true, true );
+  this.addDirtyRectangle();
 };
 
 VideoObject.prototype.setPosition = function( xPosition, yPosition )
 {
+  this.addDirtyRectangle();
+  
   Object2d.prototype.setPosition.call( this, xPosition, yPosition );
-  this.setNeedsRedraw( true, false );
+  
+  //this.setNeedsRedraw( true, false );
+  this.addDirtyRectangle();
 };
 
 VideoObject.prototype.addObject = function( videoObject )
@@ -46,169 +52,112 @@ VideoObject.prototype.getCanvas = function()
   return null;
 };
 
-VideoObject.prototype.setNeedsRedraw = function( needsRedraw, propagate )
-{
-  this.needsRedraw = needsRedraw;
-
-  // Always back propagate, if necessary.
-  var targetVideoObject = this.targetVideoObject;
-  if( targetVideoObject !== undefined && targetVideoObject !== null ) // TODO: See if there is a way to simplify this check.
-  {
-    if( !targetVideoObject.needsRedraw )
-    {
-      targetVideoObject.setNeedsRedraw( true, false );
-    }
-  }
-  
-  // Forward propagate, if wanted.
-  if( propagate )
-  {
-    var videoObjectListLength = this.objectList.length;
-    if( videoObjectListLength > 0 )
-    {
-      var videoObject;
-      for( var index = 0; index < videoObjectListLength; index++ )
-      {
-        this.objectList[index].setNeedsRedraw( needsRedraw, propagate );
-      }
-    }
-  }
-};
-
-VideoObject.prototype.drawTo = function( targetVideoObject )
+VideoObject.prototype.drawTo = function( targetVideoObject, rectangle )
 {
   if( targetVideoObject !== null )
   {
+    // TODO: Needs to factor in scaled dimensions.
     DrawWithNearestScale( this, targetVideoObject,
-                          0, 0,
-                          this._width, this._height,
-                          this.startPoint.x, this.startPoint.y,
-                          this._width, this._height );
+                          rectangle.startPoint.x, rectangle.startPoint.y,
+                          rectangle.endPoint.x - rectangle.startPoint.x + 1,
+                          rectangle.endPoint.y - rectangle.startPoint.y + 1,
+                          rectangle.startPoint.x, rectangle.startPoint.y,
+                          rectangle.endPoint.x - rectangle.startPoint.x + 1,
+                          rectangle.endPoint.y - rectangle.startPoint.y + 1 );
+
+    //this.needsRedraw = false;
   }
 };
 
-VideoObject.prototype.draw = function()
+VideoObject.prototype.draw = function( rectangle )
 {
-  this.drawTo( this.targetVideoObject );
+  this.drawTo( this.targetVideoObject, rectangle );
 };
 
 VideoObject.prototype.drawUpdate = function()
 {
-  if( this.numberOfEraseQueueObjects > 0 )
-  {
-    this.processEraseQueue();
-  }
-
-  this.draw();
-  //this.setNeedsRedraw( false, false );
-  
-  var videoObjectListLength = this.objectList.length;
-  if( videoObjectListLength > 0 )
+  var dirtyRectangleListLength = this.dirtyRectangleList.length;
+  if( dirtyRectangleListLength > 0 )
   {
     var videoObject;
-    for( var index = 0; index < videoObjectListLength; index++ )
+    var videoObjectListIndex;
+    var dirtyRectangle;
+    var dirtyRectangleListIndex;
+    
+    var tempDirtyRectangle = new Rectangle();
+
+    for( dirtyRectangleListIndex = 0; dirtyRectangleListIndex < dirtyRectangleListLength; dirtyRectangleListIndex++ )
     {
-      videoObject = this.objectList[index];
-      if( videoObject.needsRedraw )
+      dirtyRectangle = this.dirtyRectangleList[dirtyRectangleListIndex];
+      if( this.isIntersecting( dirtyRectangle ) )
       {
-        videoObject.drawUpdate();
+        this.getIntersection( dirtyRectangle, tempDirtyRectangle );
+        this.draw( tempDirtyRectangle );
       }
     }
+
+    var videoObjectListLength = this.objectList.length;
+    for( videoObjectListIndex = 0; videoObjectListIndex < videoObjectListLength; videoObjectListIndex++ )
+    {
+      videoObject = this.objectList[videoObjectListIndex];
+      for( dirtyRectangleListIndex = 0; dirtyRectangleListIndex < dirtyRectangleListLength; dirtyRectangleListIndex++ )
+      {
+        dirtyRectangle = this.dirtyRectangleList[dirtyRectangleListIndex];
+        if( videoObject.isIntersecting( dirtyRectangle ) )
+        {
+          videoObject.getIntersection( dirtyRectangle, tempDirtyRectangle );
+          videoObject.draw( tempDirtyRectangle );
+        }
+      }
+    }
+
+    // NOTE: Shambles of an attempt to use quad tree query over multiple linear traversals
+    // of object list and intersection tests.
+    /*var collisionList = new Array();
+    this.quadTree.query( dirtyRectangle, collisionList );
+    var videoObjectListLength = collisionList.length;
+    if( videoObjectListLength > 0 )
+    {
+      for( videoObjectListIndex = 0; videoObjectListIndex < videoObjectListLength; videoObjectListIndex++ )
+      {
+        videoObject = collisionList[videoObjectListIndex];
+        videoObject.needsRedraw = true;
+      }
+
+      videoObjectListLength = this.objectList.length;
+      for( videoObjectListIndex = 0; videoObjectListIndex < videoObjectListLength; videoObjectListIndex++ )
+      {
+        videoObject = this.objectList[videoObjectListIndex];
+        if( videoObject.needsRedraw )
+        {
+          videoObject.getIntersection( dirtyRectangle, tempDirtyRectangle );
+          videoObject.draw( tempDirtyRectangle );
+        }
+      }
+    }*/
+
+    this.dirtyRectangleList.length = 0;
   }
 };
 
-VideoObject.prototype.getNextEraseQueueObject = function()
+VideoObject.prototype.addDirtyRectangle = function( rectangle )
 {
-  var numberOfEraseQueueObjects = ++this.numberOfEraseQueueObjects;
-
-  var eraseQueueObject;
-  var eraseQueueLength = this.eraseQueue.length;
-  if( numberOfEraseQueueObjects < eraseQueueLength )
+  if( rectangle === undefined )
   {
-    eraseQueueObject = this.eraseQueue[numberOfEraseQueueObjects - 1];
+    if( this.targetVideoObject != null )
+    {
+      this.targetVideoObject.addDirtyRectangle( this );
+    }
+    else
+    {
+      this.addDirtyRectangle( this );
+    }
   }
   else
   {
-    eraseQueueObject = new EraseQueueObject();
-    this.eraseQueue[numberOfEraseQueueObjects - 1] = eraseQueueObject;
-  }
-
-  return eraseQueueObject;
-};
-
-VideoObject.prototype.processEraseQueue = function()
-{
-  /*var eraseQueueObject;
-  var lastCanvas    = null;
-  var currentCanvas = null;
-  var context;
-  var targetVideoObject;
-  var numberOfEraseQueueObjects = this.numberOfEraseQueueObjects;
-  for( var index = 0; index < numberOfEraseQueueObjects; index++ )
-  {
-    eraseQueueObject = this.eraseQueue[index];
-    targetVideoObject = eraseQueueObject.targetVideoObject;
-    currentCanvas = targetVideoObject.getCanvas();
-    if( currentCanvas != lastCanvas )
+    if( this.dirtyRectangleList )
     {
-      context = GetCanvasContext2D( currentCanvas );
-      lastCanvas = currentCanvas;
+      this.dirtyRectangleList.push( new Rectangle( rectangle ) );
     }
-    
-    context.fillStyle = targetVideoObject.backgroundColor;
-    context.fillRect( eraseQueueObject.xPosition,
-                       eraseQueueObject.yPosition,
-                       eraseQueueObject.width,
-                       eraseQueueObject.height );
   }
-  */
-  this.numberOfEraseQueueObjects = 0;
-};
-
-// NOTE: This function is likely going away with dirty rectangles, as nothing will simply
-// erase.
-VideoObject.prototype.erase = function()
-{
-  var targetVideoObject = this.targetVideoObject;
-  if( targetVideoObject === null )
-  {
-    return;
-  }
-
-  var canvas = targetVideoObject.getCanvas();
-  var context = GetCanvasContext2D( canvas );
-
-  context.clearRect( this.startPoint.x, this.startPoint.y,
-                     this._width, this._height );
-};
-
-VideoObject.prototype.queueErase = function()
-{
-  var targetVideoObject = this.targetVideoObject;
-  if( targetVideoObject === null )
-  {
-    return;
-  }
-
-  var eraseQueueObject = targetVideoObject.getNextEraseQueueObject();
-  if( eraseQueueObject === undefined )
-  {
-    return;
-  }
-
-  eraseQueueObject.targetVideoObject = targetVideoObject;
-
-  eraseQueueObject.xPosition = this.startPoint.x;
-  eraseQueueObject.yPosition = this.startPoint.y;
-  eraseQueueObject.width     = this._width;
-  eraseQueueObject.height    = this._height;
-};
-
-function EraseQueueObject()
-{
-  this.targetVideoObject;
-  this.xPosition;
-  this.yPosition;
-  this.width;
-  this.height;
 };

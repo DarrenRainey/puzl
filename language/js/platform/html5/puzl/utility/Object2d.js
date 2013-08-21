@@ -43,7 +43,7 @@ Object2d.prototype.setXPosition = function( xPosition )
   this.startPoint.x = xPosition;
   this.endPoint.x   = xPosition + this._width - 1;
 
-  this.updateQuadTree();
+  this.insertIntoParentQuadTree();
 };
 
 Object2d.prototype.setYPosition = function( yPosition )
@@ -51,7 +51,7 @@ Object2d.prototype.setYPosition = function( yPosition )
   this.startPoint.y = yPosition;
   this.endPoint.y   = yPosition + this._height - 1;
 
-  this.updateQuadTree();
+  this.insertIntoParentQuadTree();
 };
 
 Object2d.prototype.setPosition = function( xPosition, yPosition )
@@ -62,7 +62,7 @@ Object2d.prototype.setPosition = function( xPosition, yPosition )
   this.startPoint.y = yPosition;
   this.endPoint.y   = yPosition + this._height - 1;
 
-  this.updateQuadTree();
+  this.insertIntoParentQuadTree();
 };
 
 Object2d.prototype.getWidth = function()
@@ -83,13 +83,13 @@ Object2d.prototype.setDimensions = function( width, height )
   this.endPoint.x = this.startPoint.x + width  - 1;
   this.endPoint.y = this.startPoint.y + height - 1;
 
-  if( this.quadTree != null )
+  if( this.quadTree !== null )
   {
-    console.log( "Object2d::setDimensions, ( this.quadTree != null ), " + width + ":" + height );
+    //console.log( "Object2d::setDimensions, ( this.quadTree != null ), " + width + ":" + height );
     this.quadTree.setRectangle( 0, 0, width - 1, height - 1 );
   }
 
-  this.updateQuadTree();
+  this.insertIntoParentQuadTree();
 };
 
 Object2d.prototype.addObject = function( object )
@@ -107,13 +107,13 @@ Object2d.prototype.addObject = function( object )
   }
 
   var objectParentObject = object.parentObject;
-  if( objectParentObject != null )
+  if( objectParentObject !== null )
   {
     objectParentObject.removeObject( object );
   }
   
   object.parentObject = this;
-  this.objectList[this.objectList.length] = object;
+  this.objectList.push( object );
 
   this.quadTree.insert( object );
 };
@@ -144,23 +144,29 @@ Object2d.prototype.clearObjects = function()
     this.objectList[index].parentObject = null;
   }
 
-  this.objectList = []; // NOTE: Bad. Should clear currently allocated Array object.
+  this.objectList.length = 0;
 
   // NOTE: Should this update the quad tree?
 };
 
-/*Object2d.prototype.setQuadTreeNode = function( quadTreeNode )
+Object2d.prototype.insertIntoParentQuadTree = function()
 {
-  this.quadTreeNode = quadTreeNode;
-};*/
-
-Object2d.prototype.updateQuadTree = function()
-{
-  //console.log( "Object2d::updateQuadTree" );
-  /*var parentObject = this.parentObject;
-  if( ( parentObject != null ) &&
-      ( parentObject.quadTree != null ) )
+  //console.log( "Object2d::insertIntoParentQuadTree" );
+  var parentObject = this.parentObject;
+  if( ( parentObject !== null ) &&
+      ( parentObject.quadTree !== null ) )
   {
+    var previousNode = this.quadTreeNode;
+    if( previousNode !== null )
+    {
+      var previousNodeObjectList = previousNode.objectList;
+      var index = previousNodeObjectList.indexOf( this );
+      if( index > -1 )
+      {
+        previousNodeObjectList.splice( index, 1 );
+      }
+    }
+    
     parentObject.quadTree.insert( this );
-  }*/
+  }
 };

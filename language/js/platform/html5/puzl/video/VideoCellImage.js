@@ -170,13 +170,7 @@ VideoCellImage.prototype.setColor = function( color, layerIndex )
   }
   
   if( shouldChangeColor )
-  { 
-    if( this.queueErase ) // TODO: Fix with polymorphism, as VideoCellImage doesn't have queueErase?
-    {
-      this.queueErase();
-    }
-    this.needsRedraw = true;
-
+  {
     //console.log( "Changing layer #" + layerIndex + " to " + thisColor.string );
 
     var sourceVideoObjectCanvas = this.sourceVideoObject.getCanvas();
@@ -254,12 +248,14 @@ VideoCellImage.prototype.setColor = function( color, layerIndex )
       //canvasContext.fillStyle = thisColor.string;
       canvasContext.drawImage( sourceVideoObjectCanvas, 0, 0, sourceVideoObjectCanvas.width, sourceVideoObjectCanvas.height );
     }
+
+    this.addDirtyRectangle();
   }
 };
 
 VideoCellImage.prototype.loadCell = function( xPosition, yPosition, mode )
 {
-  if( mode == null )
+  if( mode === null )
   {
     mode = EXTRACT_MODE_ABS;
   }
@@ -271,7 +267,7 @@ VideoCellImage.prototype.loadCell = function( xPosition, yPosition, mode )
   }
 
   var cellIndex = this.cellList.length;
-  this.cellList[cellIndex] = new Array( xPosition, yPosition );
+  this.cellList.push( new Array( xPosition, yPosition ) );
   return cellIndex;
 };
 

@@ -31,16 +31,6 @@ VideoDisplay.prototype.setRealDimensions = function( width, height )
       this.setDimensions( this._width, this._height );
     }
   }
-
-  // TODO: Temporary first time draw.
-  /*this.clear();
-
-  var length = this.objectList.length;
-  var index;
-  for( index = 0; index < length; index++ )
-  {
-    this.objectList[index].setNeedsRedraw( true );
-  }*/
 };
 
 VideoDisplay.prototype.setDimensions = function( width, height )
@@ -114,9 +104,13 @@ VideoDisplay.prototype.getCanvas = function()
   return this.canvas;
 };
 
-VideoDisplay.prototype.draw = function()
+VideoDisplay.prototype.draw = function( rectangle )
 {
   var canvasContext = GetCanvasContext2D( this.canvas );
+
+  // TODO: Needs to factor in scaled dimensions.
   canvasContext.fillStyle = this.backgroundColor.string;
-  canvasContext.fillRect( 0, 0, this._width, this._height );
+  canvasContext.fillRect( rectangle.startPoint.x, rectangle.startPoint.y,
+                          rectangle.endPoint.x - rectangle.startPoint.x + 1,
+                          rectangle.endPoint.y - rectangle.startPoint.y + 1 );
 };
