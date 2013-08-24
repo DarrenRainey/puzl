@@ -56,11 +56,14 @@ Object2d.prototype.setYPosition = function( yPosition )
 
 Object2d.prototype.setPosition = function( xPosition, yPosition )
 {
-  this.startPoint.x = xPosition;
-  this.endPoint.x   = xPosition + this._width - 1;
+  var thisStartPoint = this.startPoint;
+  var thisEndPoint = this.endPoint;
+  
+  thisStartPoint.x = xPosition;
+  thisEndPoint.x   = xPosition + this._width - 1;
 
-  this.startPoint.y = yPosition;
-  this.endPoint.y   = yPosition + this._height - 1;
+  thisStartPoint.y = yPosition;
+  thisEndPoint.y   = yPosition + this._height - 1;
 
   this.insertIntoParentQuadTree();
 };
@@ -80,8 +83,10 @@ Object2d.prototype.setDimensions = function( width, height )
   this._width  = width;
   this._height = height;
 
-  this.endPoint.x = this.startPoint.x + width  - 1;
-  this.endPoint.y = this.startPoint.y + height - 1;
+  var thisStartPoint = this.startPoint;
+  var thisEndPoint = this.endPoint;
+  thisEndPoint.x = thisStartPoint.x + width  - 1;
+  thisEndPoint.y = thisStartPoint.y + height - 1;
 
   if( this.quadTree !== null )
   {
@@ -120,14 +125,16 @@ Object2d.prototype.addObject = function( object )
 
 Object2d.prototype.removeObject = function( object )
 {
-  var length = this.objectList.length;
+  var thisObjectList = this.objectList;
+  
+  var length = thisObjectList.length;
   var index;
   for( index = 0; index < length; index++ )
   {
-    if( object == this.objectList[index] )
+    if( object == thisObjectList[index] )
     {
       object.parentObject = null;
-      this.objectList.splice( index, 1 );
+      thisObjectList.splice( index, 1 );
       return;
     }
   }
@@ -137,14 +144,16 @@ Object2d.prototype.removeObject = function( object )
 
 Object2d.prototype.clearObjects = function()
 {
-  var length = this.objectList.length;
+  var thisObjectList = this.objectList;
+  
+  var length = thisObjectList.length;
   var index;
   for( index = 0; index < length; index++ )
   {
-    this.objectList[index].parentObject = null;
+    thisObjectList[index].parentObject = null;
   }
 
-  this.objectList.length = 0;
+  thisObjectList.length = 0;
 
   // NOTE: Should this update the quad tree?
 };

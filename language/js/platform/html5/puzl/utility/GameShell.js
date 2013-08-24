@@ -125,7 +125,8 @@ GameShell.prototype.shellLoop = function()
     this.logic();
     this.inputSystem.update();
 
-    this.videoSystem.getRequestAnimFrame( VBlank );
+    //this.videoSystem.getRequestAnimFrame( VBlank );
+    RequestAnimationFrame( VBlank );
 
     /*var now = Date.now();
     var delta = now - lastUpdateTime;

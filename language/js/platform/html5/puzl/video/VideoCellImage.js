@@ -44,7 +44,7 @@ function VideoCellImage( sourceVideoObject, videoCellImageData )
   }
   
   this.sourceVideoObject = sourceVideoObject;
-  var sourceVideoObjectCanvas = this.sourceVideoObject.getCanvas();
+  var sourceVideoObjectCanvas = sourceVideoObject.getCanvas();
 
   this.cellWidth  = videoCellImageData["cellWidth"];
   this.cellHeight = videoCellImageData["cellHeight"];
@@ -249,7 +249,11 @@ VideoCellImage.prototype.setColor = function( color, layerIndex )
       canvasContext.drawImage( sourceVideoObjectCanvas, 0, 0, sourceVideoObjectCanvas.width, sourceVideoObjectCanvas.height );
     }
 
-    this.addDirtyRectangle();
+    var thisTargetVideoObject = this.targetVideoObject;
+    if( thisTargetVideoObject )
+    {
+      thisTargetVideoObject.addDirtyRectangle( this );
+    }
   }
 };
 

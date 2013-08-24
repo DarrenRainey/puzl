@@ -74,8 +74,9 @@ BlockGraphic.prototype.print = function( text )
   {
     return;
   }
-  
-  var canvas = this.targetVideoObject.getCanvas();
+
+  var thisTargetVideoObject = this.targetVideoObject;
+  var canvas = thisTargetVideoObject.getCanvas();
   var context = GetCanvasContext2D( canvas );
 
   var hasAlpha; // TODO: Optimize. Could allocate this value once for each blockgraphic object.
@@ -92,6 +93,13 @@ BlockGraphic.prototype.print = function( text )
   var xPosition = VideoCellImage.prototype.getXPosition.call( this );
   var yPosition = VideoCellImage.prototype.getYPosition.call( this );
 
+  var thisCellWidth  = this.cellWidth;
+  var thisCellHeight = this.cellHeight;
+  var thisWidth  = this._width;
+  var thisHeight = this._height;
+
+  var thisCodeToCellTable = this.codeToCellTable;
+  
   var character;
   var characterCode;
   var cell;
@@ -107,17 +115,17 @@ BlockGraphic.prototype.print = function( text )
 
     characterCode = character.charCodeAt( 0 );
     
-    cell = this.codeToCellTable[characterCode];
+    cell = thisCodeToCellTable[characterCode];
     if( cell !== undefined )
     {
-      DrawWithNearestScale( this, this.targetVideoObject,
+      DrawWithNearestScale( this, thisTargetVideoObject,
                             cell[0], cell[1],
-                            this.cellWidth, this.cellHeight,
+                            thisCellWidth, thisCellHeight,
                             xPosition, yPosition,
-                            this._width, this._height );
+                            thisWidth, thisHeight );
     }
 
-    xPosition += this._width;
+    xPosition += thisWidth;
   }
 
   VideoCellImage.prototype.setPosition.call( this, xPosition, yPosition );
@@ -132,8 +140,8 @@ BlockGraphic.prototype.setPosition = function( xPosition, yPosition )
 {
   if( this.absolute !== true )
   {
-    xPosition = xPosition * this.cellWidth;
-    yPosition = yPosition * this.cellHeight;
+    xPosition *= this.cellWidth;
+    yPosition *= this.cellHeight;
   }
   
   VideoCellImage.prototype.setPosition.call( this, xPosition, yPosition );
