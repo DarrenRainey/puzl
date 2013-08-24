@@ -27,26 +27,39 @@ function Vector2d()
 }
 
 // --------------------------------------------------------
+Vector2d.prototype.copy = function( vector2d )
+{
+  this.x = vector2d.x;
+  this.y = vector2d.y;
+};
+
+// --------------------------------------------------------
 Vector2d.prototype.isInside = function( rectangle )
 {
-  var rectanglePoint = rectangle.startPoint;
-  if( this.x < rectanglePoint.x )
+  var thisX = this.x;
+  var rectangleStartPoint = rectangle.startPoint;
+  var rectangleStartPointX = rectangleStartPoint.x;
+  if( thisX < rectangleStartPointX )
   {
     return false;
   }
 
-  if( this.y < rectanglePoint.y )
+  var thisY = this.y;
+  var rectangleStartPointY = rectangleStartPoint.y;
+  if( thisY < rectangleStartPointY )
   {
     return false;
   }
   
-  rectanglePoint = rectangle.endPoint;
-  if( this.x > rectanglePoint.x )
+  var rectangleEndPoint = rectangle.endPoint;
+  var rectangleEndPointX = rectangleEndPoint.x;
+  if( thisX > rectangleEndPointX )
   {
     return false;
   }
 
-  if( this.y > rectanglePoint.y )
+  rectangleEndPointY = rectangleEndPoint.y;
+  if( thisY > rectangleEndPointY )
   {
     return false;
   }
@@ -91,38 +104,100 @@ function Rectangle()
   }
 }
 
+// --------------------------------------------------------
+Rectangle.prototype.copy = function( rectangle )
+{
+  this.startPoint.copy( rectangle.startPoint );
+  this.endPoint.copy( rectangle.endPoint );
+};
+
 Rectangle.prototype.isInside = function( rectangle )
 {
-  if( this.startPoint.isInside( rectangle ) &&
-      this.endPoint.isInside( rectangle ) )
+  var thisStartPoint = this.startPoint;
+  var thisStartPointX = thisStartPoint.x;
+  var rectangleStartPoint = rectangle.startPoint;
+  var rectangleStartPointX = rectangleStartPoint.x;
+  if( thisStartPointX < rectangleStartPointX )
   {
-    return true;
+    return false;
   }
 
-  return false;
+  var thisStartPointY = thisStartPoint.y;
+  var rectanglePointY = rectangleStartPoint.y;
+  if( thisStartPointY < rectanglePointY )
+  {
+    return false;
+  }
+
+  var thisEndPoint = this.endPoint;
+  var thisEndPointX = thisEndPoint.x;
+  var rectanglePoint = rectangle.endPoint;
+  var rectangleEndPointX = rectanglePoint.x;
+  if( thisEndPointX > rectangleEndPointX )
+  {
+    return false;
+  }
+
+  thisEndPointY = thisEndPoint.y;
+  rectangleEndPointY = rectanglePoint.y;
+  if( thisEndPointY > rectangleEndPointY )
+  {
+    return false;
+  }
+
+  return true;
 };
 
 Rectangle.prototype.isIntersecting = function( rectangle )
 {
   // TODO: Optimize to favor collision vertically, as most displays
   // will be wider than they are tall.
-  return !( rectangle.startPoint.x > this.endPoint.x ||
-            rectangle.endPoint.x < this.startPoint.x ||
-            rectangle.startPoint.y > this.endPoint.y ||
-            rectangle.endPoint.y < this.startPoint.y );
+
+  var thisStartPoint = this.startPoint;
+  var thisStartPointX = thisStartPoint.x;
+  var thisStartPointY = thisStartPoint.y;
+  var thisEndPoint = this.endPoint;
+  var thisEndPointX = thisEndPoint.x;
+  var thisEndPointY = thisEndPoint.y;
+
+  var rectangleStartPoint = rectangle.startPoint;
+  var rectangleStartPointX = rectangleStartPoint.x;
+  var rectangleStartPointY = rectangleStartPoint.y;
+  var rectangleEndPoint = rectangle.endPoint;
+  var rectangleEndPointX = rectangleEndPoint.x;
+  var rectangleEndPointY = rectangleEndPoint.y;
+  
+  return !( rectangleStartPointX > thisEndPointX ||
+            rectangleEndPointX < thisStartPointX ||
+            rectangleStartPointY > thisEndPointY ||
+            rectangleEndPointY < thisStartPointY );
 };
 
 Rectangle.prototype.getIntersection = function( rectangle, intersectionRectangle )
 {
+  var thisStartPoint = this.startPoint;
+  var thisStartPointX = thisStartPoint.x;
+  var thisStartPointY = thisStartPoint.y;
+  var thisEndPoint = this.endPoint;
+  var thisEndPointX = thisEndPoint.x;
+  var thisEndPointY = thisEndPoint.y;
+
+  var rectangleStartPoint = rectangle.startPoint;
+  var rectangleStartPointX = rectangleStartPoint.x;
+  var rectangleStartPointY = rectangleStartPoint.y;
+  var rectangleEndPoint = rectangle.endPoint;
+  var rectangleEndPointX = rectangleEndPoint.x;
+  var rectangleEndPointY = rectangleEndPoint.y;
+  
   intersectionRectangle.startPoint.x =
-    ( this.startPoint.x > rectangle.startPoint.x ) ? this.startPoint.x : rectangle.startPoint.x;
+    ( thisStartPointX > rectangleStartPointX ) ? thisStartPointX : rectangleStartPointX;
 
   intersectionRectangle.startPoint.y =
-    ( this.startPoint.y > rectangle.startPoint.y ) ? this.startPoint.y : rectangle.startPoint.y;
+    ( thisStartPointY > rectangleStartPointY ) ? thisStartPointY : rectangleStartPointY;
 
   intersectionRectangle.endPoint.x =
-    ( this.endPoint.x < rectangle.endPoint.x ) ? this.endPoint.x : rectangle.endPoint.x;
+    ( thisEndPointX < rectangleEndPointX ) ? thisEndPointX : rectangleEndPointX;
 
   intersectionRectangle.endPoint.y =
-    ( this.endPoint.y < rectangle.endPoint.y ) ? this.endPoint.y : rectangle.endPoint.y;
+    ( thisEndPointY < rectangleEndPointY ) ? thisEndPointY : rectangleEndPointY;
 };

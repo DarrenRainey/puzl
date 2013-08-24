@@ -178,8 +178,8 @@ VideoSprite.prototype.setYVelocity = function( yVelocity )
 
 VideoSprite.prototype.setVelocity = function( xVelocity, yVelocity )
 {
-  this.setXVelocity( xVelocity );
-  this.setYVelocity( yVelocity );
+  this.xVelocity = xVelocity;
+  this.yVelocity = yVelocity;
 };
 
 VideoSprite.prototype.move = function()
@@ -220,25 +220,28 @@ VideoSprite.prototype.getCurrentSequence = function()
 VideoSprite.prototype.setCurrentSequence = function( currentSequence )
 {
   //console.log( currentSequence );
-  var previousFrame = this.animation.getCurrentFrame();
+  var thisAnimation = this.animation;
+  var previousFrame = thisAnimation.getCurrentFrame();
   
-  this.animation.setCurrentSequence( currentSequence );
-  if( previousFrame !== this.animation.getCurrentFrame() )
+  thisAnimation.setCurrentSequence( currentSequence );
+  if( previousFrame !== thisAnimation.getCurrentFrame() )
   {
     //this.needsRedraw = true;
-    this.addDirtyRectangle();
+    this.targetVideoObject.addDirtyRectangle( this );
   }
 };
 
 VideoSprite.prototype.setCurrentFrame = function( currentFrame )
 {
-  if( currentFrame !== this.animation.getCurrentFrame() )
+  var thisAnimation = this.animation;
+  
+  if( currentFrame !== thisAnimation.getCurrentFrame() )
   {
     //this.needsRedraw = true;
-    this.addDirtyRectangle();
+    this.targetVideoObject.addDirtyRectangle( this );
   }
   
-  this.animation.setCurrentFrame( currentFrame );
+  thisAnimation.setCurrentFrame( currentFrame );
 };
 
 VideoSprite.prototype.setCurrentFrameByName = function( frameName )
@@ -263,7 +266,7 @@ VideoSprite.prototype.animate = function()
   if( frameChanged )
   {
     //this.needsRedraw = true;
-    this.addDirtyRectangle();
+    this.targetVideoObject.addDirtyRectangle( this );
   }
 
   return frameChanged;

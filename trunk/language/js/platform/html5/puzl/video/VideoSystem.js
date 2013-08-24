@@ -1,14 +1,14 @@
 CanvasIdCounter = -1;
 
-RequestAnimFrame = window.requestAnimationFrame       ||
-                   window.webkitRequestAnimationFrame ||
-                   window.mozRequestAnimationFrame    ||
-                   window.oRequestAnimationFrame      ||
-                   window.msRequestAnimationFrame     ||
-                   function( callback )
-                   {
-                     window.setTimeout( callback, 1000 / 60 );
-                   };
+RequestAnimationFrame = window.requestAnimationFrame       ||
+                        window.webkitRequestAnimationFrame ||
+                        window.mozRequestAnimationFrame    ||
+                        window.oRequestAnimationFrame      ||
+                        window.msRequestAnimationFrame     ||
+                        function( callback )
+                        {
+                          window.setTimeout( callback, 1000 / 60 );
+                        };
 
 var GlobalVideoSystem;
 
@@ -26,11 +26,6 @@ function VideoSystem( width, height )
   this.videoImageLoadQueue = new Array();
 
   this.display = new VideoDisplay( width, height );
-}
-
-VideoSystem.prototype.getRequestAnimFrame = function( callback )
-{
-  return RequestAnimFrame( callback );
 }
 
 VideoSystem.prototype.update = function()

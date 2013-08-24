@@ -13,6 +13,8 @@ function VideoDisplay( width, height )
   var context = GetCanvasContext2D( this.canvas );
   context.save();
 
+  this.targetVideoObject = this; // Special case where a display's target is itself.
+
   this.setDimensions( width, height );
 
   this.backgroundColor = new Color( 0, 0, 0 );
@@ -23,11 +25,12 @@ extend( VideoDisplay, VideoObject );
 
 VideoDisplay.prototype.setRealDimensions = function( width, height )
 {
-  if( this.canvas !== undefined )
+  var thisCanvas = this.canvas;
+  if( thisCanvas !== undefined )
   {
-    if( ( this.canvas.width !== width ) || ( this.canvas.height !== height ) )
+    if( ( thisCanvas.width !== width ) || ( thisCanvas.height !== height ) )
     {
-      SetCanvasDimensions( this.canvas, width, height );
+      SetCanvasDimensions( thisCanvas, width, height );
       this.setDimensions( this._width, this._height );
     }
   }
@@ -38,12 +41,13 @@ VideoDisplay.prototype.setDimensions = function( width, height )
   VideoObject.prototype.setDimensions.call( this, width, height );
 
   // Determine scale.
-  if( this.canvas !== undefined )
+  var thisCanvas = this.canvas;
+  if( thisCanvas !== undefined )
   {
-    var xScale = ( this.canvas.width  / width );
-    var yScale = ( this.canvas.height / height );
+    var xScale = ( thisCanvas.width  / width );
+    var yScale = ( thisCanvas.height / height );
 
-    var context = GetCanvasContext2D( this.canvas );
+    var context = GetCanvasContext2D( thisCanvas );
     context.restore();
     context.scale( xScale, yScale );
     context.save();
@@ -110,7 +114,15 @@ VideoDisplay.prototype.draw = function( rectangle )
 
   // TODO: Needs to factor in scaled dimensions.
   canvasContext.fillStyle = this.backgroundColor.string;
-  canvasContext.fillRect( rectangle.startPoint.x, rectangle.startPoint.y,
-                          rectangle.endPoint.x - rectangle.startPoint.x + 1,
-                          rectangle.endPoint.y - rectangle.startPoint.y + 1 );
+
+  var rectangleStartPoint = rectangle.startPoint;
+  var rectangleStartPointX = rectangleStartPoint.x;
+  var rectangleStartPointY = rectangleStartPoint.y;
+  var rectangleEndPoint = rectangle.endPoint;
+  var rectangleEndPointX = rectangleEndPoint.x;
+  var rectangleEndPointY = rectangleEndPoint.y;
+  
+  canvasContext.fillRect( rectangleStartPointX, rectangleStartPointY,
+                          rectangleEndPointX - rectangleStartPointX + 1,
+                          rectangleEndPointY - rectangleStartPointY + 1 );
 };
