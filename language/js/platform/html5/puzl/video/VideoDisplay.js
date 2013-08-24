@@ -15,7 +15,7 @@ function VideoDisplay( width, height )
 
   this.targetVideoObject = this; // Special case where a display's target is itself.
 
-  this.setDimensions( width, height );
+  Object2d.prototype.setDimensions.call( this, width, height );
 
   this.backgroundColor = new Color( 0, 0, 0 );
   this.foregroundColor = new Color( 255, 255, 255 );

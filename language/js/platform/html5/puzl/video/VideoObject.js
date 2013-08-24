@@ -175,9 +175,26 @@ VideoObject.prototype.drawUpdate = function()
 
 VideoObject.prototype.addDirtyRectangle = function( rectangle )
 {
-  if( this.dirtyRectangleList )
+  var thisDirtyRectangleList = this.dirtyRectangleList;
+  if( thisDirtyRectangleList )
   {
     var dirtyRectangle;
+    
+    var thisDirtyRectangleListLength = thisDirtyRectangleList.length;
+    if( thisDirtyRectangleListLength > 0 )
+    {
+      var dirtyRectangleListIndex = thisDirtyRectangleListLength - 1;
+      do
+      {
+        dirtyRectangle = thisDirtyRectangleList[dirtyRectangleListIndex];
+        if( rectangle.isInside( dirtyRectangle ) )
+        {
+          // Exit without actually adding this rectangle.
+          return;
+        }
+      }
+      while( --dirtyRectangleListIndex > -1 );
+    }
 
     var thisRectanglePool = this.rectanglePool;
     if( thisRectanglePool.length === 0 )

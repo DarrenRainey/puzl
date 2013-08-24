@@ -52,7 +52,7 @@ function VideoCellImage( sourceVideoObject, videoCellImageData )
   this.mapWidth  = ( sourceVideoObjectCanvas.width  / ( this.cellWidth  + 1 ) ) | 0;
   this.mapHeight = ( sourceVideoObjectCanvas.height / ( this.cellHeight + 1 ) ) | 0;
 
-  this.setDimensions( this.cellWidth, this.cellHeight );
+  Object2d.prototype.setDimensions.call( this, this.cellWidth, this.cellHeight );
 
   // Populate cells from videoCellImageData.
   this.cellList = new Array();

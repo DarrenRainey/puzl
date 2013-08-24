@@ -20,7 +20,7 @@ function Object2d()
   this.quadTree = new QuadTree();
 
   this.parentObject = null;
-  this.setDimensions( 1, 1 );
+  Object2d.prototype.setDimensions.call( this, 1, 1 );
 
   //this.quadTree.setObject2d( this );
   this.quadTreeNode = null;
