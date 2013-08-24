@@ -168,15 +168,7 @@ VideoObject.prototype.drawUpdate = function()
       }
     }*/
 
-    var thisRectanglePool = this.rectanglePool;
-    
-    dirtyRectangleListIndex = dirtyRectangleListLength - 1;
-    do
-    {
-      thisRectanglePool.push( thisDirtyRectangleList[dirtyRectangleListIndex] );
-    }
-    while( --dirtyRectangle > -1 );
-    
+    this.rectanglePool.concat( thisDirtyRectangleList );
     thisDirtyRectangleList.length = 0;
   }
 };
@@ -186,13 +178,15 @@ VideoObject.prototype.addDirtyRectangle = function( rectangle )
   if( this.dirtyRectangleList )
   {
     var dirtyRectangle;
-    if( this.rectanglePool.length === 0 )
+
+    var thisRectanglePool = this.rectanglePool;
+    if( thisRectanglePool.length === 0 )
     {
       dirtyRectangle = new Rectangle( rectangle );
     }
     else
     {
-      dirtyRectangle = this.rectanglePool.pop();
+      dirtyRectangle = thisRectanglePool.pop();
       dirtyRectangle.copy( rectangle );
     }
     
