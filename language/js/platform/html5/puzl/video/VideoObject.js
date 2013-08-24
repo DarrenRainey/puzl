@@ -168,7 +168,14 @@ VideoObject.prototype.drawUpdate = function()
       }
     }*/
 
-    this.rectanglePool.concat( thisDirtyRectangleList );
+    var thisRectanglePool = this.rectanglePool;
+    dirtyRectangleListIndex = dirtyRectangleListLength - 1;
+    do
+    {
+      thisRectanglePool.push( thisDirtyRectangleList[dirtyRectangleListIndex] );
+    }
+    while( --dirtyRectangleListIndex > -1 );
+    
     thisDirtyRectangleList.length = 0;
   }
 };
