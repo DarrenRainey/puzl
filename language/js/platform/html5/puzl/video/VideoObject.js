@@ -124,26 +124,25 @@ VideoObject.prototype.drawUpdate = function()
     }
     while( --dirtyRectangleListIndex > -1 );
 
-    // NOTE: Shambles of an attempt to use quad tree query over multiple linear traversals
-    // of object list and intersection tests.
     var objectList;
     var videoObjectListLength;
 
     var thisQuadTree = this.quadTree;
 
-    var sortString
+    //var sortString;
     
     dirtyRectangleListIndex = dirtyRectangleListLength - 1;
     do
     {
       dirtyRectangle = thisDirtyRectangleList[dirtyRectangleListIndex];
-      
+
+      // Use quad tree query instead of traversing over all video objects.
       objectList = thisQuadTree.query( dirtyRectangle );
       //objectList = this.objectList;
 
       //console.log( objectList );
 
-      sortString = "";
+      //sortString = "";
     
       videoObjectListLength = objectList.length;
       if( videoObjectListLength > 0 )
@@ -154,15 +153,15 @@ VideoObject.prototype.drawUpdate = function()
         {
           videoObject = objectList[videoObjectListIndex];
 
-          sortString += videoObject.orderId;
-          sortString += " ";
+          //sortString += videoObject.orderId;
+          //sortString += " ";
 
           videoObject.getIntersection( dirtyRectangle, tempDirtyRectangle );
           videoObject.draw( tempDirtyRectangle );
         }
       }
 
-      console.log( sortString );
+      //console.log( sortString );
     }
     while( --dirtyRectangleListIndex > -1 );
 
