@@ -230,20 +230,15 @@ QuadTreeNode.prototype.getQuadrantId = function( rectangle )
 
 QuadTreeNode.prototype.insert = function( object2d )
 {
-  var targetSubNodeIndex;
-  
   if( ( this.objectList.length > QUAD_TREE_MAX_CAPACITY ) &&
       ( this.depthLevel <= QUAD_TREE_MAX_DEPTH_LEVEL ) )
   {
-    targetSubNodeIndex = this.getQuadrantId( object2d );
-    //console.log( "QuadTreeNode::insert, targetSubNodeIndex: " + targetSubNodeIndex );
+    var targetSubNodeIndex = this.getQuadrantId( object2d );
     if( targetSubNodeIndex !== -1 )
     {
-      //console.log( "new: " + targetSubNodeIndex );
       var subNode = this.subNodeList[targetSubNodeIndex];
       if( subNode === null )
       {
-        //console.log( "new: " + targetSubNodeIndex );
         subNode = this.createSubNode( targetSubNodeIndex );
       }
 
@@ -252,26 +247,37 @@ QuadTreeNode.prototype.insert = function( object2d )
     }
   }
 
-  //console.log( targetSubNodeIndex );
-
   // Put it in this node.
-  //console.log( object2d );
   object2d.quadTreeNode = this;
   this.objectList.push( object2d );
 };
 
-QuadTreeNode.prototype.query = function( rectangle, resultList )
+QuadTreeNode.prototype.query = function( rectangle, queryResultList )
 {
-  var numberOfObjects = this.objectList.length;
+  if( queryResultList === undefined )
+  {
+    queryResultList = this.queryResultList;
+    queryResultList.length = 0;
+  }
+
+  this.queryRecursive( rectangle, queryResultList );
+
+  return queryResultList;
+}
+
+QuadTreeNode.prototype.queryRecursive = function( rectangle, queryResultList )
+{
+  var thisObjectList = this.objectList;
+  var numberOfObjects = thisObjectList.length;
   if( numberOfObjects > 0 )
   {
     var currentObject2d;
     for( var index = 0; index < numberOfObjects; index++ )
     {
-      currentObject2d = this.objectList[index];
+      currentObject2d = thisObjectList[index];
       if( currentObject2d.isIntersecting( rectangle ) )
       {
-        resultList.push( currentObject2d );
+        queryResultList.push( currentObject2d );
       }
     }
   }
@@ -284,18 +290,10 @@ QuadTreeNode.prototype.query = function( rectangle, resultList )
     for( var index = 0; index < 4; index++ )
     {
       currentNode = subNodeList[index];
-      if( currentNode != null )
+      if( currentNode !== null )
       {
-        currentNode.query( rectangle, resultList );
+        currentNode.queryRecursive( rectangle, queryResultList );
       }
-    }
-  }
-  else
-  {
-    var currentNode = this.subNodeList[targetSubNodeIndex];
-    if( currentNode != null )
-    {
-      currentNode.query( rectangle, resultList );
     }
   }
 };
@@ -304,6 +302,11 @@ QuadTreeNode.prototype.query = function( rectangle, resultList )
 function QuadTree()
 {
   QuadTreeNode.call( this, null, -1 );
+
+  this.queryResultList;
+
+  // Constructor.
+  this.queryResultList = new Array();
 }
 
 extend( QuadTree, QuadTreeNode );
