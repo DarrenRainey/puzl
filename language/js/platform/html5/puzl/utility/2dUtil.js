@@ -27,10 +27,29 @@ function Vector2d()
 }
 
 // --------------------------------------------------------
+Vector2d.prototype.equals = function( vector2d )
+{
+  return this.x === vector2d.x &&
+         this.y === vector2d.y;
+};
+
+// --------------------------------------------------------
 Vector2d.prototype.copy = function( vector2d )
 {
   this.x = vector2d.x;
   this.y = vector2d.y;
+};
+
+// --------------------------------------------------------
+Vector2d.prototype.toString = function()
+{
+  var string = "(";
+  string += this.x;
+  string += ",";
+  string += this.y;
+  string += ")";
+
+  return string;
 };
 
 // --------------------------------------------------------
@@ -105,10 +124,29 @@ function Rectangle()
 }
 
 // --------------------------------------------------------
+Rectangle.prototype.equals = function( rectangle )
+{
+  return this.startPoint.equals( rectangle.startPoint ) &&
+         this.endPoint.equals( rectangle.endPoint );
+};
+
+// --------------------------------------------------------
 Rectangle.prototype.copy = function( rectangle )
 {
   this.startPoint.copy( rectangle.startPoint );
   this.endPoint.copy( rectangle.endPoint );
+};
+
+// --------------------------------------------------------
+Rectangle.prototype.toString = function()
+{
+  var string = "[";
+  string += this.startPoint.toString();
+  string += ",";
+  string += this.endPoint.toString();
+  string += "]";
+
+  return string;
 };
 
 Rectangle.prototype.isInside = function( rectangle )
@@ -173,7 +211,7 @@ Rectangle.prototype.isIntersecting = function( rectangle )
             rectangleEndPointY < thisStartPointY );
 };
 
-Rectangle.prototype.getIntersection = function( rectangle, intersectionRectangle )
+Rectangle.prototype.getIntersection = function( rectangle, resultRectangle )
 {
   var thisStartPoint = this.startPoint;
   var thisStartPointX = thisStartPoint.x;
@@ -189,15 +227,44 @@ Rectangle.prototype.getIntersection = function( rectangle, intersectionRectangle
   var rectangleEndPointX = rectangleEndPoint.x;
   var rectangleEndPointY = rectangleEndPoint.y;
   
-  intersectionRectangle.startPoint.x =
+  resultRectangle.startPoint.x =
     ( thisStartPointX > rectangleStartPointX ) ? thisStartPointX : rectangleStartPointX;
 
-  intersectionRectangle.startPoint.y =
+  resultRectangle.startPoint.y =
     ( thisStartPointY > rectangleStartPointY ) ? thisStartPointY : rectangleStartPointY;
 
-  intersectionRectangle.endPoint.x =
+  resultRectangle.endPoint.x =
     ( thisEndPointX < rectangleEndPointX ) ? thisEndPointX : rectangleEndPointX;
 
-  intersectionRectangle.endPoint.y =
+  resultRectangle.endPoint.y =
     ( thisEndPointY < rectangleEndPointY ) ? thisEndPointY : rectangleEndPointY;
+};
+
+Rectangle.prototype.getConvexHull = function( rectangle, resultRectangle )
+{
+  var thisStartPoint = this.startPoint;
+  var thisStartPointX = thisStartPoint.x;
+  var thisStartPointY = thisStartPoint.y;
+  var thisEndPoint = this.endPoint;
+  var thisEndPointX = thisEndPoint.x;
+  var thisEndPointY = thisEndPoint.y;
+
+  var rectangleStartPoint = rectangle.startPoint;
+  var rectangleStartPointX = rectangleStartPoint.x;
+  var rectangleStartPointY = rectangleStartPoint.y;
+  var rectangleEndPoint = rectangle.endPoint;
+  var rectangleEndPointX = rectangleEndPoint.x;
+  var rectangleEndPointY = rectangleEndPoint.y;
+
+  resultRectangle.startPoint.x =
+    ( thisStartPointX < rectangleStartPointX ) ? thisStartPointX : rectangleStartPointX;
+
+  resultRectangle.startPoint.y =
+    ( thisStartPointY < rectangleStartPointY ) ? thisStartPointY : rectangleStartPointY;
+
+  resultRectangle.endPoint.x =
+    ( thisEndPointX > rectangleEndPointX ) ? thisEndPointX : rectangleEndPointX;
+
+  resultRectangle.endPoint.y =
+    ( thisEndPointY > rectangleEndPointY ) ? thisEndPointY : rectangleEndPointY;
 };
