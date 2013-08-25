@@ -5,16 +5,18 @@ function VideoObject()
 
   this.targetVideoObject;
 
+  this.orderId;
+
   this.dirtyRectangleList;
-  this.needsRedraw;
 
   // Constructor.
   this.targetVideoObject = null;
+  this.orderId = -1;
   
-  this.needsRedraw = false;
   this.dirtyRectangleList = new Array();
 
   this.tempDirtyRectangle = new Rectangle();
+  
   this.rectanglePool = new Array();
 };
 
@@ -30,7 +32,6 @@ VideoObject.prototype.setDimensions = function( width, height )
   
   Object2d.prototype.setDimensions.call( this, width, height );
   
-  //this.setNeedsRedraw( true, true );
   if( thisTargetVideoObject )
   {
     thisTargetVideoObject.addDirtyRectangle( this );
@@ -47,7 +48,6 @@ VideoObject.prototype.setPosition = function( xPosition, yPosition )
   
   Object2d.prototype.setPosition.call( this, xPosition, yPosition );
   
-  //this.setNeedsRedraw( true, false );
   if( thisTargetVideoObject )
   {
     thisTargetVideoObject.addDirtyRectangle( this );
@@ -57,6 +57,8 @@ VideoObject.prototype.setPosition = function( xPosition, yPosition )
 VideoObject.prototype.addObject = function( videoObject )
 {
   Object2d.prototype.addObject.call( this, videoObject );
+
+  videoObject.orderId = this.objectList.length - 1;
 
   if( videoObject.targetVideoObject === null )
   {
@@ -89,8 +91,6 @@ VideoObject.prototype.drawTo = function( targetVideoObject, rectangle )
                           rectangleWidth, rectangleHeight,
                           rectangleStartPointX, rectangleStartPointY,
                           rectangleWidth, rectangleHeight );
-
-    //this.needsRedraw = false;
   }
 };
 
@@ -124,49 +124,47 @@ VideoObject.prototype.drawUpdate = function()
     }
     while( --dirtyRectangleListIndex > -1 );
 
-    var thisObjectList = this.objectList;
-    var videoObjectListLength = thisObjectList.length;
-    for( videoObjectListIndex = 0; videoObjectListIndex < videoObjectListLength; videoObjectListIndex++ )
-    {
-      videoObject = thisObjectList[videoObjectListIndex];
-      
-      dirtyRectangleListIndex = dirtyRectangleListLength - 1;
-      do
-      {
-        dirtyRectangle = thisDirtyRectangleList[dirtyRectangleListIndex];
-        if( videoObject.isIntersecting( dirtyRectangle ) )
-        {
-          videoObject.getIntersection( dirtyRectangle, tempDirtyRectangle );
-          videoObject.draw( tempDirtyRectangle );
-        }
-      }
-      while( --dirtyRectangleListIndex > -1 );
-    }
-
     // NOTE: Shambles of an attempt to use quad tree query over multiple linear traversals
     // of object list and intersection tests.
-    /*var collisionList = new Array();
-    this.quadTree.query( dirtyRectangle, collisionList );
-    var videoObjectListLength = collisionList.length;
-    if( videoObjectListLength > 0 )
-    {
-      for( videoObjectListIndex = 0; videoObjectListIndex < videoObjectListLength; videoObjectListIndex++ )
-      {
-        videoObject = collisionList[videoObjectListIndex];
-        videoObject.needsRedraw = true;
-      }
+    var objectList;
+    var videoObjectListLength;
 
-      videoObjectListLength = this.objectList.length;
-      for( videoObjectListIndex = 0; videoObjectListIndex < videoObjectListLength; videoObjectListIndex++ )
+    var thisQuadTree = this.quadTree;
+
+    var sortString
+    
+    dirtyRectangleListIndex = dirtyRectangleListLength - 1;
+    do
+    {
+      dirtyRectangle = thisDirtyRectangleList[dirtyRectangleListIndex];
+      
+      objectList = thisQuadTree.query( dirtyRectangle );
+      //objectList = this.objectList;
+
+      //console.log( objectList );
+
+      sortString = "";
+    
+      videoObjectListLength = objectList.length;
+      if( videoObjectListLength > 0 )
       {
-        videoObject = this.objectList[videoObjectListIndex];
-        if( videoObject.needsRedraw )
+        objectList.sort( this.sortByOrderId );
+
+        for( videoObjectListIndex = 0; videoObjectListIndex < videoObjectListLength; videoObjectListIndex++ )
         {
+          videoObject = objectList[videoObjectListIndex];
+
+          sortString += videoObject.orderId;
+          sortString += " ";
+
           videoObject.getIntersection( dirtyRectangle, tempDirtyRectangle );
           videoObject.draw( tempDirtyRectangle );
         }
       }
-    }*/
+
+      console.log( sortString );
+    }
+    while( --dirtyRectangleListIndex > -1 );
 
     var thisRectanglePool = this.rectanglePool;
     dirtyRectangleListIndex = dirtyRectangleListLength - 1;
@@ -203,6 +201,19 @@ VideoObject.prototype.addDirtyRectangle = function( rectangle )
       while( --dirtyRectangleListIndex > -1 );
     }
 
+    if( thisDirtyRectangleListLength > 0 )
+    {
+      var dirtyRectangleListIndex = thisDirtyRectangleListLength - 1;
+      do
+      {
+        dirtyRectangle = thisDirtyRectangleList[dirtyRectangleListIndex];
+        rectangle.getConvexHull( dirtyRectangle, dirtyRectangle );
+      }
+      while( --dirtyRectangleListIndex > -1 );
+
+      return;
+    }
+
     var thisRectanglePool = this.rectanglePool;
     if( thisRectanglePool.length === 0 )
     {
@@ -214,6 +225,11 @@ VideoObject.prototype.addDirtyRectangle = function( rectangle )
       dirtyRectangle.copy( rectangle );
     }
     
-    this.dirtyRectangleList.push( dirtyRectangle );
+    thisDirtyRectangleList.push( dirtyRectangle );
   }
+};
+
+VideoObject.prototype.sortByOrderId = function( videoObject1, videoObject2 )
+{
+  return videoObject1.orderId - videoObject2.orderId;
 };
