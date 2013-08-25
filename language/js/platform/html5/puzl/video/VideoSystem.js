@@ -166,12 +166,15 @@ function DrawWithNearestScale( sourceDrawObject, targetDrawObject, sourceXPositi
     image = sourceDrawObject.getCanvas();
   }
   
-  var canvas = targetDrawObject.getCanvas();
-  var context = GetCanvasContext2D( canvas );
+  var context = targetDrawObject.context;
+  if( context === undefined )
+  {
+    context = GetCanvasContext2D( targetDrawObject.getCanvas() );
+    context.smoothingEnabled = false;
+    context.mozImageSmoothingEnabled    = false;
+    context.webkitImageSmoothingEnabled = false;
+  }
   
-  context.smoothingEnabled = false;
-  context.mozImageSmoothingEnabled    = false;
-  context.webkitImageSmoothingEnabled = false;
   context.drawImage( image, sourceXPosition, sourceYPosition, sourceWidth, sourceHeight, xPosition, yPosition, width, height );
 }
 
