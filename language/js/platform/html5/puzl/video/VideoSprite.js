@@ -152,8 +152,6 @@ VideoSprite.prototype.drawTo = function( targetVideoObject, rectangle )
   {
     context.globalAlpha = 1.0;
   }
-
-  //this.needsRedraw = false;
 };
 
 VideoSprite.prototype.getXVelocity = function()
@@ -226,7 +224,6 @@ VideoSprite.prototype.setCurrentSequence = function( currentSequence )
   thisAnimation.setCurrentSequence( currentSequence );
   if( previousFrame !== thisAnimation.getCurrentFrame() )
   {
-    //this.needsRedraw = true;
     this.targetVideoObject.addDirtyRectangle( this );
   }
 };
@@ -237,7 +234,6 @@ VideoSprite.prototype.setCurrentFrame = function( currentFrame )
   
   if( currentFrame !== thisAnimation.getCurrentFrame() )
   {
-    //this.needsRedraw = true;
     this.targetVideoObject.addDirtyRectangle( this );
   }
   
@@ -265,7 +261,6 @@ VideoSprite.prototype.animate = function()
   var frameChanged = this.animation.read();
   if( frameChanged )
   {
-    //this.needsRedraw = true;
     this.targetVideoObject.addDirtyRectangle( this );
   }
 
