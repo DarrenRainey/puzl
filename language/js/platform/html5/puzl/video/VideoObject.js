@@ -112,6 +112,13 @@ VideoObject.prototype.drawUpdate = function()
     
     var tempDirtyRectangle = this.tempDirtyRectangle;
 
+    var objectList;
+    var videoObjectListLength;
+
+    var thisQuadTree = this.quadTree;
+
+    var thisRectanglePool = this.rectanglePool;
+
     dirtyRectangleListIndex = dirtyRectangleListLength - 1;
     do
     {
@@ -121,20 +128,8 @@ VideoObject.prototype.drawUpdate = function()
         this.getIntersection( dirtyRectangle, tempDirtyRectangle );
         this.draw( tempDirtyRectangle );
       }
-    }
-    while( --dirtyRectangleListIndex > -1 );
 
-    var objectList;
-    var videoObjectListLength;
-
-    var thisQuadTree = this.quadTree;
-
-    //var sortString;
-    
-    dirtyRectangleListIndex = dirtyRectangleListLength - 1;
-    do
-    {
-      dirtyRectangle = thisDirtyRectangleList[dirtyRectangleListIndex];
+      //var sortString;
 
       // Use quad tree query instead of traversing over all video objects.
       objectList = thisQuadTree.query( dirtyRectangle );
@@ -162,14 +157,8 @@ VideoObject.prototype.drawUpdate = function()
       }
 
       //console.log( sortString );
-    }
-    while( --dirtyRectangleListIndex > -1 );
 
-    var thisRectanglePool = this.rectanglePool;
-    dirtyRectangleListIndex = dirtyRectangleListLength - 1;
-    do
-    {
-      thisRectanglePool.push( thisDirtyRectangleList[dirtyRectangleListIndex] );
+      thisRectanglePool.push( dirtyRectangle );
     }
     while( --dirtyRectangleListIndex > -1 );
     
@@ -187,6 +176,8 @@ VideoObject.prototype.addDirtyRectangle = function( rectangle )
     var thisDirtyRectangleListLength = thisDirtyRectangleList.length;
     if( thisDirtyRectangleListLength > 0 )
     {
+      // Check if any existing dirty rectangles already include the same space
+      // as the newly submitted one.
       var dirtyRectangleListIndex = thisDirtyRectangleListLength - 1;
       do
       {
@@ -198,10 +189,9 @@ VideoObject.prototype.addDirtyRectangle = function( rectangle )
         }
       }
       while( --dirtyRectangleListIndex > -1 );
-    }
 
-    if( thisDirtyRectangleListLength > 0 )
-    {
+      // Convert existing dirty rectangle(s) to be convex hull
+      // between it and the newly submitted one.
       var dirtyRectangleListIndex = thisDirtyRectangleListLength - 1;
       do
       {
