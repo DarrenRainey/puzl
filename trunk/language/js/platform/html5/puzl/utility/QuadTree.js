@@ -283,7 +283,7 @@ QuadTreeNode.prototype.queryRecursive = function( rectangle, queryResultList )
   }
 
   targetSubNodeIndex = this.getQuadrantId( rectangle );
-  if( targetSubNodeIndex !== -1 )
+  if( targetSubNodeIndex === -1 )
   {
     var subNodeList = this.subNodeList;
     var currentNode; // subNodeList order: NW, NE, SW, SE.
@@ -294,6 +294,14 @@ QuadTreeNode.prototype.queryRecursive = function( rectangle, queryResultList )
       {
         currentNode.queryRecursive( rectangle, queryResultList );
       }
+    }
+  }
+  else
+  {
+    var currentNode = this.subNodeList[targetSubNodeIndex];
+    if( currentNode !== null )
+    {
+      currentNode.queryRecursive( rectangle, queryResultList );
     }
   }
 };
