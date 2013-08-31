@@ -120,18 +120,20 @@ VideoSprite.prototype.drawTo = function( targetVideoObject, rectangle )
   var rectangleStartPoint = rectangle.startPoint;
   var rectangleStartX = rectangleStartPoint.x;
   var rectangleStartY = rectangleStartPoint.y;
-  var xOffset = rectangle.startPoint.x - this.startPoint.x;
-  var yOffset = rectangle.startPoint.y - this.startPoint.y;
-  var rectangleWidth  = rectangle.endPoint.x - rectangleStartX + 1;
-  var rectangleHeight = rectangle.endPoint.y - rectangleStartY + 1;
+  var thisStartPoint = this.startPoint;
+  var xOffset = rectangleStartX - thisStartPoint.x;
+  var yOffset = rectangleStartY - thisStartPoint.y;
+  var rectangleEndPoint = rectangle.endPoint;
+  var rectangleWidth  = rectangleEndPoint.x - rectangleStartX + 1;
+  var rectangleHeight = rectangleEndPoint.y - rectangleStartY + 1;
 
-  var thisCanvas = this.canvas;
-  var numberOfCanvases = thisCanvas.length;
+  var thisLayerCanvas = this.layerCanvas;
+  var numberOfCanvases = thisLayerCanvas.length;
   var index;
   for( index = 0; index < numberOfCanvases; index++ )
   {
     // TODO: Needs to factor in scaled dimensions.
-    DrawWithNearestScale( thisCanvas[index], targetVideoObject,
+    DrawWithNearestScale( thisLayerCanvas[index], targetVideoObject,
                           cell[0] + xOffset, cell[1] + yOffset,
                           
                           rectangleWidth,
