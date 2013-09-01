@@ -151,33 +151,6 @@ function SetCanvasDimensions( canvas, width, height )
   canvas.height = height;
 }
 
-//var offscreenCanvas        = document.createElement( "canvas" );
-//var offscreenCanvasContext = offscreenCanvas.getContext( "2d" );
-
-function DrawWithNearestScale( sourceDrawObject, targetDrawObject, sourceXPosition, sourceYPosition, sourceWidth, sourceHeight, xPosition, yPosition, width, height )
-{
-  var image;
-  if( sourceDrawObject.getCanvas === undefined )
-  {
-    image = sourceDrawObject;
-  }
-  else
-  {
-    image = sourceDrawObject.getCanvas();
-  }
-  
-  var context = targetDrawObject.context;
-  if( context === undefined )
-  {
-    targetDrawObject.context = context = GetCanvasContext2D( targetDrawObject.getCanvas() );
-    context.smoothingEnabled = false;
-    context.mozImageSmoothingEnabled    = false;
-    context.webkitImageSmoothingEnabled = false;
-  }
-  
-  context.drawImage( image, sourceXPosition, sourceYPosition, sourceWidth, sourceHeight, xPosition, yPosition, width, height );
-}
-
 function BuildRgb( red, green, blue )
 {
   return "rgb(" + red + "," + green + "," + blue + ")";
@@ -269,11 +242,25 @@ GetCanvasContext2D =
     if( navigator.isCocoonJS )
     {
       console.log( "Switching on CocoonJS GetCanvasContext2D." );
-      return function( canvas ){return canvas.getContext( "2d", {"antialias" : false} );};
+      return function( canvas )
+             {
+               var context = canvas.getContext( "2d", {"antialias" : false} );
+               context.smoothingEnabled = false;
+               context.mozImageSmoothingEnabled    = false;
+               context.webkitImageSmoothingEnabled = false;
+               return context;
+             };
     }
     else
     {
-      return function( canvas ){return canvas.getContext( "2d" );};
+      return function( canvas )
+             {
+               var context = canvas.getContext( "2d" );
+               context.smoothingEnabled = false;
+               context.mozImageSmoothingEnabled    = false;
+               context.webkitImageSmoothingEnabled = false;
+               return context;
+             };
     }
   }
 )();

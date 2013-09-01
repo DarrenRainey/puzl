@@ -161,6 +161,8 @@ function VideoCellImage( sourceVideoObject, videoCellImageData )
   this.alpha = 1;
 
   this._redrawPrimaryCanvas();
+
+  this.context = GetCanvasContext2D( this.canvas );
 };
 
 extend( VideoCellImage, VideoObject );

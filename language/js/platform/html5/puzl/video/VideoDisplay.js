@@ -10,7 +10,7 @@ function VideoDisplay( width, height )
   
   // Constructor.
   this.canvas = CreateOnScreenCanvas();
-  var context = GetCanvasContext2D( this.canvas );
+  var context = this.context = GetCanvasContext2D( this.canvas );
   context.save();
 
   this.targetVideoObject = this; // Special case where a display's target is itself.
@@ -47,7 +47,7 @@ VideoDisplay.prototype.setDimensions = function( width, height )
     var xScale = ( thisCanvas.width  / width );
     var yScale = ( thisCanvas.height / height );
 
-    var context = GetCanvasContext2D( thisCanvas );
+    var context = this.context;
     context.restore();
     context.scale( xScale, yScale );
     context.save();
@@ -56,17 +56,17 @@ VideoDisplay.prototype.setDimensions = function( width, height )
 
 VideoDisplay.prototype.clear = function()
 {
-  var canvasContext = GetCanvasContext2D( this.canvas );
+  var context = this.context;
   if( this.backgroundColor !== undefined )
   {
-    canvasContext.fillStyle = this.backgroundColor.string;
+    context.fillStyle = this.backgroundColor.string;
   }
   else
   {
-    canvasContext.fillStyle = "#000000";
+    context.fillStyle = "#000000";
   }
 
-  canvasContext.fillRect( 0, 0, this._width, this._height );
+  context.fillRect( 0, 0, this._width, this._height );
 };
 
 VideoDisplay.prototype.setBackgroundColor = function( color )
@@ -87,15 +87,9 @@ VideoDisplay.prototype.drawRectangleTo = function( targetVideoObject, xPosition,
     targetVideoObject = this;
   }
   
-  var canvas = targetVideoObject.getCanvas();
-  if( canvas === null )
-  {
-    return;
-  }
-  
-  var canvasContext = GetCanvasContext2D( canvas );
-  canvasContext.fillStyle = this.foregroundColor.string;
-  canvasContext.fillRect( xPosition, yPosition, width, height );
+  var context = targetVideoObject.context;
+  context.fillStyle = this.foregroundColor.string;
+  context.fillRect( xPosition, yPosition, width, height );
 };
 
 VideoDisplay.prototype.drawRectangle = function( xPosition, yPosition, width, height )
@@ -110,10 +104,10 @@ VideoDisplay.prototype.getCanvas = function()
 
 VideoDisplay.prototype.draw = function( rectangle )
 {
-  var canvasContext = GetCanvasContext2D( this.canvas );
+  var context = this.context;
 
   // TODO: Needs to factor in scaled dimensions.
-  canvasContext.fillStyle = this.backgroundColor.string;
+  context.fillStyle = this.backgroundColor.string;
 
   var rectangleStartPoint = rectangle.startPoint;
   var rectangleStartPointX = rectangleStartPoint.x;
@@ -122,7 +116,7 @@ VideoDisplay.prototype.draw = function( rectangle )
   var rectangleEndPointX = rectangleEndPoint.x;
   var rectangleEndPointY = rectangleEndPoint.y;
   
-  canvasContext.fillRect( rectangleStartPointX, rectangleStartPointY,
-                          rectangleEndPointX - rectangleStartPointX + 1,
-                          rectangleEndPointY - rectangleStartPointY + 1 );
+  context.fillRect( rectangleStartPointX, rectangleStartPointY,
+                    rectangleEndPointX - rectangleStartPointX + 1,
+                    rectangleEndPointY - rectangleStartPointY + 1 );
 };

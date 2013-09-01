@@ -31,6 +31,11 @@ VideoObject.prototype.setDimensions = function( width, height )
   }
   
   Object2d.prototype.setDimensions.call( this, width, height );
+
+  if( this.context !== undefined )
+  {
+    this.context = GetCanvasContext2D( this.canvas );
+  }
   
   if( thisTargetVideoObject )
   {
@@ -86,11 +91,11 @@ VideoObject.prototype.drawTo = function( targetVideoObject, rectangle )
     var rectangleHeight = rectangleEndPointY - rectangleStartPointY + 1;
   
     // TODO: Needs to factor in scaled dimensions.
-    DrawWithNearestScale( this, targetVideoObject,
-                          rectangleStartPointX, rectangleStartPointY,
-                          rectangleWidth, rectangleHeight,
-                          rectangleStartPointX, rectangleStartPointY,
-                          rectangleWidth, rectangleHeight );
+    targetVideoObject.context.drawImage( this.canvas,
+                                         rectangleStartPointX, rectangleStartPointY,
+                                         rectangleWidth, rectangleHeight,
+                                         rectangleStartPointX, rectangleStartPointY,
+                                         rectangleWidth, rectangleHeight );
   }
 };
 
