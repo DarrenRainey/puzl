@@ -101,7 +101,7 @@ VideoSprite.prototype.drawTo = function( targetVideoObject, rectangle )
   var context = GetCanvasContext2D( canvas );
   
   var hasAlpha; // TODO: Optimize. Could allocate this value once for each blockgraphic object.
-  if( this.alpha !== 1.0 )
+  if( this.alpha !== 1 )
   {
     hasAlpha = true;
     context.globalAlpha = this.alpha;
@@ -141,7 +141,7 @@ VideoSprite.prototype.drawTo = function( targetVideoObject, rectangle )
   
   if( hasAlpha )
   {
-    context.globalAlpha = 1.0;
+    context.globalAlpha = 1;
   }
 };
 

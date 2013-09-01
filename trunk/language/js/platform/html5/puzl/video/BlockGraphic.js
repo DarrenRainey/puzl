@@ -80,7 +80,7 @@ BlockGraphic.prototype.print = function( text )
   var context = GetCanvasContext2D( canvas );
 
   var hasAlpha; // TODO: Optimize. Could allocate this value once for each blockgraphic object.
-  if( this.alpha !== 1.0 )
+  if( this.alpha !== 1 )
   {
     hasAlpha = true;
     context.globalAlpha = this.alpha;
@@ -132,7 +132,7 @@ BlockGraphic.prototype.print = function( text )
 
   if( hasAlpha )
   {
-    context.globalAlpha = 1.0;
+    context.globalAlpha = 1;
   }
 };
 

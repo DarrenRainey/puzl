@@ -22,6 +22,7 @@ function VideoCellImage( sourceVideoObject, videoCellImageData )
   this.layerCanvas;
 
   this.attributes;
+  this.alpha;
 
   this.color;
   this.colorKey;
@@ -156,6 +157,8 @@ function VideoCellImage( sourceVideoObject, videoCellImageData )
     this.colorKey.push( undefined );
     this.color.push( new Color( 255, 255, 255, 1 ) );
   }
+
+  this.alpha = 1;
 
   this._redrawPrimaryCanvas();
 };
