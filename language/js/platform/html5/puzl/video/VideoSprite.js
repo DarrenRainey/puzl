@@ -127,28 +127,17 @@ VideoSprite.prototype.drawTo = function( targetVideoObject, rectangle )
   var rectangleWidth  = rectangleEndPoint.x - rectangleStartX + 1;
   var rectangleHeight = rectangleEndPoint.y - rectangleStartY + 1;
 
-  var thisLayerCanvas = this.layerCanvas;
-  var numberOfCanvases = thisLayerCanvas.length;
-  var index;
-  for( index = 0; index < numberOfCanvases; index++ )
-  {
-    // TODO: Needs to factor in scaled dimensions.
-    DrawWithNearestScale( thisLayerCanvas[index], targetVideoObject,
-                          cell[0] + xOffset, cell[1] + yOffset,
-                          
-                          rectangleWidth,
-                          rectangleHeight,
-                          
-                          rectangleStartX, rectangleStartY,
+  // TODO: Needs to factor in scaled dimensions.
+  DrawWithNearestScale( this.canvas, targetVideoObject,
+                        cell[0] + xOffset, cell[1] + yOffset,
 
-                          rectangleWidth,
-                          rectangleHeight );
-    
-                          /*cell[0], cell[1],
-                          this.cellWidth, this.cellHeight,
-                          this.startPoint.x, this.startPoint.y,
-                          this._width, this._height );*/
-  }
+                        rectangleWidth,
+                        rectangleHeight,
+
+                        rectangleStartX, rectangleStartY,
+
+                        rectangleWidth,
+                        rectangleHeight );
   
   if( hasAlpha )
   {

@@ -18,6 +18,7 @@ function VideoCellImage( sourceVideoObject, videoCellImageData )
   this.mapWidth;
   this.mapHeight;
 
+  this.canvas;
   this.layerCanvas;
 
   this.attributes;
@@ -49,8 +50,11 @@ function VideoCellImage( sourceVideoObject, videoCellImageData )
   this.cellWidth  = videoCellImageData["cellWidth"];
   this.cellHeight = videoCellImageData["cellHeight"];
 
-  this.mapWidth  = ( sourceVideoObjectCanvas.width  / ( this.cellWidth  + 1 ) ) | 0;
-  this.mapHeight = ( sourceVideoObjectCanvas.height / ( this.cellHeight + 1 ) ) | 0;
+  var overallWidth  = sourceVideoObjectCanvas.width;
+  var overallHeight = sourceVideoObjectCanvas.height;
+
+  this.mapWidth  = ( overallWidth  / ( this.cellWidth  + 1 ) ) | 0;
+  this.mapHeight = ( overallHeight / ( this.cellHeight + 1 ) ) | 0;
 
   Object2d.prototype.setDimensions.call( this, this.cellWidth, this.cellHeight );
 
@@ -74,24 +78,29 @@ function VideoCellImage( sourceVideoObject, videoCellImageData )
     console.warn( "VideoCellImage driving data does not contain frame information." );
   }
 
+  this.canvas = CreateOffScreenCanvas();
+
   // Populate layer information.
   this.color = new Array();
   this.layerCanvas = new Array();
   this.colorKey = new Array();
+
+  var numberOfLayers;
+  var layerIndex;
   
   var layers = videoCellImageData["layers"];
   if( layers !== undefined )
   {
     var sourceVideoObjectCanvas = this.sourceVideoObject.getCanvas();
     
-    var numberOfLayers = layers.length;
-    var layerIndex;
+    numberOfLayers = layers.length;
+    layerIndex;
     for( layerIndex = 0; layerIndex < numberOfLayers; layerIndex++ )
     {
       var layer = layers[layerIndex];
       //console.log( layer["name"] );
       var canvas = CreateOffScreenCanvas();
-      SetCanvasDimensions( canvas, sourceVideoObjectCanvas.width, sourceVideoObjectCanvas.height );
+      SetCanvasDimensions( canvas, overallWidth, overallHeight );
       this.layerCanvas.push( canvas );
 
       var canvasContext = GetCanvasContext2D( this.layerCanvas[layerIndex] );
@@ -103,7 +112,7 @@ function VideoCellImage( sourceVideoObject, videoCellImageData )
         colorKey = new Color( colorKey );
         this.colorKey.push( colorKey );
 
-        var imageData = canvasContext.getImageData( 0, 0, sourceVideoObjectCanvas.width, sourceVideoObjectCanvas.height );
+        var imageData = canvasContext.getImageData( 0, 0, overallWidth, overallHeight );
         var data = imageData.data;
 
         var redKey   = colorKey.red;
@@ -142,14 +151,34 @@ function VideoCellImage( sourceVideoObject, videoCellImageData )
     console.warn( "VideoCellImage driving data does not contain layer information. Defaulting single layer." );
 
     var canvas = CreateOffScreenCanvas();
-    SetCanvasDimensions( canvas, sourceVideoObjectCanvas.width, sourceVideoObjectCanvas.height );
+    SetCanvasDimensions( canvas, overallWidth, overallHeight );
     this.layerCanvas.push( canvas );
     this.colorKey.push( undefined );
     this.color.push( new Color( 255, 255, 255, 1 ) );
   }
+
+  this._redrawPrimaryCanvas();
 };
 
 extend( VideoCellImage, VideoObject );
+
+// NOTE: Temporary routine until video cell image layers are handled by sub video objects.
+VideoCellImage.prototype._redrawPrimaryCanvas = function()
+{
+  var thisCanvas = this.canvas;
+  var overallWidth  = thisCanvas.width;
+  var overallHeight = thisCanvas.height;
+  var context = GetCanvasContext2D( thisCanvas );
+  context.clearRect( 0, 0, overallWidth, overallHeight );
+
+  var thisLayerCanvas = this.layerCanvas;
+  var numberOfLayers = thisLayerCanvas.length;
+  var layerIndex;
+  for( layerIndex = 0; layerIndex < numberOfLayers; layerIndex++ )
+  {
+    context.drawImage( thisLayerCanvas[layerIndex], 0, 0, overallWidth, overallHeight );
+  }
+};
 
 VideoCellImage.prototype.getAttributes = function()
 {
@@ -234,6 +263,8 @@ VideoCellImage.prototype.setColor = function( color, layerIndex )
     canvasContext.drawImage( sourceVideoObjectCanvas, 0, 0, sourceVideoObjectCanvas.width, sourceVideoObjectCanvas.height );
   }
 
+  this._redrawPrimaryCanvas();
+
   var thisTargetVideoObject = this.targetVideoObject;
   if( thisTargetVideoObject )
   {
@@ -266,5 +297,5 @@ VideoCellImage.prototype.getNumberOfCells = function()
 
 VideoCellImage.prototype.getCanvas = function()
 {
-  return this.layerCanvas[0];
+  return this.canvas;
 };

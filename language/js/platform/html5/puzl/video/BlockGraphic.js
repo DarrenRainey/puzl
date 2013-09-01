@@ -118,7 +118,7 @@ BlockGraphic.prototype.print = function( text )
     cell = thisCodeToCellTable[characterCode];
     if( cell !== undefined )
     {
-      DrawWithNearestScale( this, thisTargetVideoObject,
+      DrawWithNearestScale( this.canvas, thisTargetVideoObject,
                             cell[0], cell[1],
                             thisCellWidth, thisCellHeight,
                             xPosition, yPosition,
