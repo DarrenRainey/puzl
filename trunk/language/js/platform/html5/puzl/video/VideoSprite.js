@@ -97,8 +97,7 @@ VideoSprite.prototype.drawTo = function( targetVideoObject, rectangle )
     return;
   }
 
-  var canvas = targetVideoObject.getCanvas();
-  var context = GetCanvasContext2D( canvas );
+  var context = targetVideoObject.context;
   
   var hasAlpha; // TODO: Optimize. Could allocate this value once for each blockgraphic object.
   if( this.alpha !== 1 )
@@ -128,16 +127,16 @@ VideoSprite.prototype.drawTo = function( targetVideoObject, rectangle )
   var rectangleHeight = rectangleEndPoint.y - rectangleStartY + 1;
 
   // TODO: Needs to factor in scaled dimensions.
-  DrawWithNearestScale( this.canvas, targetVideoObject,
-                        cell[0] + xOffset, cell[1] + yOffset,
+  context.drawImage( this.canvas,
+                     cell[0] + xOffset, cell[1] + yOffset,
 
-                        rectangleWidth,
-                        rectangleHeight,
+                     rectangleWidth,
+                     rectangleHeight,
 
-                        rectangleStartX, rectangleStartY,
+                     rectangleStartX, rectangleStartY,
 
-                        rectangleWidth,
-                        rectangleHeight );
+                     rectangleWidth,
+                     rectangleHeight );
   
   if( hasAlpha )
   {

@@ -75,9 +75,8 @@ BlockGraphic.prototype.print = function( text )
     return;
   }
 
-  var thisTargetVideoObject = this.targetVideoObject;
-  var canvas = thisTargetVideoObject.getCanvas();
-  var context = GetCanvasContext2D( canvas );
+  var thisCanvas = this.canvas;
+  var context = this.targetVideoObject.context;
 
   var hasAlpha; // TODO: Optimize. Could allocate this value once for each blockgraphic object.
   if( this.alpha !== 1 )
@@ -118,11 +117,11 @@ BlockGraphic.prototype.print = function( text )
     cell = thisCodeToCellTable[characterCode];
     if( cell !== undefined )
     {
-      DrawWithNearestScale( this.canvas, thisTargetVideoObject,
-                            cell[0], cell[1],
-                            thisCellWidth, thisCellHeight,
-                            xPosition, yPosition,
-                            thisWidth, thisHeight );
+      context.drawImage( thisCanvas,
+                         cell[0], cell[1],
+                         thisCellWidth, thisCellHeight,
+                         xPosition, yPosition,
+                         thisWidth, thisHeight );
     }
 
     xPosition += thisWidth;

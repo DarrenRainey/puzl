@@ -4,7 +4,7 @@ function VideoImage()
   VideoObject.call( this );
   
   this.canvas;
-  this.display;
+  this.context;
 
   this.filename;
 
@@ -23,6 +23,8 @@ function VideoImage()
   }*/
 
   this.canvas = CreateOffScreenCanvas();
+  this.context = GetCanvasContext2D( this.canvas );
+  
   this.filename = "";
 }
 
@@ -59,7 +61,8 @@ VideoImage.prototype.getRealHeight = function()
 VideoImage.prototype.fill = function( color )
 {
   var canvas = this.canvas;
-  var context = GetCanvasContext2D( canvas );
+  //var context = GetCanvasContext2D( canvas );
+  var context = this.context;
   context.fillStyle = color.string;
   context.fillRect( 0, 0, canvas.width, canvas.height );
 };
@@ -67,8 +70,8 @@ VideoImage.prototype.fill = function( color )
 VideoImage.prototype.clear = function()
 {
   var canvas = this.canvas;
-  var context = GetCanvasContext2D( canvas );
-  context.clearRect( 0, 0, canvas.width, canvas.height );
+  //var context = GetCanvasContext2D( canvas );
+  this.context.clearRect( 0, 0, canvas.width, canvas.height );
 };
 
 VideoImage.prototype.load = function( filename )
@@ -86,5 +89,5 @@ VideoImage.prototype.getCanvas = function()
 
 VideoImage.prototype.getContext = function()
 {
-  return GetCanvasContext2D( this.canvas );
+  return this.context;
 };
