@@ -167,14 +167,23 @@ GameShell.prototype.shellResize = function()
 
 GameShell.prototype.clientScale = function()
 {
-  var clientWidth = Math.max( Math.max( document.body.offsetWidth, document.documentElement.offsetWidth ),
-                              Math.max( document.body.clientWidth, document.documentElement.clientWidth ) );
+  var clientWidth  = window.innerWidth;
+  var clientHeight = window.innerHeight;
 
-  var clientHeight = Math.max( Math.max( document.body.offsetHeight, document.documentElement.offsetHeight ),
-                               Math.max( document.body.clientHeight, document.documentElement.clientHeight ) );
-
-  var xScale = ( clientWidth  / this.display.getWidth() );
-  var yScale = ( clientHeight / this.display.getHeight() );
+  //var documentBody = document.body;
+  //var documentElement = document.documentElement;
+  //var clientWidth = Math.max( Math.max( documentBody.offsetWidth, documentElement.offsetWidth ),
+  //                            Math.max( documentBody.clientWidth, documentElement.clientWidth ) );
+  //
+  //var clientHeight = Math.max( Math.max( documentBody.offsetHeight, documentElement.offsetHeight ),
+  //                             Math.max( documentBody.clientHeight, documentElement.clientHeight ) );
+  
+  var thisDisplay = this.display;
+  var thisDisplayWidth  = thisDisplay.getWidth();
+  var thisDisplayHeight = thisDisplay.getHeight();
+  
+  var xScale = ( clientWidth  / thisDisplayWidth );
+  var yScale = ( clientHeight / thisDisplayHeight );
 
   if( true )//fullScreen )
   {
@@ -202,21 +211,22 @@ GameShell.prototype.clientScale = function()
     yScale = 1;
   }
 
-  var width  = this.display.getWidth()  * xScale;
-  var height = this.display.getHeight() * yScale;
-  this.display.setRealDimensions( width, height );
+  var width  = thisDisplayWidth  * xScale;
+  var height = thisDisplayHeight * yScale;
+  thisDisplay.setRealDimensions( width, height );
 
   // Center display (determine position offset).
-  var canvas = this.display.getCanvas();
+  var canvas = thisDisplay.getCanvas();
   var xOffset = ( ( clientWidth  - width  ) / 2 ) | 0;
   var yOffset = ( ( clientHeight - height ) / 2 ) | 0;
   SetCanvasPosition( canvas, xOffset, yOffset );
 
   // Adjust mouse metrics to fit display on browser.
-  this.mouse.xScale = xScale;
-  this.mouse.yScale = yScale;
-  this.mouse.xOffset = xOffset;
-  this.mouse.yOffset = yOffset;
+  var thisMouse = this.mouse;
+  thisMouse.xScale = xScale;
+  thisMouse.yScale = yScale;
+  thisMouse.xOffset = xOffset;
+  thisMouse.yOffset = yOffset;
 };
 
 GameShell.prototype.input  = function(){};
@@ -248,7 +258,7 @@ GameShell.prototype.processXmlHttpRequestLoadQueue = function()
 
 function ProcessXmlHttpRequestLoad( loadEvent )
 {
-  console.log( "ProcessXmlHttpRequestLoad" );
+  //console.log( "ProcessXmlHttpRequestLoad" );
   
   var filename = loadEvent.target.filename;
 
