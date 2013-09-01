@@ -169,7 +169,7 @@ function DrawWithNearestScale( sourceDrawObject, targetDrawObject, sourceXPositi
   var context = targetDrawObject.context;
   if( context === undefined )
   {
-    context = GetCanvasContext2D( targetDrawObject.getCanvas() );
+    targetDrawObject.context = context = GetCanvasContext2D( targetDrawObject.getCanvas() );
     context.smoothingEnabled = false;
     context.mozImageSmoothingEnabled    = false;
     context.webkitImageSmoothingEnabled = false;
