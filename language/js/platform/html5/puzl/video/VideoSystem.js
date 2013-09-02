@@ -25,6 +25,11 @@ function VideoSystem( width, height )
   this.videoImageIDList    = new Array();
   this.videoImageLoadQueue = new Array();
 
+  if( navigator.isCocoonJS !== undefined )
+  {
+    ext.IDTK_APP.makeCall( "setDefaultAntialias", false );
+  }
+  
   this.display = new VideoDisplay( width, height );
 }
 
@@ -169,18 +174,18 @@ function BuildRgba( red, green, blue, alpha )
 function CreateOnScreenCanvas()
 {
   var canvas;
-  if( false )
-  //if( ( navigator.isCocoonJS !== undefined ) && ( CanvasIdCounter === -1 ) )
+  if( ( navigator.isCocoonJS !== undefined ) && ( CanvasIdCounter === -1 ) )
   {
     // Utilize CocoonJS screencanvas for very first canvas created.
-    console.log( "Creating a CocoonJS 'screencanvas'." );
-    canvas = document.createElement( "screencanvas" );
+    //console.log( "Creating a CocoonJS 'screencanvas'." );
+    //canvas = document.createElement( "screencanvas" );
+    canvas = document.createElement( "canvas" );
+    //canvas.style.cssText = "idtkscale:ScaleAspectFit;";
     //canvas.screencanvas = "true";
   }
   else
   {
     canvas = document.createElement( "canvas" );
-    
     // TODO: Append text node that says 'canvas is not supported'?
   }
   
@@ -199,6 +204,12 @@ function CreateOnScreenCanvas()
 function CreateOffScreenCanvas()
 {
   var canvas = document.createElement( "canvas" );
+
+  //if( navigator.isCocoonJS !== undefined )
+  //{
+  //  canvas.style.cssText = "idtkscale:ScaleAspectFit;";
+  //}
+  
   canvas.id = ++CanvasIdCounter + "canvas";
 
   return canvas;
@@ -235,19 +246,19 @@ function GetCanvas( id )
   return canvas;
 }
 
+// TODO: Add optional parameter to enforce antialiasing / linear stretch.
 GetCanvasContext2D =
 (
   function()
   {
     if( navigator.isCocoonJS )
     {
-      console.log( "Switching on CocoonJS GetCanvasContext2D." );
+      //console.log( "Switching on CocoonJS GetCanvasContext2D." );
       return function( canvas )
              {
-               var context = canvas.getContext( "2d", {"antialias" : false} );
-               context.smoothingEnabled = false;
-               context.mozImageSmoothingEnabled    = false;
-               context.webkitImageSmoothingEnabled = false;
+               var context = canvas.getContext( "2d" );
+               //var context = canvas.getContext( "2d", {antialias : false} );
+               //context.smoothingEnabled = false;
                return context;
              };
     }
@@ -256,7 +267,7 @@ GetCanvasContext2D =
       return function( canvas )
              {
                var context = canvas.getContext( "2d" );
-               context.smoothingEnabled = false;
+               //context.smoothingEnabled = false;
                context.mozImageSmoothingEnabled    = false;
                context.webkitImageSmoothingEnabled = false;
                return context;
