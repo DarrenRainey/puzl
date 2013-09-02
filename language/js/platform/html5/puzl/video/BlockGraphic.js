@@ -4,6 +4,7 @@ function BlockGraphic( sourceVideoObject, blockgraphicData )
   VideoCellImage.call( this, sourceVideoObject, blockgraphicData );
 
   this.absolute;
+  this.replace;
 
   this.codeToCellTable;
   
@@ -23,6 +24,8 @@ function BlockGraphic( sourceVideoObject, blockgraphicData )
   }
 
   this.absolute = false;
+  this.replace = true;
+  
   this.setPosition( 0, 0 );
 
   // Populate character code to cell lookup table.
@@ -76,7 +79,9 @@ BlockGraphic.prototype.print = function( text )
   }
 
   var thisCanvas = this.canvas;
-  var context = this.targetVideoObject.context;
+  
+  var targetVideoObject = this.targetVideoObject;
+  var context = targetVideoObject.context;
 
   var hasAlpha; // TODO: Optimize. Could allocate this value once for each blockgraphic object.
   if( this.alpha !== 1 )
@@ -91,6 +96,11 @@ BlockGraphic.prototype.print = function( text )
 
   var xPosition = VideoCellImage.prototype.getXPosition.call( this );
   var yPosition = VideoCellImage.prototype.getYPosition.call( this );
+  
+  var tempDirtyRectangle = this.tempDirtyRectangle;
+  var tempDirtyRectangleStartPoint = tempDirtyRectangle.startPoint;
+  tempDirtyRectangleStartPoint.x = xPosition;
+  tempDirtyRectangleStartPoint.y = yPosition;
 
   var thisCellWidth  = this.cellWidth;
   var thisCellHeight = this.cellHeight;
@@ -98,6 +108,12 @@ BlockGraphic.prototype.print = function( text )
   var thisHeight = this._height;
 
   var thisCodeToCellTable = this.codeToCellTable;
+  
+  var printWidth = length * thisWidth;
+  if( this.replace )
+  {
+    context.clearRect( xPosition, yPosition, printWidth, thisHeight );
+  }
   
   var character;
   var characterCode;
@@ -133,6 +149,11 @@ BlockGraphic.prototype.print = function( text )
   {
     context.globalAlpha = 1;
   }
+
+  var tempDirtyRectangleEndPoint = tempDirtyRectangle.endPoint;
+  tempDirtyRectangleEndPoint.x = xPosition + printWidth - 1;
+  tempDirtyRectangleEndPoint.y = yPosition + thisHeight - 1;
+  targetVideoObject.targetVideoObject.addDirtyRectangle( tempDirtyRectangle );
 };
 
 BlockGraphic.prototype.setPosition = function( xPosition, yPosition )
