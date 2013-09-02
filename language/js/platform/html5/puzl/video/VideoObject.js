@@ -186,16 +186,29 @@ VideoObject.prototype.addDirtyRectangle = function( rectangle )
       var dirtyRectangleListIndex = thisDirtyRectangleListLength - 1;
       do
       {
+        // TODO: Possible to optimize this loop if calls to isInside and isIntersecting
+        // are not made, but instead all logic presides here (less recalculating of same values).
         dirtyRectangle = thisDirtyRectangleList[dirtyRectangleListIndex];
         if( rectangle.isInside( dirtyRectangle ) )
         {
           // Exit without actually adding this rectangle.
           return;
         }
+        else
+        if( rectangle.isIntersecting( dirtyRectangle ) )
+        {
+          rectangle.getConvexHull( dirtyRectangle, dirtyRectangle );
+          return;
+        }
+        
+        // TODO: Also see if rectangles are colinear vertically or horizontally.
       }
       while( --dirtyRectangleListIndex > -1 );
 
-      // Convert existing dirty rectangle(s) to be convex hull
+      // TODO: Perhaps it would be good to call this block of code,
+      // if the rectangles are within a certain threshold, such as distance from each other or
+      // difference in area between convex hull and sum of individual rectangles.
+      /*// Convert existing dirty rectangle(s) to be convex hull
       // between it and the newly submitted one.
       var dirtyRectangleListIndex = thisDirtyRectangleListLength - 1;
       do
@@ -205,7 +218,7 @@ VideoObject.prototype.addDirtyRectangle = function( rectangle )
       }
       while( --dirtyRectangleListIndex > -1 );
 
-      return;
+      return;*/
     }
 
     var thisRectanglePool = this.rectanglePool;
