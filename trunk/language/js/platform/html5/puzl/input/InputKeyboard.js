@@ -147,15 +147,18 @@ function InputKeyboard()
   this.keyInput;
   
   // Constructor.
-  this.keyInput = new Array();
+  var thisKeyInput = this.keyInput = new Array();
   
+  var keyInput;
   var index;
   for( index = 0; index < NUM_KEY_CODES; index++ )
   {
-    this.keyInput[index]       = new Input();
-    this.keyInput[index].id    = index;
-    this.keyInput[index].state = KEY_STATE_UP;
-    this.keyInput[index].type  = INPUT_TYPE_KEYBOARD_KEY;
+    keyInput       = new Input();
+    keyInput.id    = index;
+    keyInput.state = KEY_STATE_UP;
+    keyInput.type  = INPUT_TYPE_KEYBOARD_KEY;
+    
+    thisKeyInput.push( keyInput );
   }
 
   this.input = this.keyInput;

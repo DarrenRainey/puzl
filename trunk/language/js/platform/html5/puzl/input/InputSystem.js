@@ -14,18 +14,21 @@ function InputSystem()
   this.numberOfKeyboards = 1;
   this.numberOfMice      = 1;
 
-  this.keyboards = new Array( this.numberOfKeyboards );
-  this.mice      = new Array( this.numberOfMice );
+  var keyboards = this.keyboards = new Array();
+  var mice      = this.mice      = new Array();
 
   var index;
-  for( index = 0; index < this.numberOfKeyboards; index++ )
+  
+  var numberOfKeyboards = this.numberOfKeyboards;
+  for( index = 0; index < numberOfKeyboards; index++ )
   {
-    this.keyboards[index] = new InputKeyboard();
+    keyboards.push( new InputKeyboard() );
   }
 
-  for( index = 0; index < this.numberOfMice; index++ )
+  var numberOfMice = this.numberOfMice;
+  for( index = 0; index < numberOfMice; index++ )
   {
-    this.mice[index] = new InputMouse();
+    mice.push( new InputMouse() );
   }
 
   // Gamepad support (with shim).
@@ -56,7 +59,7 @@ function InputSystem()
         }
 
         // Return empty array for for no support.
-        return function(){ return []; };
+        return function(){ return InputSystem.prototype.emptyGamepadList; };
       }
     )();
   }
@@ -64,40 +67,39 @@ function InputSystem()
   this.supportsGamepads = !!navigator.getGamepads || navigator.webkitGetGamepads || !!navigator.mozGetGamepads;
   if( this.supportsGamepads )
   {
+    var numberOfJoysticks = 0;
+      
     var gamepadList = navigator.getGamepads();
     if( gamepadList !== null )
     {
       //console.log( gamepadList );
       
       // Determine actual number of valid / defined gamepads.
-      this.numberOfJoysticks = 0;
-      for( index = 0; index < gamepadList.length; index++ )
+      var gamepadListLength = gamepadList.length;
+      for( index = 0; index < gamepadListLength; index++ )
       {
         if( gamepadList[index] !== undefined )
         {
-          this.numberOfJoysticks++;
+          numberOfJoysticks++;
         }
       }
     }
-    else
+    
+    this.numberOfJoysticks = numberOfJoysticks;
+    
+    var joysticks = this.joysticks = new Array();
+    
+    if( numberOfJoysticks !== 0 )
     {
-      this.numberOfJoysticks = 0;
-    }
-
-    if( this.numberOfJoysticks !== 0 )
-    {
-      this.joysticks = new Array( this.numberOfJoysticks );
-      for( index = 0; index < this.numberOfJoysticks; index++ )
+      for( index = 0; index < numberOfJoysticks; index++ )
       {
-        this.joysticks[index] = new InputJoystick();
+        joysticks.push( new InputJoystick() );
       }
-    }
-    else
-    {
-      this.joysticks = new Array();
     }
   }
 }
+
+InputSystem.prototype.emptyGamepadList = new Array();
 
 InputSystem.prototype.getKeyboard = function( id )
 {
@@ -121,26 +123,47 @@ InputSystem.prototype.getJoystick = function( id )
 
 InputSystem.prototype.update = function()
 {
+  var numberOfDevices;
+  var deviceList;
   var index;
-  if( this.numberOfKeyboards > 0 )
+  
+  numberOfDevices = this.numberOfKeyboards;
+  if( numberOfDevices > 0 )
   {
-    for( index = 0; index < this.numberOfKeyboards; index++ )
+    deviceList = this.keyboards;
+    
+    index = numberOfDevices - 1;
+    do
     {
-      this.keyboards[index].age();
+      deviceList[index].age();
     }
+    while( --index > -1 );
   }
 
-  if( this.numberOfMice > 0 )
+  numberOfDevices = this.numberOfMice;
+  if( numberOfDevices > 0 )
   {
-    for( index = 0; index < this.numberOfMice; index++ )
+    deviceList = this.mice;
+
+    index = numberOfDevices - 1;
+    do
     {
-      this.mice[index].age();
+      deviceList[index].age();
     }
+    while( --index > -1 );
   }
 
-  for( index = 0; index < this.numberOfJoysticks; index++ )
+  numberOfDevices = this.numberOfJoysticks;
+  if( numberOfDevices > 0 )
   {
-    this.joysticks[index].age();
+    deviceList = this.joysticks;
+
+    index = numberOfDevices - 1;
+    do
+    {
+      deviceList[index].age();
+    }
+    while( --index > -1 );
   }
 
   if( this.supportsGamepads )
@@ -148,14 +171,17 @@ InputSystem.prototype.update = function()
     var gamepadList = navigator.getGamepads();
     if( gamepadList !== undefined )
     {
+      deviceList = this.joysticks;
+      
       var numberOfGamepads = gamepadList.length;
-      if( this.numberOfJoysticks < numberOfGamepads )
+      //numberOfDevices = this.numberOfJoysticks; // NOTE: numberOfDevices is already this.numberOfJoysticks!
+      if( numberOfDevices < numberOfGamepads )
       {
         // Newly attached / detected gamepad.
         // It needs to be registered into the input engine.
-        for( index = this.numberOfJoysticks - 1; index < numberOfGamepads; index++ )
+        for( index = numberOfDevices - 1; index < numberOfGamepads; index++ )
         {
-          this.joysticks[index] = new InputJoystick();
+          deviceList[index] = new InputJoystick();
         }
 
         this.numberOfJoysticks = numberOfGamepads;
@@ -164,16 +190,18 @@ InputSystem.prototype.update = function()
       // NOTE: This code assumes joystick and corresponding gamepad indexes are the same.
       // This notion needs to be investigated.
       var gamepad;
-      for( index = 0; index < numberOfGamepads; index++ )
+      index = numberOfGamepads - 1;
+      do
       {
         gamepad = gamepadList[index];
         if( gamepad !== undefined )
         {
           // TODO: Only call this update when timestamp differs from last
           // attempt?
-          this.joysticks[index].updateWithGamepad( gamepad );
+          deviceList[index].updateWithGamepad( gamepad );
         }
       }
+      while( --index > -1 );
     }
   }
 };

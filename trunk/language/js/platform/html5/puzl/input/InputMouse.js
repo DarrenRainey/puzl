@@ -62,14 +62,15 @@ function ProcessTouchStart( touchEvent )
 
 function ProcessTouchEnd( touchEvent )
 {
+  var touchEventTargetTouches = touchEvent.targetTouches;
   var targetTouch;
-  if( touchEvent.targetTouches.length > 0 )
+  if( touchEventTargetTouches.length > 0 )
   {
-    targetTouch = touchEvent.targetTouches[0];
+    targetTouch = touchEventTargetTouches[0];
   }
   else
   {
-    targetTouch = touchEvent.targetTouches;
+    targetTouch = touchEventTargetTouches;
   }
 
   GlobalMouse.xPosition = ( ( targetTouch.pageX - GlobalMouse.xOffset ) / GlobalMouse.xScale ) | 0;
@@ -83,14 +84,15 @@ function ProcessTouchEnd( touchEvent )
 
 function ProcessTouchMove( touchEvent )
 {
+  var touchEventTargetTouches = touchEvent.targetTouches;
   var targetTouch;
-  if( touchEvent.targetTouches.length > 0 )
+  if( touchEventTargetTouches.length > 0 )
   {
-    targetTouch = touchEvent.targetTouches[0];
+    targetTouch = touchEventTargetTouches[0];
   }
   else
   {
-    targetTouch = touchEvent.targetTouches;
+    targetTouch = touchEventTargetTouches;
   }
   
   GlobalMouse.xPosition = ( ( targetTouch.pageX - GlobalMouse.xOffset ) / GlobalMouse.xScale ) | 0;
@@ -114,15 +116,18 @@ function InputMouse()
   this.yOffset;
 
   // Constructor.
-  this.mouseInput = new Array();
+  var thisMouseInput = this.mouseInput = new Array();
 
+  var mouseInput;
   var index;
   for( index = 0; index < NUM_BUTTONS; index++ )
   {
-    this.mouseInput[index]       = new Input();
-    this.mouseInput[index].id    = index;
-    this.mouseInput[index].state = BUTTON_STATE_UP;
-    this.mouseInput[index].type  = INPUT_TYPE_MOUSE_BUTTON;
+    mouseInput       = new Input();
+    mouseInput.id    = index;
+    mouseInput.state = BUTTON_STATE_UP;
+    mouseInput.type  = INPUT_TYPE_MOUSE_BUTTON;
+    
+    thisMouseInput.push( mouseInput );
   }
 
   this.input = this.mouseInput;
