@@ -15,15 +15,18 @@ function InputJoystick()
   this.yAxis;
 
   // Constructor.
-  this.joystickInput = new Array();
+  var thisJoystickInput = this.joystickInput = new Array();
 
+  var joystickInput;
   var index;
   for( index = 0; index < NUM_BUTTONS; index++ )
   {
-    this.joystickInput[index]       = new Input();
-    this.joystickInput[index].id    = index;
-    this.joystickInput[index].state = BUTTON_STATE_UP;
-    this.joystickInput[index].type  = INPUT_TYPE_JOYSTICK_BUTTON;
+    joystickInput       = new Input(); 
+    joystickInput.id    = index;
+    joystickInput.state = BUTTON_STATE_UP;
+    joystickInput.type  = INPUT_TYPE_JOYSTICK_BUTTON;
+    
+    thisJoystickInput.push( joystickInput );
   }
 
   this.input = this.joystickInput;
@@ -74,13 +77,16 @@ InputJoystick.prototype.getLastButtonPress = function()
 
 InputJoystick.prototype.updateWithGamepad = function( gamepad )
 {
-  this.xAxis = gamepad.axes[0];
-  this.yAxis = gamepad.axes[1];
+  var gamepadAxes = gamepad.axes;
+  this.xAxis = gamepadAxes[0];
+  this.yAxis = gamepadAxes[1];
+  
+  var gamepadButtons = gamepad.buttons;
 
   var index;
   for( index = 0; index < NUM_BUTTONS; index++ )
   {
-    this.setButtonState( index, gamepad.buttons[index] !== 0 ? BUTTON_STATE_DOWN : BUTTON_STATE_UP );
+    this.setButtonState( index, gamepadButtons[index] !== 0 ? BUTTON_STATE_DOWN : BUTTON_STATE_UP );
   }
   
 };

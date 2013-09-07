@@ -53,9 +53,10 @@ InputDevice.prototype.getState = function( inputId )
 
 InputDevice.prototype.setState = function( inputId, state )
 {
+  var thisInput = this.input[inputId];
   if( state === INPUT_STATE_PRESSED )
   {
-    var currentState = this.input[inputId].state;
+    var currentState = thisInput.state;
     if( ( currentState & INPUT_STATE_DOWN ) > 0 )
     {
       return;
@@ -64,9 +65,19 @@ InputDevice.prototype.setState = function( inputId, state )
     this.lastInputId = inputId;
   }
   
-  this.input[inputId].state = state;
+  thisInput.state = state;
 
-  this.stateChange[this.numberOfStateChanges++] = this.input[inputId];
+  var stateChangeIndex = this.numberOfStateChanges++;
+  
+  var thisStateChange = this.stateChange;
+  if( thisStateChange.length < stateChangeIndex + 1 )
+  {
+    thisStateChange.push( thisInput );
+  }
+  else
+  {
+    thisStateChange[stateChangeIndex] = thisInput;
+  }
 };
 
 InputDevice.prototypegetLastInputId = function()
@@ -76,18 +87,24 @@ InputDevice.prototypegetLastInputId = function()
 
 InputDevice.prototype.age = function()
 {
-  if( this.numberOfStateChanges > 0 )
+  var numberOfStateChanges = this.numberOfStateChanges;
+  if( numberOfStateChanges > 0 )
   {
+    var thisStateChange = this.stateChange;
+    
+    var tempState;
+    var tempStateChange;
     var index;
-    for( index = 0; index < this.numberOfStateChanges; index++ )
+    for( index = 0; index < numberOfStateChanges; index++ )
     {
-      var tempStateChange = this.stateChange[index];
-      if( tempStateChange.state === INPUT_STATE_RELEASED )
+      tempStateChange = thisStateChange[index];
+      tempState = tempStateChange.state;
+      if( tempState === INPUT_STATE_RELEASED )
       {
         tempStateChange.state = INPUT_STATE_UP;
       }
       else
-      if( tempStateChange.state === INPUT_STATE_PRESSED )
+      if( tempState === INPUT_STATE_PRESSED )
       {
         tempStateChange.state = INPUT_STATE_DOWN;
       }
