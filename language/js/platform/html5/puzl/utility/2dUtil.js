@@ -77,7 +77,7 @@ Vector2d.prototype.isInside = function( rectangle )
     return false;
   }
 
-  rectangleEndPointY = rectangleEndPoint.y;
+  var rectangleEndPointY = rectangleEndPoint.y;
   if( thisY > rectangleEndPointY )
   {
     return false;
@@ -176,8 +176,8 @@ Rectangle.prototype.isInside = function( rectangle )
     return false;
   }
 
-  thisEndPointY = thisEndPoint.y;
-  rectangleEndPointY = rectanglePoint.y;
+  var thisEndPointY = thisEndPoint.y;
+  var rectangleEndPointY = rectanglePoint.y;
   if( thisEndPointY > rectangleEndPointY )
   {
     return false;
