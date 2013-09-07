@@ -246,32 +246,29 @@ function GetCanvas( id )
   return canvas;
 }
 
+CocoonJSGetCanvasContext2d = function( canvas )
+{
+  var context = canvas.getContext( "2d" );
+  //var context = canvas.getContext( "2d", {antialias : false} );
+  //context.smoothingEnabled = false;
+  return context;
+};
+
+GeneralGetCanvasContext2d = function( canvas )
+{
+  var context = canvas.getContext( "2d" );
+  context.mozImageSmoothingEnabled    = false;
+  context.webkitImageSmoothingEnabled = false;
+  return context;
+};
+
 // TODO: Add optional parameter to enforce antialiasing / linear stretch.
-GetCanvasContext2D =
-(
-  function()
-  {
-    if( navigator.isCocoonJS )
-    {
-      //console.log( "Switching on CocoonJS GetCanvasContext2D." );
-      return function( canvas )
-             {
-               var context = canvas.getContext( "2d" );
-               //var context = canvas.getContext( "2d", {antialias : false} );
-               //context.smoothingEnabled = false;
-               return context;
-             };
-    }
-    else
-    {
-      return function( canvas )
-             {
-               var context = canvas.getContext( "2d" );
-               //context.smoothingEnabled = false;
-               context.mozImageSmoothingEnabled    = false;
-               context.webkitImageSmoothingEnabled = false;
-               return context;
-             };
-    }
-  }
-)();
+if( navigator.isCocoonJS )
+{
+  //console.log( "Switching on CocoonJS GetCanvasContext2D." );
+  GetCanvasContext2D = CocoonJSGetCanvasContext2d;
+}
+else
+{
+  GetCanvasContext2D = GeneralGetCanvasContext2d;
+}
