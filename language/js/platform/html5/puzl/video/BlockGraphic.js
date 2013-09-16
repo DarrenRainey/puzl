@@ -1,3 +1,6 @@
+var PRINT_ATTR_ALIGN_LEFT = 0;
+var PRINT_ATTR_ALIGN_RIGHT = 1;
+
 function BlockGraphic( sourceVideoObject, blockgraphicData )
 {
   // console.log( "Creating BlockGraphic" );
@@ -5,6 +8,8 @@ function BlockGraphic( sourceVideoObject, blockgraphicData )
 
   this.absolute;
   this.replace;
+
+  this.alignment;
 
   this.codeToCellTable;
   
@@ -25,6 +30,8 @@ function BlockGraphic( sourceVideoObject, blockgraphicData )
 
   this.absolute = false;
   this.replace = true;
+
+  this.alignment = PRINT_ATTR_ALIGN_LEFT;
   
   this.setPosition( 0, 0 );
 
@@ -72,10 +79,22 @@ extend( BlockGraphic, VideoCellImage );
 
 BlockGraphic.prototype.print = function( text )
 {
-  var length = text.length;
-  if( length < 1 )
+  var isString;
+  var length;
+  if( text.length !== undefined ) // TODO: REALLY crummy way to determine if text is string.
   {
-    return;
+    length = text.length;
+    if( length < 1 )
+    {
+      return;
+    }
+
+    isString = true;
+  }
+  else
+  {
+    length = 1;
+    isString = false;
   }
 
   var thisCanvas = this.canvas;
@@ -96,64 +115,105 @@ BlockGraphic.prototype.print = function( text )
 
   var xPosition = VideoCellImage.prototype.getXPosition.call( this );
   var yPosition = VideoCellImage.prototype.getYPosition.call( this );
-  
+
+  var thisWidth  = this._width;
+  var thisHeight = this._height;
+  var printWidth = length * thisWidth;
+
+  var alignment = this.alignment;
+  if( alignment === PRINT_ATTR_ALIGN_LEFT )
+  {
+    VideoCellImage.prototype.setPosition.call( this, xPosition + printWidth, yPosition );
+  }
+  else
+  if( alignment === PRINT_ATTR_ALIGN_RIGHT )
+  {
+    xPosition -= printWidth;
+    VideoCellImage.prototype.setPosition.call( this, xPosition, yPosition );
+  }
+  else
+  {
+    console.error( "BlockGraphic::print:  Unimplemented alignment:  " + this.alignment );
+    return;
+  }
+
   var tempDirtyRectangle = this.tempDirtyRectangle;
   var tempDirtyRectangleStartPoint = tempDirtyRectangle.startPoint;
   tempDirtyRectangleStartPoint.x = xPosition;
   tempDirtyRectangleStartPoint.y = yPosition;
+  var tempDirtyRectangleEndPoint = tempDirtyRectangle.endPoint;
+  tempDirtyRectangleEndPoint.x = xPosition + printWidth - 1;
+  tempDirtyRectangleEndPoint.y = yPosition + thisHeight - 1;
 
-  var thisCellWidth  = this.cellWidth;
-  var thisCellHeight = this.cellHeight;
-  var thisWidth  = this._width;
-  var thisHeight = this._height;
-
-  var thisCodeToCellTable = this.codeToCellTable;
-  
-  var printWidth = length * thisWidth;
   if( this.replace )
   {
     context.clearRect( xPosition, yPosition, printWidth, thisHeight );
   }
-  
-  var character;
-  var characterCode;
-  var cell;
-  for( var index = 0; index < length; index++ )
-  {
-    character = text.charAt( index );
-    /*if( character === '\n' )
-    {
-      xPosition = 0;
-      yPosition += this.height;
-      continue;
-    }*/
 
-    characterCode = character.charCodeAt( 0 );
-    
-    cell = thisCodeToCellTable[characterCode];
+  var thisCellWidth  = this.cellWidth;
+  var thisCellHeight = this.cellHeight;
+
+  var thisCodeToCellTable = this.codeToCellTable;
+
+  var cell;
+
+  if( isString )
+  {
+    var character;
+    var characterCode;
+    for( var index = 0; index < length; index++ )
+    {
+      character = text.charAt( index );
+      /*if( character === '\n' )
+      {
+        xPosition = 0;
+        yPosition += this.height;
+        continue;
+      }*/
+
+      characterCode = character.charCodeAt( 0 );
+      if( characterCode !== 32 )
+      {
+        cell = thisCodeToCellTable[characterCode];
+        if( cell !== undefined )
+        {
+          context.drawImage( thisCanvas,
+                             cell[0], cell[1],
+                             thisCellWidth, thisCellHeight,
+                             xPosition, yPosition,
+                             thisWidth, thisHeight );
+        }
+      }
+
+      xPosition += thisWidth;
+    }
+
+    targetVideoObject.targetVideoObject.addDirtyRectangle( tempDirtyRectangle );
+  }
+  else
+  {
+    cell = thisCodeToCellTable[text];
     if( cell !== undefined )
     {
-      context.drawImage( thisCanvas,
-                         cell[0], cell[1],
-                         thisCellWidth, thisCellHeight,
-                         xPosition, yPosition,
-                         thisWidth, thisHeight );
+      if( characterCode !== 0 )
+      {
+        context.drawImage( thisCanvas,
+                           cell[0], cell[1],
+                           thisCellWidth, thisCellHeight,
+                           xPosition, yPosition,
+                           thisWidth, thisHeight );
+
+        targetVideoObject.targetVideoObject.addDirtyRectangle( tempDirtyRectangle );
+      }
     }
 
     xPosition += thisWidth;
   }
 
-  VideoCellImage.prototype.setPosition.call( this, xPosition, yPosition );
-
   if( hasAlpha )
   {
     context.globalAlpha = 1;
   }
-
-  var tempDirtyRectangleEndPoint = tempDirtyRectangle.endPoint;
-  tempDirtyRectangleEndPoint.x = xPosition + printWidth - 1;
-  tempDirtyRectangleEndPoint.y = yPosition + thisHeight - 1;
-  targetVideoObject.targetVideoObject.addDirtyRectangle( tempDirtyRectangle );
 };
 
 BlockGraphic.prototype.setPosition = function( xPosition, yPosition )
