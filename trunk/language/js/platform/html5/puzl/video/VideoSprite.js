@@ -19,6 +19,11 @@ var SPRITE_ATTRIBUTE_WRAPAROUND    = 64   // Sprite wraps around edges
 var SPRITE_ATTRIBUTE_LOADED        = 128  // Sprite has been loaded
 var SPRITE_ATTRIBUTE_CLONE         = 256  // Sprite is a clone
 
+var SPRITE_ATTRIBUTE_ANIMATION_MASK = SPRITE_ATTRIBUTE_SINGLE_FRAME |
+                                      SPRITE_ATTRIBUTE_MULTI_FRAME |
+                                      SPRITE_ATTRIBUTE_MULTI_ANIM |
+                                      SPRITE_ATTRIBUTE_ANIM_ONE_SHOT;
+
 var SPRITE_ATTRIBUTE_TRANSPARENCY  = 1024 // Indicates sprite with transparency
 var SPRITE_ATTRIBUTE_ALPHABLEND    = 2048 // Indicates sprite with alpha/semi transparency
 var SPRITE_ATTRIBUTE_COLOR         = 4096 // Indicates sprite with color modulation
@@ -33,6 +38,9 @@ function VideoSprite( sourceVideoObject, videoSpriteData )
 
   this.xVelocity;
   this.yVelocity;
+
+  this.attributes;
+  this.state;
 
   this.animation;
   this.animationNameIndexHash;
@@ -54,6 +62,8 @@ function VideoSprite( sourceVideoObject, videoSpriteData )
   
   this.xVelocity = 0;
   this.yVelocity = 0;
+  
+  this.state = SPRITE_STATE_ALIVE;
 
   this.animation = new Operation();
   this.animationNameIndexHash = new Array();
@@ -86,12 +96,19 @@ function VideoSprite( sourceVideoObject, videoSpriteData )
   {
     //console.warn( "Loading VideoSprite without animation information." );
   }
+
+  this.setAttribute( SPRITE_ATTRIBUTE_VISIBLE );
 }
 
 extend( VideoSprite, VideoCellImage );
 
 VideoSprite.prototype.drawTo = function( targetVideoObject, rectangle )
 {
+  if( ( this.attributes & SPRITE_ATTRIBUTE_VISIBLE ) === 0 )
+  {
+    return;
+  }
+  
   if( targetVideoObject === null )
   {
     return;
@@ -184,9 +201,70 @@ VideoSprite.prototype.move = function()
   return false;
 };
 
+VideoSprite.prototype.getState = function()
+{
+  return this.state;
+};
+
+VideoSprite.prototype.setState = function( state )
+{
+  this.state = state;
+};
+
+VideoSprite.prototype.setAttribute = function( attribute )
+{
+  var attributes = this.attributes | attribute;
+  if( this.attributes === attributes )
+  {
+    return;
+  }
+
+  this.attributes = attributes;
+  
+  if( attribute < SPRITE_ATTRIBUTE_VISIBLE )
+  {
+    this.animation.setAttributes( attributes & SPRITE_ATTRIBUTE_ANIMATION_MASK );
+  }
+
+  if( attribute & SPRITE_ATTRIBUTE_VISIBLE )
+  {
+    // Time to show sprite.
+    if( this.targetVideoObject !== null )
+    {
+      this.targetVideoObject.addDirtyRectangle( this );
+    }
+  }
+};
+
+VideoSprite.prototype.clearAttribute = function( attribute )
+{
+  var attributes = this.attributes & ~attribute;
+  if( this.attributes === attributes )
+  {
+    return;
+  }
+
+  this.attributes = attributes;
+  
+  if( attribute < SPRITE_ATTRIBUTE_VISIBLE )
+  {
+    this.animation.setAttributes( attributes & SPRITE_ATTRIBUTE_ANIMATION_MASK );
+  }
+  
+  if( attribute & SPRITE_ATTRIBUTE_VISIBLE )
+  {
+    // Time to hide sprite.
+    if( this.targetVideoObject !== null )
+    {
+      this.targetVideoObject.addDirtyRectangle( this );
+    }
+  }
+};
+
 VideoSprite.prototype.setAttributes = function( attributes )
 {
-  return this.animation.setAttributes( attributes );
+  this.attributes = attributes;
+  this.animation.setAttributes( attributes & ~SPRITE_ATTRIBUTE_ANIMATION_MASK );
 };
 
 VideoSprite.prototype.loadFrame = function( xPosition, yPosition, mode )
@@ -216,6 +294,28 @@ VideoSprite.prototype.setCurrentSequence = function( currentSequence )
   {
     this.targetVideoObject.addDirtyRectangle( this );
   }
+};
+
+VideoSprite.prototype.getFrameIndex = function()
+{
+  return this.animation.getFrameIndex();
+};
+
+VideoSprite.prototype.setFrameIndex = function( frameIndex )
+{
+  var thisAnimation = this.animation;
+
+  if( frameIndex !== thisAnimation.getFrameIndex() )
+  {
+    this.targetVideoObject.addDirtyRectangle( this );
+  }
+
+  thisAnimation.setFrameIndex( frameIndex );
+};
+
+VideoSprite.prototype.getCurrentFrame = function()
+{
+  return this.animation.getCurrentFrame();
 };
 
 VideoSprite.prototype.setCurrentFrame = function( currentFrame )
