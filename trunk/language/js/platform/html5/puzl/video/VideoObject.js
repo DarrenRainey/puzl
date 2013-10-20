@@ -59,6 +59,38 @@ VideoObject.prototype.setPosition = function( xPosition, yPosition )
   }
 };
 
+VideoObject.prototype.setXPosition = function( xPosition )
+{
+  var thisTargetVideoObject = this.targetVideoObject;
+  if( thisTargetVideoObject )
+  {
+    thisTargetVideoObject.addDirtyRectangle( this );
+  }
+  
+  Object2d.prototype.setXPosition.call( this, xPosition );
+  
+  if( thisTargetVideoObject )
+  {
+    thisTargetVideoObject.addDirtyRectangle( this );
+  }
+};
+
+VideoObject.prototype.setYPosition = function( yPosition )
+{
+  var thisTargetVideoObject = this.targetVideoObject;
+  if( thisTargetVideoObject )
+  {
+    thisTargetVideoObject.addDirtyRectangle( this );
+  }
+  
+  Object2d.prototype.setYPosition.call( this, yPosition );
+  
+  if( thisTargetVideoObject )
+  {
+    thisTargetVideoObject.addDirtyRectangle( this );
+  }
+};
+
 VideoObject.prototype.addObject = function( videoObject )
 {
   Object2d.prototype.addObject.call( this, videoObject );
