@@ -36,8 +36,7 @@ function VideoSprite( sourceVideoObject, videoSpriteData )
   //console.log( "Creating VideoSprite" );
   VideoCellImage.call( this, sourceVideoObject, videoSpriteData );
 
-  this.xVelocity;
-  this.yVelocity;
+  this.velocity;
 
   this.attributes;
   this.state;
@@ -60,8 +59,7 @@ function VideoSprite( sourceVideoObject, videoSpriteData )
     return null;
   }
   
-  this.xVelocity = 0;
-  this.yVelocity = 0;
+  this.velocity = new Vector2d( 0, 0 );
   
   this.state = SPRITE_STATE_ALIVE;
 
@@ -163,37 +161,41 @@ VideoSprite.prototype.drawTo = function( targetVideoObject, rectangle )
 
 VideoSprite.prototype.getXVelocity = function()
 {
-  return this.xVelocity;
+  return this.velocity.x;
 };
 
 VideoSprite.prototype.getYVelocity = function()
 {
-  return this.yVelocity;
+  return this.velocity.y;
 };
 
 VideoSprite.prototype.setXVelocity = function( xVelocity )
 {
-  this.xVelocity = xVelocity;
+  this.velocity.x = xVelocity;
 };
 
 VideoSprite.prototype.setYVelocity = function( yVelocity )
 {
-  this.yVelocity = yVelocity;
+  this.velocity.y = yVelocity;
 };
 
 VideoSprite.prototype.setVelocity = function( xVelocity, yVelocity )
 {
-  this.xVelocity = xVelocity;
-  this.yVelocity = yVelocity;
+  var velocity = this.velocity;
+  velocity.x = xVelocity;
+  velocity.y = yVelocity;
 };
 
 VideoSprite.prototype.move = function()
 {
-  if( ( this.xVelocity !== 0 ) || ( this.yVelocity !== 0 ) )
+  var velocity = this.velocity;
+  var velocityX = velocity.x;
+  var velocityY = velocity.y;
+  if( ( velocityX !== 0 ) || ( velocityY !== 0 ) )
   {
     var position = this.startPoint;
-    this.setPosition( position.x + this.xVelocity,
-                      position.y + this.yVelocity );
+    this.setPosition( position.x + velocityX,
+                      position.y + velocityY );
     
     return true;
   }
