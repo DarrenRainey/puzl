@@ -41,6 +41,42 @@ Vector2d.prototype.copy = function( vector2d )
 };
 
 // --------------------------------------------------------
+Vector2d.prototype.add = function( vector2d )
+{
+  this.x += vector2d.x;
+  this.y += vector2d.y;
+};
+
+// --------------------------------------------------------
+Vector2d.prototype.subtract = function( vector2d )
+{
+  this.x -= vector2d.x;
+  this.y -= vector2d.y;
+};
+
+// --------------------------------------------------------
+Vector2d.prototype.multiply = function( vector2d )
+{
+  this.x *= vector2d.x;
+  this.y *= vector2d.y;
+};
+
+// --------------------------------------------------------
+Vector2d.prototype.divide = function( vector2d )
+{
+  var vector2dX = vector2d.x;
+  var vector2dY = vector2d.y;
+  if( ( vector2dX === 0 ) || ( vector2dY === 0 ) )
+  {
+    console.error( "Divide by 0." );
+    return;
+  }
+  
+  this.x /= vector2dX;
+  this.y /= vector2dY;
+};
+
+// --------------------------------------------------------
 Vector2d.prototype.toString = function()
 {
   var string = "(";
@@ -147,6 +183,49 @@ Rectangle.prototype.toString = function()
   string += "]";
 
   return string;
+};
+
+Rectangle.prototype.setPosition = function( xPosition, yPosition )
+{
+  var thisStartPoint = this.startPoint;
+  var thisEndPoint = this.endPoint;
+
+  var widthMinusOne = thisEndPoint.x - thisStartPoint.x;
+  var heightMinusOne = thisEndPoint.y - thisStartPoint.y;
+
+  thisStartPoint.x = xPosition;
+  thisStartPoint.y = yPosition;
+
+  thisEndPoint.x = xPosition + widthMinusOne;
+  thisEndPoint.y = yPosition + heightMinusOne;
+};
+
+Rectangle.prototype.getXPosition = function()
+{
+  return this.startPoint.x;
+};
+
+Rectangle.prototype.getYPosition = function()
+{
+  return this.startPoint.y;
+};
+
+Rectangle.prototype.setDimensions = function( width, height )
+{
+  var thisStartPoint = this.startPoint;
+  var thisEndPoint = this.endPoint;
+  thisEndPoint.x = thisStartPoint.x + width - 1;
+  thisEndPoint.y = thisStartPoint.y + height - 1;
+};
+
+Rectangle.prototype.getWidth = function()
+{
+  return this.endPoint.x - this.startPoint.x + 1;
+};
+
+Rectangle.prototype.getHeight = function()
+{
+  return this.endPoint.y - this.startPoint.y + 1;
 };
 
 Rectangle.prototype.isInside = function( rectangle )
