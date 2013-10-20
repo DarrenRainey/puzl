@@ -67,15 +67,26 @@ GameShell.prototype.run = function()
 GameShell.prototype.shellInitialize = function()
 {
   //console.log( "GameShell::initialize()" );
-  this.inputSystem = new InputSystem();
-  this.keyboard    = this.inputSystem.getKeyboard( 0 );
-  this.mouse       = this.inputSystem.getMouse( 0 );
-  this.joysticks   = this.inputSystem.getJoysticks();
-
   this.videoSystem = new VideoSystem( this.gameShellSettings.width, this.gameShellSettings.height );
   this.display     = this.videoSystem.getDisplay();
-  this.clientScale();
   GlobalVideoDisplay = this.display;
+  
+  this.inputSystem = new InputSystem();
+  this.keyboard    = this.inputSystem.getKeyboard( 0 );
+  this.joysticks   = this.inputSystem.getJoysticks();
+  
+  if( navigator.isCocoonJS !== undefined )
+  {
+    this.inputSystem.attachDisplay( this.display );
+  }
+  else
+  {
+    this.inputSystem.attachNoDisplay();
+  }
+  
+  this.mouse = this.inputSystem.getMouse( 0 );
+  
+  this.clientScale();
 
   this.audioSystem = new AudioSystem();
 
@@ -225,8 +236,17 @@ GameShell.prototype.clientScale = function()
   var thisMouse = this.mouse;
   thisMouse.xScale = xScale;
   thisMouse.yScale = yScale;
-  thisMouse.xOffset = xOffset;
-  thisMouse.yOffset = yOffset;
+  
+  if( navigator.isCocoonJS === undefined )
+  {
+    thisMouse.xOffset = xOffset;
+    thisMouse.yOffset = yOffset;
+  }
+  else
+  {
+    thisMouse.xOffset = 0;
+    thisMouse.yOffset = 0;
+  }
 };
 
 GameShell.prototype.input  = function(){};

@@ -5,17 +5,21 @@ function InputSystem()
   this.numberOfJoysticks;
   
   this.keyboards;
+  
   this.mice;
+  this.hasTouch;
   
   this.joysticks;
   this.supportsGamepads;
   
   // Constructor.
   this.numberOfKeyboards = 1;
-  this.numberOfMice      = 1;
+  this.numberOfMice      = 0;
 
   var keyboards = this.keyboards = new Array();
-  var mice      = this.mice      = new Array();
+  
+  var mice = this.mice = null;
+  this.hasTouch = ( 'ontouchstart' in document.documentElement );
 
   var index;
   
@@ -23,12 +27,6 @@ function InputSystem()
   for( index = 0; index < numberOfKeyboards; index++ )
   {
     keyboards.push( new InputKeyboard() );
-  }
-
-  var numberOfMice = this.numberOfMice;
-  for( index = 0; index < numberOfMice; index++ )
-  {
-    mice.push( new InputMouse() );
   }
 
   // Gamepad support (with shim).
@@ -100,6 +98,35 @@ function InputSystem()
 }
 
 InputSystem.prototype.emptyGamepadList = new Array();
+
+InputSystem.prototype.attachDisplay = function( display )
+{
+  if( display === null )
+  {
+    this.numberOfMice = 0;
+    this.mice = null;
+    // TODO: Remove approach registered listeners.
+    
+    return;
+  }
+  
+  var numberOfMice = this.numberOfMice = 1;
+  var mice = this.mice = new Array();
+  for( var index = 0; index < numberOfMice; index++ )
+  {
+    mice.push( new InputMouse( display ) );
+  }
+};
+
+InputSystem.prototype.attachNoDisplay = function()
+{
+  var numberOfMice = this.numberOfMice = 1;
+  var mice = this.mice = new Array();
+  for( var index = 0; index < numberOfMice; index++ )
+  {
+    mice.push( new InputMouse( null ) );
+  }
+};
 
 InputSystem.prototype.getKeyboard = function( id )
 {

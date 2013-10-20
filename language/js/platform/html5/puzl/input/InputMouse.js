@@ -26,8 +26,9 @@ function ProcessMouseUp( mouseEvent )
 
 function ProcessMouseMove( mouseEvent )
 {
-  GlobalMouse.xPosition = ( ( mouseEvent.pageX - GlobalMouse.xOffset ) / GlobalMouse.xScale ) | 0;
-  GlobalMouse.yPosition = ( ( mouseEvent.pageY - GlobalMouse.yOffset ) / GlobalMouse.yScale ) | 0;
+  var mouse = GlobalMouse;
+  mouse.xPosition = ( ( mouseEvent.pageX - mouse.xOffset ) / mouse.xScale ) | 0;
+  mouse.yPosition = ( ( mouseEvent.pageY - mouse.yOffset ) / mouse.yScale ) | 0;
   
   mouseEvent.stopPropagation();
   mouseEvent.preventDefault();
@@ -51,10 +52,11 @@ function ProcessTouchStart( touchEvent )
     targetTouch = touchEvent.targetTouches;
   }
 
-  GlobalMouse.xPosition = ( ( targetTouch.pageX - GlobalMouse.xOffset ) / GlobalMouse.xScale ) | 0;
-  GlobalMouse.yPosition = ( ( targetTouch.pageY - GlobalMouse.yOffset ) / GlobalMouse.yScale ) | 0;
+  var mouse = GlobalMouse;
+  mouse.xPosition = ( ( targetTouch.pageX - mouse.xOffset ) / mouse.xScale ) | 0;
+  mouse.yPosition = ( ( targetTouch.pageY - mouse.yOffset ) / mouse.yScale ) | 0;
 
-  GlobalMouse.setButtonState( 0, BUTTON_STATE_PRESSED );
+  mouse.setButtonState( 0, BUTTON_STATE_PRESSED );
 
   touchEvent.stopPropagation();
   touchEvent.preventDefault();
@@ -73,10 +75,11 @@ function ProcessTouchEnd( touchEvent )
     targetTouch = touchEventTargetTouches;
   }
 
-  GlobalMouse.xPosition = ( ( targetTouch.pageX - GlobalMouse.xOffset ) / GlobalMouse.xScale ) | 0;
-  GlobalMouse.yPosition = ( ( targetTouch.pageY - GlobalMouse.yOffset ) / GlobalMouse.yScale ) | 0;
+  var mouse = GlobalMouse;
+  //mouse.xPosition = ( ( targetTouch.pageX - mouse.xOffset ) / mouse.xScale ) | 0;
+  //mouse.yPosition = ( ( targetTouch.pageY - mouse.yOffset ) / mouse.yScale ) | 0;
 
-  GlobalMouse.setButtonState( 0, BUTTON_STATE_RELEASED );
+  mouse.setButtonState( 0, BUTTON_STATE_RELEASED );
 
   touchEvent.stopPropagation();
   touchEvent.preventDefault();
@@ -95,14 +98,15 @@ function ProcessTouchMove( touchEvent )
     targetTouch = touchEventTargetTouches;
   }
   
-  GlobalMouse.xPosition = ( ( targetTouch.pageX - GlobalMouse.xOffset ) / GlobalMouse.xScale ) | 0;
-  GlobalMouse.yPosition = ( ( targetTouch.pageY - GlobalMouse.yOffset ) / GlobalMouse.yScale ) | 0;
+  var mouse = GlobalMouse;
+  mouse.xPosition = ( ( targetTouch.pageX - mouse.xOffset ) / mouse.xScale ) | 0;
+  mouse.yPosition = ( ( targetTouch.pageY - mouse.yOffset ) / mouse.yScale ) | 0;
 
   touchEvent.stopPropagation();
   touchEvent.preventDefault();
 }
 
-function InputMouse()
+function InputMouse( display )
 {
   InputDevice.call( this );
 
@@ -133,15 +137,35 @@ function InputMouse()
   this.input = this.mouseInput;
   GlobalMouse = this;
   
-  document.addEventListener( "mousedown", ProcessMouseDown, false );
-  document.addEventListener( "mouseup",   ProcessMouseUp,   false );
-  document.addEventListener( "mousemove", ProcessMouseMove, false );
+  if( display === null )
+  {
+    document.addEventListener( "mousedown", ProcessMouseDown, false );
+    document.addEventListener( "mouseup",   ProcessMouseUp,   false );
+    document.addEventListener( "mousemove", ProcessMouseMove, false );
+  }
+  else
+  {
+    var canvas = display.getCanvas();
+    canvas.addEventListener( "mousedown", ProcessMouseDown, false );
+    canvas.addEventListener( "mouseup",   ProcessMouseUp,   false );
+    canvas.addEventListener( "mousemove", ProcessMouseMove, false );
+  }
   
   if( IsTouchDevice() )
   {
-    document.addEventListener( "touchstart", ProcessTouchStart, false );
-    document.addEventListener( "touchend",   ProcessTouchEnd,   false );
-    document.addEventListener( "touchmove",  ProcessTouchMove,  false );
+    if( display === null )
+    {
+      document.addEventListener( "touchstart", ProcessTouchStart, false );
+      document.addEventListener( "touchend",   ProcessTouchEnd,   false );
+      document.addEventListener( "touchmove",  ProcessTouchMove,  false );
+    }
+    else
+    {
+      var canvas = display.getCanvas();
+      canvas.addEventListener( "touchstart", ProcessTouchStart, false );
+      canvas.addEventListener( "touchend",   ProcessTouchEnd,   false );
+      canvas.addEventListener( "touchmove",  ProcessTouchMove, false );
+    }
   }
 
   this.xPosition = 0;
