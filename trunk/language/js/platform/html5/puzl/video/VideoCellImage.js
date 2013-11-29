@@ -163,7 +163,7 @@ function VideoCellImage( sourceVideoObject, videoCellImageData )
   this._redrawPrimaryCanvas();
 
   this.context = GetCanvasContext2D( this.canvas );
-};
+}
 
 extend( VideoCellImage, VideoObject );
 
@@ -188,12 +188,12 @@ VideoCellImage.prototype._redrawPrimaryCanvas = function()
 VideoCellImage.prototype.getAttributes = function()
 {
   return this.attributes;
-}
+};
 
 VideoCellImage.prototype.setAttributes = function( attributes )
 {
   this.attributes = attributes;
-}
+};
 
 VideoCellImage.prototype.getColor = function( layerIndex )
 {
@@ -204,7 +204,7 @@ VideoCellImage.prototype.getColor = function( layerIndex )
   }
   
   return this.color[layerIndex];
-}
+};
 
 VideoCellImage.prototype.setColor = function( color, layerIndex )
 {

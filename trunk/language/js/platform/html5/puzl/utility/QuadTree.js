@@ -226,7 +226,7 @@ QuadTreeNode.prototype.getQuadrantId = function( rectangle )
   }
 
   return -1;
-}
+};
 
 QuadTreeNode.prototype.insert = function( object2d )
 {
@@ -263,7 +263,7 @@ QuadTreeNode.prototype.query = function( rectangle, queryResultList )
   this.queryRecursive( rectangle, queryResultList );
 
   return queryResultList;
-}
+};
 
 QuadTreeNode.prototype.queryRecursive = function( rectangle, queryResultList )
 {
