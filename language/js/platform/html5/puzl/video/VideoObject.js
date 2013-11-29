@@ -18,7 +18,7 @@ function VideoObject()
   this.tempDirtyRectangle = new Rectangle();
   
   this.rectanglePool = new Array();
-};
+}
 
 extend( VideoObject, Object2d );
 

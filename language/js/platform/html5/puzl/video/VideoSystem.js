@@ -36,12 +36,12 @@ function VideoSystem( width, height )
 VideoSystem.prototype.update = function()
 {
   this.display.drawUpdate();
-}
+};
 
 VideoSystem.prototype.getDisplay = function()
 {
   return this.display;
-}
+};
 
 VideoSystem.prototype.getAvailableImageID = function()
 {
@@ -56,7 +56,7 @@ VideoSystem.prototype.getAvailableImageID = function()
   }
 
   return index;
-}
+};
 
 VideoSystem.prototype.queueVideoImage = function( videoImage, filename )
 {
@@ -73,7 +73,7 @@ VideoSystem.prototype.queueVideoImage = function( videoImage, filename )
   videoImage.image.onload = ProcessVideoImageLoad;
 
   videoImage.filename = filename;
-}
+};
 
 VideoSystem.prototype.processImageLoadQueue = function()
 {
@@ -85,7 +85,7 @@ VideoSystem.prototype.processImageLoadQueue = function()
     videoImage = this.videoImageLoadQueue[index];
     videoImage.image.src = videoImage.filename;
   }
-}
+};
 
 function ProcessVideoImageLoad( loadEvent )
 {
@@ -132,29 +132,29 @@ function ProcessVideoImageLoad( loadEvent )
     // Attempt game post initialize.
     GlobalGameShell.shellPostInitialize();
   }
-}
+};
 
 function SetCanvasXPosition( canvas, xPosition )
 {
   canvas.style.left = xPosition + "px";
-}
+};
 
 function SetCanvasYPosition( canvas, yPosition )
 {
   canvas.style.top  = yPosition + "px";
-}
+};
 
 function SetCanvasPosition( canvas, xPosition, yPosition )
 {
   SetCanvasXPosition( canvas, xPosition );
   SetCanvasYPosition( canvas, yPosition );
-}
+};
 
 function SetCanvasDimensions( canvas, width, height )
 {
   canvas.width  = width;
   canvas.height = height;
-}
+};
 
 function BuildRgb( red, green, blue )
 {

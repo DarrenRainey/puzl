@@ -64,7 +64,7 @@ Color.prototype.equals = function( color )
   }
 
   return true;
-}
+};
 
 Color.prototype.copy = function( color )
 {
@@ -74,7 +74,7 @@ Color.prototype.copy = function( color )
   this.alpha = color.alpha;
 
   this.string = color.string;
-}
+};
 
 Color.prototype.updateString = function()
 {
@@ -139,7 +139,7 @@ Color.prototype.updateString = function()
     // Compute an rgba() string.
     this.string = this.getRgbaString();
   }
-}
+};
 
 Color.prototype.setRgb = function()
 {
@@ -231,33 +231,33 @@ Color.prototype.setRgb = function()
   }
 
   this.updateString();
-}
+};
 
 Color.prototype.setRed = function( red )
 {
   this.red = red;
   this.updateString();
-}
+};
 
 Color.prototype.setGreen = function( green )
 {
   this.green = green;
   this.updateString();
-}
+};
 
 Color.prototype.setBlue = function( blue )
 {
   this.blue = blue;
   this.updateString();
-}
+};
 
 Color.prototype.setAlpha = function( alpha )
 {
   this.alpha = alpha;
   this.updateString();
-}
+};
 
 Color.prototype.getRgbaString = function()
 {
   return "rgba(" + this.red + "," + this.green  + "," + this.blue + "," + this.alpha + ")";
-}
+};
