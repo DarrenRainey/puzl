@@ -80,6 +80,7 @@ function VideoCellImage( sourceVideoObject, videoCellImageData )
   }
 
   this.canvas = CreateOffScreenCanvas();
+  SetCanvasDimensions( this.canvas, overallWidth, overallHeight );
 
   // Populate layer information.
   this.color = new Array();
