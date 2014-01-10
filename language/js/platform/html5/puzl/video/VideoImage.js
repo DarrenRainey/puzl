@@ -32,9 +32,10 @@ extend( VideoImage, VideoObject );
 
 VideoImage.prototype.setRealDimensions = function( width, height )
 {
-  if( this.canvas !== undefined )
+  if( this.canvas )
   {
     SetCanvasDimensions( this.canvas, width, height );
+    this.context = GetCanvasContext2D( this.canvas );
   }
 };
 
@@ -65,6 +66,12 @@ VideoImage.prototype.fill = function( color )
   var context = this.context;
   context.fillStyle = color.string;
   context.fillRect( 0, 0, canvas.width, canvas.height );
+  
+  var thisTargetVideoObject = this.targetVideoObject;
+  if( thisTargetVideoObject )
+  {
+    thisTargetVideoObject.addDirtyRectangle( this );
+  }
 };
 
 VideoImage.prototype.clear = function()
@@ -72,6 +79,12 @@ VideoImage.prototype.clear = function()
   var canvas = this.canvas;
   //var context = GetCanvasContext2D( canvas );
   this.context.clearRect( 0, 0, canvas.width, canvas.height );
+  
+  var thisTargetVideoObject = this.targetVideoObject;
+  if( thisTargetVideoObject )
+  {
+    thisTargetVideoObject.addDirtyRectangle( this );
+  }
 };
 
 VideoImage.prototype.load = function( filename )

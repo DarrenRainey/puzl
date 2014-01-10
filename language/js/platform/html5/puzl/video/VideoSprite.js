@@ -326,7 +326,10 @@ VideoSprite.prototype.setCurrentFrame = function( currentFrame )
   
   if( currentFrame !== thisAnimation.getCurrentFrame() )
   {
-    this.targetVideoObject.addDirtyRectangle( this );
+    if( this.targetVideoObject )
+    {
+      this.targetVideoObject.addDirtyRectangle( this );
+    }
   }
   
   thisAnimation.setCurrentFrame( currentFrame );
