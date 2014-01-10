@@ -32,7 +32,8 @@ VideoObject.prototype.setDimensions = function( width, height )
   
   Object2d.prototype.setDimensions.call( this, width, height );
 
-  if( this.context !== undefined )
+  //if( !this.context ) // TODO: Check / test if this is correct?
+  if( this.canvas )
   {
     this.context = GetCanvasContext2D( this.canvas );
   }
