@@ -100,7 +100,9 @@ function ProcessVideoImageLoad( loadEvent )
     videoImage = GlobalVideoSystem.videoImageLoadQueue[index];
     if( id === videoImage.id )
     {
-      if( ( videoImage.image.width === 0 ) && ( videoImage.image.height === 0 ) )
+      var videoImageWidth  = videoImage.image.width;
+      var videoImageHeight = videoImage.image.height;
+      if( ( videoImageWidth === 0 ) && ( videoImageHeight === 0 ) )
       {
         // Trash image and retry with a new one; something went wrong.
         // NOTE: This is a hack for webkit browsers running the load event before
@@ -114,10 +116,11 @@ function ProcessVideoImageLoad( loadEvent )
         return;
       }
       
-      videoImage.setDimensions( videoImage.image.width, videoImage.image.height );
-      //console.log( this.width );
-      //console.log( this.height );
-      videoImage.getContext().drawImage( videoImage.image, 0, 0 );
+      videoImage.setRealDimensions( videoImageWidth, videoImageHeight );
+      videoImage.setDimensions( videoImageWidth, videoImageHeight );
+      videoImage.context.drawImage( videoImage.image, 0, 0 );
+      
+      //OffScreenToOnScreenCanvas( videoImage.canvas );
       
       GlobalVideoSystem.videoImageLoadQueue.splice( index, 1 );
       //videoImage.image.src = null; // NOTE: Should this be nulled here?
@@ -204,6 +207,8 @@ function CreateOnScreenCanvas()
 function CreateOffScreenCanvas()
 {
   var canvas = document.createElement( "canvas" );
+  //canvas.width = 0;
+  //canvas.height = 0;
 
   //if( navigator.isCocoonJS !== undefined )
   //{
@@ -219,6 +224,7 @@ function OffScreenToOnScreenCanvas( oldCanvas )
 {
   //document.write( oldCanvas.outerHTML );
   var newCanvas = CreateOnScreenCanvas( oldCanvas.id );
+  SetCanvasDimensions( newCanvas, oldCanvas.width, oldCanvas.height );
   var context   = GetCanvasContext2D( newCanvas );
   context.drawImage( oldCanvas, 0, 0 );
   // NOTE: First draw sets the dimensions?
