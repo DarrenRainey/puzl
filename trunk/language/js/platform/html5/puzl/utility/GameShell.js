@@ -189,6 +189,11 @@ GameShell.prototype.clientScale = function()
   //var clientHeight = Math.max( Math.max( documentBody.offsetHeight, documentElement.offsetHeight ),
   //                             Math.max( documentBody.clientHeight, documentElement.clientHeight ) );
   
+  
+  var fullscreen = true;
+  var maintainAspectRatio = true;
+  var stretch = false;
+  
   var thisDisplay = this.display;
   var thisDisplayWidth  = thisDisplay.getWidth();
   var thisDisplayHeight = thisDisplay.getHeight();
@@ -196,22 +201,35 @@ GameShell.prototype.clientScale = function()
   var xScale = ( clientWidth  / thisDisplayWidth );
   var yScale = ( clientHeight / thisDisplayHeight );
 
-  if( true )//fullScreen )
+  if( fullscreen )
   {
-    xScale |= 0;
-    yScale |= 0;
-
-    if( xScale <= 0 )
+    var xScaleTruncated = xScale | 0;
+    var yScaleTruncated = yScale | 0;
+    /*var yScaleRemainder = xScale - xScaleTruncated;
+    var xScaleRemainder = yScale - yScaleTruncated;
+    
+    if( xScaleRemainder > 0.25 )
     {
-      xScale = 1;
+      stretch = true;
+    }*/
+    
+    if( !stretch )
+    {
+      xScale = xScaleTruncated;
+      yScale = yScaleTruncated;
+  
+      if( xScale <= 0 )
+      {
+        xScale = 1;
+      }
+  
+      if( yScale <= 0 )
+      {
+        yScale = 1;
+      }
     }
 
-    if( yScale <= 0 )
-    {
-      yScale = 1;
-    }
-
-    if( true )//maintainAspectRatio )
+    if( maintainAspectRatio )
     {
       xScale = yScale = Math.min( xScale, yScale );
     }
@@ -222,8 +240,8 @@ GameShell.prototype.clientScale = function()
     yScale = 1;
   }
 
-  var width  = thisDisplayWidth  * xScale;
-  var height = thisDisplayHeight * yScale;
+  var width  = ( thisDisplayWidth  * xScale ) | 0;
+  var height = ( thisDisplayHeight * yScale ) | 0;
   thisDisplay.setRealDimensions( width, height );
 
   // Center display (determine position offset).
