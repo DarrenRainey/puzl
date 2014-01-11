@@ -67,6 +67,12 @@ VideoDisplay.prototype.clear = function()
   }
 
   context.fillRect( 0, 0, this._width, this._height );
+  
+  var thisTargetVideoObject = this.targetVideoObject;
+  if( thisTargetVideoObject )
+  {
+    thisTargetVideoObject.addDirtyRectangle( this );
+  }
 };
 
 VideoDisplay.prototype.setBackgroundColor = function( color )
