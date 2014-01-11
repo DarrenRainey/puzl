@@ -1,35 +1,28 @@
 function GameScreen( gameShell, parentScreen )
 {
-  this.gameShell;
-  this.parentScreen;
-  
-  this.subScreenIndex;
-  this.subScreen;
-  this.subScreenList;
-  
   // Constructor.
   this.gameShell    = gameShell;
   this.parentScreen = parentScreen; // TODO: Check for undefined.
 
-  this.subScreenIndex = -1;
   this.subScreen      = null;
-  this.subScreenList  = new Array();
+  this.nextSubScreen  = null;
+  this.resetSubScreen = true;
 }
 
-GameScreen.prototype.setSubScreenIndex = function( subScreenIndex )
+GameScreen.prototype.setNextSubScreen = function( nextSubScreen, reset )
 {
   //console.log( "GameScreen::setSubScreenIndex(" + subScreenIndex + ")" );
-  if( this.subScreenIndex === subScreenIndex )
+  if( this.subScreen != nextSubScreen )
   {
-    return;
+    this.nextSubScreen = nextSubScreen;
   }
   
-  this.subScreenIndex = subScreenIndex;
-  this.subScreen      = this.subScreenList[this.subScreenIndex];
-
-  // NOTE: Kind of crappily needed for instance runs to recongize
-  // this.parentScreen when running subscreen routines.
-  //this.parentScreen   = this;
+  if( reset === undefined )
+  {
+    reset = false;
+  }
+  
+  this.resetSubScreen = reset;
 };
 
 GameScreen.prototype.initialize = function()
@@ -44,25 +37,36 @@ GameScreen.prototype.postInitialize = function()
 
 GameScreen.prototype.reset = function()
 {
-  this.subScreen.reset();
+  if( this.subScreen != null )
+  {
+    this.subScreen.reset();
+    this.resetSubScreen = false;
+  }
 };
 
 GameScreen.prototype.input = function()
 {
-  this.subScreen.input();
+  if( this.subScreen != null )
+  {
+    this.subScreen.input();
+  }
 };
 
 GameScreen.prototype.logic = function()
 {
-  this.subScreen.logic();
-};
-
-GameScreen.prototype.resize = function()
-{
-  if( this.subScreen != null )
-  if( this.subScreen.resize != undefined )
+  if( this.nextSubScreen != null )
   {
-    this.subScreen.resize();
+    this.subScreen = this.nextSubScreen;
+    this.nextSubScreen = null;
+  }
+  
+  if( this.resetSubScreen )
+  {
+    this.reset();
+  }
+  
+  if( this.subScreen != null )
+  {
+    this.subScreen.logic();
   }
 };
-
