@@ -72,7 +72,14 @@ VideoDisplay.prototype.clear = function()
 VideoDisplay.prototype.setBackgroundColor = function( color )
 {
   this.backgroundColor.copy( color );
-  //document.body.style.backgroundColor = color.string;
+};
+
+VideoDisplay.prototype.setBorderColor = function( color )
+{
+  if( color )
+  {
+    document.body.style.backgroundColor = color.string;
+  }
 };
 
 VideoDisplay.prototype.setForegroundColor = function( color )
