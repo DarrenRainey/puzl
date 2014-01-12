@@ -96,12 +96,22 @@ VideoObject.prototype.addObject = function( videoObject )
 {
   Object2d.prototype.addObject.call( this, videoObject );
 
-  videoObject.orderId = this.objectList.length - 1;
+  videoObject.orderId = this.objectList.length - 1; // TODO: This needs to be based on highest value in list, not length of list.
 
   if( videoObject.targetVideoObject === null )
   {
     videoObject.targetVideoObject = this;
   }
+};
+
+VideoObject.prototype.removeObject = function( videoObject )
+{
+  Object2d.prototype.removeObject.call( this, videoObject );
+
+  // NOTE: Don't bother with order ID?
+  //videoObject.orderId = this.objectList.length - 1;
+  
+  videoObject.targetVideoObject = null;
 };
 
 VideoObject.prototype.getCanvas = function()

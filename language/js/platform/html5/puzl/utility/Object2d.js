@@ -125,8 +125,8 @@ Object2d.prototype.addObject = function( object )
 
 Object2d.prototype.removeObject = function( object )
 {
+  // TODO: Optimize (at least use a decrementing do while loop).
   var thisObjectList = this.objectList;
-  
   var length = thisObjectList.length;
   var index;
   for( index = 0; index < length; index++ )
@@ -135,11 +135,12 @@ Object2d.prototype.removeObject = function( object )
     {
       object.parentObject = null;
       thisObjectList.splice( index, 1 );
-      return;
+      break;
     }
   }
 
-  // NOTE: Should this update the quad tree?
+  // Update the quad tree?
+  this.quadTree.remove( object );
 };
 
 Object2d.prototype.clearObjects = function()
@@ -155,7 +156,7 @@ Object2d.prototype.clearObjects = function()
 
   thisObjectList.length = 0;
 
-  // NOTE: Should this update the quad tree?
+  // TODO: This should update the quad tree (clear it out completely).
 };
 
 Object2d.prototype.insertIntoParentQuadTree = function()
