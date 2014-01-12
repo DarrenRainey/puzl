@@ -252,6 +252,40 @@ QuadTreeNode.prototype.insert = function( object2d )
   this.objectList.push( object2d );
 };
 
+QuadTreeNode.prototype.remove = function( object2d )
+{
+  // TODO: Optimize (at least use a decrementing do while loop).
+  var thisObjectList = this.objectList;
+  var thisObjectListLength = thisObjectList.length;
+  if( thisObjectListLength > 0 )
+  {
+    // Check this node first.
+    var index = thisObjectListLength - 1;
+    do
+    {
+      if( object2d == thisObjectList[index] )
+      {
+        thisObjectList.splice( index, 1 );
+        object2d.quadTreeNode = null;
+        return true;
+      }
+    }
+    while( --index > -1 );
+  }
+  
+  var targetSubNodeIndex = this.getQuadrantId( object2d );
+  if( targetSubNodeIndex !== -1 )
+  {
+    var subNode = this.subNodeList[targetSubNodeIndex];
+    if( subNode === null )
+    {
+      return false;
+    }
+      
+    return subNode.remove( object2d );
+  }
+};
+
 QuadTreeNode.prototype.query = function( rectangle, queryResultList )
 {
   if( queryResultList === undefined )
