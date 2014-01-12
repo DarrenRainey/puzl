@@ -63,6 +63,7 @@ GameScreen.prototype.logic = function()
   if( this.resetSubScreen )
   {
     this.reset();
+    this.resetSubScreen = false;
   }
   
   if( this.subScreen != null )
