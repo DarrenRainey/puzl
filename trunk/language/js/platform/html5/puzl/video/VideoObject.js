@@ -96,8 +96,16 @@ VideoObject.prototype.addObject = function( videoObject )
 {
   Object2d.prototype.addObject.call( this, videoObject );
 
-  videoObject.orderId = this.objectList.length - 1; // TODO: This needs to be based on highest value in list, not length of list.
-
+  var objectListLength = this.objectList.length;
+  if( objectListLength > 0 )
+  {
+    videoObject.orderId = this.objectList[objectListLength - 1].orderId + 1;
+  }
+  else
+  {
+    videoObject.orderId = 0;
+  }
+  
   if( videoObject.targetVideoObject === null )
   {
     videoObject.targetVideoObject = this;
