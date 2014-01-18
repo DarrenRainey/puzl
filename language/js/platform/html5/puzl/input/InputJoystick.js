@@ -6,6 +6,8 @@
 var INPUT_TYPE_JOYSTICK_BUTTON = 2;
 //var NUM_BUTTONS = 3;
 
+GlobalJoystickList = new Array();
+
 function InputJoystick()
 {
   InputDevice.call( this );
@@ -34,6 +36,8 @@ function InputJoystick()
   this.stateChangeBufferSize = 10;
   this.stateChange = new Array( this.stateChangeBufferSize );
   this.numberOfStateChanges = 0;
+  
+  GlobalJoystickList.push( this );
 }
 
 extend( InputJoystick, InputDevice );
@@ -75,18 +79,36 @@ InputJoystick.prototype.getLastButtonPress = function()
   return this.getLastInputId();
 };
 
-InputJoystick.prototype.updateWithGamepad = function( gamepad )
+if( !!navigator.webkitGetGamepads )
 {
-  var gamepadAxes = gamepad.axes;
-  this.xAxis = gamepadAxes[0];
-  this.yAxis = gamepadAxes[1];
-  
-  var gamepadButtons = gamepad.buttons;
-
-  var index;
-  for( index = 0; index < NUM_BUTTONS; index++ )
+  InputJoystick.prototype.updateWithGamepad = function( gamepad )
   {
-    this.setButtonState( index, gamepadButtons[index] !== 0 ? BUTTON_STATE_DOWN : BUTTON_STATE_UP );
-  }
-  
-};
+    var gamepadAxes = gamepad.axes;
+    this.xAxis = gamepadAxes[0];
+    this.yAxis = gamepadAxes[1];
+
+    var gamepadButtons = gamepad.buttons;
+
+    for( var index = 0; index < NUM_BUTTONS; index++ )
+    {
+      this.setButtonState( index, gamepadButtons[index] !== 0 ? BUTTON_STATE_DOWN : BUTTON_STATE_UP );
+    }
+  };
+}
+else
+if( !!navigator.getGamepads )
+{
+  InputJoystick.prototype.updateWithGamepad = function( gamepad )
+  {
+    var gamepadAxes = gamepad.axes;
+    this.xAxis = gamepadAxes[0];
+    this.yAxis = gamepadAxes[1];
+
+    var gamepadButtons = gamepad.buttons;
+
+    for( var index = 0; index < NUM_BUTTONS; index++ )
+    {
+      this.setButtonState( index, gamepadButtons[index].pressed ? BUTTON_STATE_DOWN : BUTTON_STATE_UP );
+    }
+  };
+}
