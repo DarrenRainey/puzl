@@ -46,6 +46,18 @@ GameScreen.prototype.reset = function()
 
 GameScreen.prototype.input = function()
 {
+  if( this.nextSubScreen != null )
+  {
+    this.subScreen = this.nextSubScreen;
+    this.nextSubScreen = null;
+  }
+  
+  if( this.resetSubScreen ) // NOTE: Should reset run here before logic?
+  {
+    this.reset();
+    this.resetSubScreen = false;
+  }
+  
   if( this.subScreen != null )
   {
     this.subScreen.input();
@@ -54,18 +66,6 @@ GameScreen.prototype.input = function()
 
 GameScreen.prototype.logic = function()
 {
-  if( this.nextSubScreen != null )
-  {
-    this.subScreen = this.nextSubScreen;
-    this.nextSubScreen = null;
-  }
-  
-  if( this.resetSubScreen )
-  {
-    this.reset();
-    this.resetSubScreen = false;
-  }
-  
   if( this.subScreen != null )
   {
     this.subScreen.logic();
