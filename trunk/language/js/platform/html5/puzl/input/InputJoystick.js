@@ -70,7 +70,33 @@ InputJoystick.prototype.setButtonState = function( buttonID, state )
 {
   if( buttonID < NUM_BUTTONS )
   {
-    this.setState( buttonID, state );
+    var currentState = this.getState( buttonID );
+    if( state === INPUT_STATE_PRESSED )
+    {
+      if( currentState === INPUT_STATE_PRESSED )
+      {
+        this.setState( buttonID, INPUT_STATE_DOWN );
+      }
+      else
+      if( ( currentState === INPUT_STATE_UP ) ||
+          ( currentState === INPUT_STATE_RELEASED ) )
+      {
+        this.setState( buttonID, state );
+      }
+    }
+    else // ( state === INPUT_STATE_RELEASED )
+    {
+      if( currentState === INPUT_STATE_RELEASED )
+      {
+        this.setState( buttonID, INPUT_STATE_UP );
+      }
+      else
+      if( ( currentState === INPUT_STATE_DOWN ) ||
+          ( currentState === INPUT_STATE_PRESSED ) )
+      {
+        this.setState( buttonID, state );
+      }
+    }
   }
 };
 
@@ -91,7 +117,7 @@ if( !!navigator.webkitGetGamepads )
 
     for( var index = 0; index < NUM_BUTTONS; index++ )
     {
-      this.setButtonState( index, gamepadButtons[index] !== 0 ? BUTTON_STATE_DOWN : BUTTON_STATE_UP );
+      this.setButtonState( index, gamepadButtons[index] !== 0 ? BUTTON_STATE_PRESSED : BUTTON_STATE_RELEASED );
     }
   };
 }
@@ -108,7 +134,7 @@ if( !!navigator.getGamepads )
 
     for( var index = 0; index < NUM_BUTTONS; index++ )
     {
-      this.setButtonState( index, gamepadButtons[index].pressed ? BUTTON_STATE_DOWN : BUTTON_STATE_UP );
+      this.setButtonState( index, gamepadButtons[index].pressed ? BUTTON_STATE_PRESSED : BUTTON_STATE_RELEASED );
     }
   };
 }

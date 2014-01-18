@@ -185,12 +185,12 @@ InputSystem.prototype.update = function()
   {
     deviceList = this.joysticks;
 
-    index = numberOfDevices - 1;
+    /*index = numberOfDevices - 1;
     do
     {
       deviceList[index].age();
     }
-    while( --index > -1 );
+    while( --index > -1 );*/
   }
 
   if( this.supportsGamepads )
