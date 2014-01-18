@@ -94,8 +94,6 @@ VideoObject.prototype.setYPosition = function( yPosition )
 
 VideoObject.prototype.addObject = function( videoObject )
 {
-  Object2d.prototype.addObject.call( this, videoObject );
-
   var objectListLength = this.objectList.length;
   if( objectListLength > 0 )
   {
@@ -105,6 +103,8 @@ VideoObject.prototype.addObject = function( videoObject )
   {
     videoObject.orderId = 0;
   }
+  
+  Object2d.prototype.addObject.call( this, videoObject );
   
   if( videoObject.targetVideoObject === null )
   {
