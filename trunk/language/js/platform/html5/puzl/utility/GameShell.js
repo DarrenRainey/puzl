@@ -23,7 +23,7 @@ function VBlank()
 
 function GameShell( gameShellSettings )
 {
-  this.inputSystem;
+  /*this.inputSystem;
   this.videoSystem;
   this.soundSystem;
   
@@ -38,7 +38,7 @@ function GameShell( gameShellSettings )
   
   this.logic;
 
-  this.xmlHttpRequestLoadQueue;
+  this.xmlHttpRequestLoadQueue;*/
   
   // Constructor.
   //console.log( "GameShell::constructor()" );
@@ -53,9 +53,13 @@ function GameShell( gameShellSettings )
     this.gameShellSettings = new GameShellSettings();
   }
   
+  this.initialized = false;
+  
   this.quit = false;
 
   this.xmlHttpRequestLoadQueue = new Array();
+  
+  this.loadingResources = false;
 }
 
 GameShell.prototype.run = function()
@@ -91,6 +95,8 @@ GameShell.prototype.shellInitialize = function()
   this.audioSystem = new AudioSystem();
 
   this.initialize();
+  
+  this.loadingResources = true; // Set to attempt to load resources.
   this.shellPostInitialize();
 };
 
@@ -100,21 +106,19 @@ GameShell.prototype.shellPostInitialize = function()
 
   // Make sure all initial resources, queued up previous to this point
   // (during (pre)initialize), have been loaded and processed.
-  if( this.videoSystem.videoImageLoadQueue.length > 0 )
+  if( this.loadingResources && this.loadResources() )
   {
-    this.videoSystem.processImageLoadQueue();
-    return;
-  }
-
-  if( this.xmlHttpRequestLoadQueue.length > 0 )
-  {
-    this.processXmlHttpRequestLoadQueue();
     return;
   }
   
   // Continue with the game initialization and start main loop!
-  this.postInitialize();
-  this.shellLoop();
+  if( !this.initialized )
+  {
+    this.postInitialize();
+    this.initialized = true;
+    
+    this.shellLoop();
+  }
 };
 
 GameShell.prototype.shellShutdown = function()
@@ -132,6 +136,11 @@ GameShell.prototype.shellLoop = function()
   //console.log( "GameShell::shellLoop()" );
   if( !this.quit )
   {
+    if( this.loadingResources )
+    {
+      this.loadResources();
+    }
+    
     this.input();
     this.logic();
     this.inputSystem.update();
@@ -279,6 +288,35 @@ GameShell.prototype.queueXmlHttpRequest = function( resourceArray, filename )
   xmlHttpRequest.onload = ProcessXmlHttpRequestLoad;
   
   this.xmlHttpRequestLoadQueue[this.xmlHttpRequestLoadQueue.length] = xmlHttpRequest;
+};
+
+GameShell.prototype.loadResources = function()
+{
+  if( this.videoSystem.videoImageLoadQueue.length > 0 )
+  {
+    this.videoSystem.processImageLoadQueue();
+    
+    if( this.videoSystem.videoImageLoadQueue.length > 0 )
+    {
+      this.loadingResources = true;
+    }
+  }
+  else
+  if( this.xmlHttpRequestLoadQueue.length > 0 )
+  {
+    this.processXmlHttpRequestLoadQueue();
+    
+    if( this.xmlHttpRequestLoadQueue.length > 0 )
+    {
+      this.loadingResources = true;
+    }
+  }
+  else
+  {
+    this.loadingResources = false;
+  }
+  
+  return this.loadingResources;
 };
 
 GameShell.prototype.processXmlHttpRequestLoadQueue = function()
