@@ -79,6 +79,11 @@ extend( BlockGraphic, VideoCellImage );
 
 BlockGraphic.prototype.print = function( text )
 {
+  if( text === undefined )
+  {
+    return;
+  }
+  
   var isString;
   var length;
   if( text.length !== undefined ) // TODO: REALLY crummy way to determine if text is string.
@@ -101,6 +106,8 @@ BlockGraphic.prototype.print = function( text )
   
   var targetVideoObject = this.targetVideoObject;
   var context = targetVideoObject.context;
+  
+  var targetTargetVideoObject = targetVideoObject.targetVideoObject;
 
   var hasAlpha; // TODO: Optimize. Could allocate this value once for each blockgraphic object.
   if( this.alpha !== 1 )
@@ -137,14 +144,17 @@ BlockGraphic.prototype.print = function( text )
     return;
   }
 
-  var tempDirtyRectangle = this.tempDirtyRectangle;
-  var tempDirtyRectangleStartPoint = tempDirtyRectangle.startPoint;
-  tempDirtyRectangleStartPoint.x = xPosition;
-  tempDirtyRectangleStartPoint.y = yPosition;
-  var tempDirtyRectangleEndPoint = tempDirtyRectangle.endPoint;
-  tempDirtyRectangleEndPoint.x = xPosition + printWidth - 1;
-  tempDirtyRectangleEndPoint.y = yPosition + thisHeight - 1;
-
+  if( targetTargetVideoObject )
+  {
+    var tempDirtyRectangle = this.tempDirtyRectangle;
+    var tempDirtyRectangleStartPoint = tempDirtyRectangle.startPoint;
+    tempDirtyRectangleStartPoint.x = xPosition;
+    tempDirtyRectangleStartPoint.y = yPosition;
+    var tempDirtyRectangleEndPoint = tempDirtyRectangle.endPoint;
+    tempDirtyRectangleEndPoint.x = xPosition + printWidth - 1;
+    tempDirtyRectangleEndPoint.y = yPosition + thisHeight - 1;
+  }
+  
   if( this.replace )
   {
     context.clearRect( xPosition, yPosition, printWidth, thisHeight );
@@ -188,7 +198,11 @@ BlockGraphic.prototype.print = function( text )
       xPosition += thisWidth;
     }
 
-    targetVideoObject.targetVideoObject.addDirtyRectangle( tempDirtyRectangle );
+
+    if( targetTargetVideoObject )
+    {
+      targetTargetVideoObject.addDirtyRectangle( tempDirtyRectangle );
+    }
   }
   else
   {
@@ -203,7 +217,10 @@ BlockGraphic.prototype.print = function( text )
                            xPosition, yPosition,
                            thisWidth, thisHeight );
 
-        targetVideoObject.targetVideoObject.addDirtyRectangle( tempDirtyRectangle );
+        if( targetTargetVideoObject )
+        {
+          targetTargetVideoObject.addDirtyRectangle( tempDirtyRectangle );
+        }
       }
     }
 
