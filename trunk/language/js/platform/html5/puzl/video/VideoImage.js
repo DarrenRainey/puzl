@@ -74,16 +74,36 @@ VideoImage.prototype.fill = function( color )
   }
 };
 
-VideoImage.prototype.clear = function()
+VideoImage.prototype.clear = function( rectangle )
 {
   var canvas = this.canvas;
   //var context = GetCanvasContext2D( canvas );
-  this.context.clearRect( 0, 0, canvas.width, canvas.height );
+  
+  if( rectangle )
+  {
+    var rectangleStartPoint  = rectangle.startPoint;
+    var rectangleStartPointX = rectangleStartPoint.x;
+    var rectangleStartPointY = rectangleStartPoint.y;
+    var rectangleEndPoint    = rectangle.endPoint;
+    this.context.clearRect( rectangleStartPointX, rectangleStartPointY,
+                            rectangleEndPoint.x - rectangleStartPointX + 1, rectangleEndPoint.y - rectangleStartPointY + 1 );
+  }
+  else
+  {
+    this.context.clearRect( 0, 0, canvas.width, canvas.height );
+  }
   
   var thisTargetVideoObject = this.targetVideoObject;
   if( thisTargetVideoObject )
   {
-    thisTargetVideoObject.addDirtyRectangle( this );
+    if( rectangle )
+    {
+      thisTargetVideoObject.addDirtyRectangle( rectangle );
+    }
+    else
+    {
+      thisTargetVideoObject.addDirtyRectangle( this );
+    }
   }
 };
 
