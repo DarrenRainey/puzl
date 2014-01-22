@@ -91,6 +91,8 @@ GameShell.prototype.shellInitialize = function()
   this.mouse = this.inputSystem.getMouse( 0 );
   
   this.clientScale();
+  
+  this.pageParameters = GeneralUtil.getPageParameters();
 
   this.audioSystem = new AudioSystem();
 
