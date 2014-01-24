@@ -36,13 +36,13 @@ function VideoSprite( sourceVideoObject, videoSpriteData )
   //console.log( "Creating VideoSprite" );
   VideoCellImage.call( this, sourceVideoObject, videoSpriteData );
 
-  this.velocity;
+  /*this.velocity;
 
   this.attributes;
   this.state;
 
   this.animation;
-  this.animationNameIndexHash;
+  this.animationNameIndexHash;*/
 
   // Constructor.
   if( sourceVideoObject === undefined )
@@ -58,6 +58,9 @@ function VideoSprite( sourceVideoObject, videoSpriteData )
     console.error( "Attempting to load VideoSprite without driving data." );
     return null;
   }
+  
+  this.scale = new Vector2d( 1, 1 );
+  this.scaled = false;
   
   this.velocity = new Vector2d( 0, 0 );
   
@@ -131,32 +134,84 @@ VideoSprite.prototype.drawTo = function( targetVideoObject, rectangle )
     return;
   }
 
-  var rectangleStartPoint = rectangle.startPoint;
-  var rectangleStartX = rectangleStartPoint.x;
-  var rectangleStartY = rectangleStartPoint.y;
-  var thisStartPoint = this.startPoint;
-  var xOffset = rectangleStartX - thisStartPoint.x;
-  var yOffset = rectangleStartY - thisStartPoint.y;
-  var rectangleEndPoint = rectangle.endPoint;
-  var rectangleWidth  = rectangleEndPoint.x - rectangleStartX + 1;
-  var rectangleHeight = rectangleEndPoint.y - rectangleStartY + 1;
-
-  // TODO: Needs to factor in scaled dimensions.
-  context.drawImage( this.canvas,
-                     cell[0] + xOffset, cell[1] + yOffset,
-
-                     rectangleWidth,
-                     rectangleHeight,
-
-                     rectangleStartX, rectangleStartY,
-
-                     rectangleWidth,
-                     rectangleHeight );
+  if( !this.scaled )
+  {
+    var rectangleStartPoint = rectangle.startPoint;
+    var rectangleStartX = rectangleStartPoint.x;
+    var rectangleStartY = rectangleStartPoint.y;
+    
+    var thisStartPoint = this.startPoint;
+    var xOffset = rectangleStartX - thisStartPoint.x;
+    var yOffset = rectangleStartY - thisStartPoint.y;
+    
+    var rectangleEndPoint = rectangle.endPoint;
+    var rectangleWidth  = rectangleEndPoint.x - rectangleStartX + 1;
+    var rectangleHeight = rectangleEndPoint.y - rectangleStartY + 1;
+  
+    context.drawImage( this.canvas,
+                       cell[0] + xOffset, cell[1] + yOffset,
+  
+                       rectangleWidth,
+                       rectangleHeight,
+  
+                       rectangleStartX, rectangleStartY,
+  
+                       rectangleWidth,
+                       rectangleHeight );
+  }
+  else
+  {
+    // Factor in scaled dimensions.
+    var scale = this.scale;
+    var scaleX = scale.x;
+    var scaleY = scale.y;
+    
+    var rectangleStartPoint = rectangle.startPoint;
+    var rectangleStartX = rectangleStartPoint.x;
+    var rectangleStartY = rectangleStartPoint.y;
+    
+    var thisStartPoint = this.startPoint;
+    var xOffset = ( rectangleStartX - thisStartPoint.x ) / scaleX;
+    var yOffset = ( rectangleStartY - thisStartPoint.y ) / scaleX;
+    
+    var rectangleEndPoint = rectangle.endPoint;
+    var rectangleWidth  = rectangleEndPoint.x - rectangleStartX + 1;
+    var rectangleHeight = rectangleEndPoint.y - rectangleStartY + 1;
+  
+    context.drawImage( this.canvas,
+                       cell[0] + xOffset, cell[1] + yOffset,
+  
+                       rectangleWidth / scaleX,
+                       rectangleHeight / scaleY,
+  
+                       rectangleStartX, rectangleStartY,
+  
+                       rectangleWidth,
+                       rectangleHeight );
+  }
   
   if( hasAlpha )
   {
     context.globalAlpha = 1;
   }
+};
+
+VideoSprite.prototype.setDimensions = function( width, height )
+{
+  var scale = this.scale;
+  scale.x = width  / this.cellWidth;
+  scale.y = height / this.cellHeight;
+  
+  if( scale.x === 1 && scale.y === 1 )
+  {
+    this.scaled = false;
+  }
+  else
+  {
+    this.scaled = true;
+  }
+  
+  VideoCellImage.prototype.setDimensions.call( this, width, height );
 };
 
 VideoSprite.prototype.getXVelocity = function()
@@ -294,7 +349,10 @@ VideoSprite.prototype.setCurrentSequence = function( currentSequence )
   thisAnimation.setCurrentSequence( currentSequence );
   if( previousFrame !== thisAnimation.getCurrentFrame() )
   {
-    this.targetVideoObject.addDirtyRectangle( this );
+    if( this.targetVideoObject ) // NOTE: This check and others like it in this class could be optimized by checking it before it's previous condition (eg ...getCurrentFrame())
+    {
+      this.targetVideoObject.addDirtyRectangle( this );
+    }
   }
 };
 
@@ -309,7 +367,10 @@ VideoSprite.prototype.setFrameIndex = function( frameIndex )
 
   if( frameIndex !== thisAnimation.getFrameIndex() )
   {
-    this.targetVideoObject.addDirtyRectangle( this );
+    if( this.targetVideoObject )
+    {
+      this.targetVideoObject.addDirtyRectangle( this );
+    }
   }
 
   thisAnimation.setFrameIndex( frameIndex );
@@ -356,7 +417,10 @@ VideoSprite.prototype.animate = function()
   var frameChanged = this.animation.read();
   if( frameChanged )
   {
-    this.targetVideoObject.addDirtyRectangle( this );
+    if( this.targetVideoObject )
+    {
+      this.targetVideoObject.addDirtyRectangle( this );
+    }
   }
 
   return frameChanged;
