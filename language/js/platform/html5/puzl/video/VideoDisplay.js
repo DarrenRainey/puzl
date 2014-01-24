@@ -67,12 +67,6 @@ VideoDisplay.prototype.clear = function()
   }
 
   context.fillRect( 0, 0, this._width, this._height );
-  
-  var thisTargetVideoObject = this.targetVideoObject;
-  if( thisTargetVideoObject )
-  {
-    thisTargetVideoObject.addDirtyRectangle( this );
-  }
 };
 
 VideoDisplay.prototype.setBackgroundColor = function( color )
@@ -102,17 +96,33 @@ VideoDisplay.prototype.drawRectangleTo = function( targetVideoObject, xPosition,
   
   var context = targetVideoObject.context;
   context.fillStyle = this.foregroundColor.string;
-  context.fillRect( xPosition, yPosition, width, height );
   
-  var tempDirtyRectangle = this.tempDirtyRectangle;
-  var tempDirtyRectangleStartPoint = tempDirtyRectangle.startPoint;
-  tempDirtyRectangleStartPoint.x = xPosition;
-  tempDirtyRectangleStartPoint.y = yPosition;
-  var tempDirtyRectangleEndPoint = tempDirtyRectangle.endPoint;
-  tempDirtyRectangleEndPoint.x = xPosition + width - 1;
-  tempDirtyRectangleEndPoint.y = yPosition + height - 1;
-  
-  targetVideoObject.targetVideoObject.addDirtyRectangle( tempDirtyRectangle );
+  if( yPosition !== undefined )
+  {
+    context.fillRect( xPosition, yPosition, width, height );
+    
+    var tempDirtyRectangle = this.tempDirtyRectangle;
+    var tempDirtyRectangleStartPoint = tempDirtyRectangle.startPoint;
+    tempDirtyRectangleStartPoint.x = xPosition;
+    tempDirtyRectangleStartPoint.y = yPosition;
+    var tempDirtyRectangleEndPoint = tempDirtyRectangle.endPoint;
+    tempDirtyRectangleEndPoint.x = xPosition + width - 1;
+    tempDirtyRectangleEndPoint.y = yPosition + height - 1;
+    
+    targetVideoObject.targetVideoObject.addDirtyRectangle( tempDirtyRectangle );
+  }
+  else
+  {
+    var rectangle = xPosition;
+    var rectangleStartPoint = rectangle.startPoint;
+    var rectangleStartPointX = rectangleStartPoint.x;
+    var rectangleStartPointY = rectangleStartPoint.y;
+    var rectangleEndPoint = rectangle.endPoint;
+    context.fillRect( rectangleStartPointX, rectangleStartPointY,
+                      rectangleEndPoint.x - rectangleStartPointX + 1, rectangleEndPoint.y - rectangleStartPointY + 1 );
+                      
+    targetVideoObject.targetVideoObject.addDirtyRectangle( rectangle );
+  }
 };
 
 VideoDisplay.prototype.drawRectangle = function( xPosition, yPosition, width, height )
