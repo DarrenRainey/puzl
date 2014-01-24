@@ -109,6 +109,7 @@ VideoObject.prototype.addObject = function( videoObject )
   if( videoObject.targetVideoObject === null )
   {
     videoObject.targetVideoObject = this;
+    this.addDirtyRectangle( videoObject );
   }
 };
 
