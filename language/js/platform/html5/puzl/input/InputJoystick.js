@@ -105,7 +105,7 @@ InputJoystick.prototype.getLastButtonPress = function()
   return this.getLastInputId();
 };
 
-if( !!navigator.webkitGetGamepads )
+if( !!navigator.webkitGetGamepads || !!navigator.isCocoonJS )
 {
   InputJoystick.prototype.updateWithGamepad = function( gamepad )
   {
@@ -114,7 +114,6 @@ if( !!navigator.webkitGetGamepads )
     this.yAxis = gamepadAxes[1];
 
     var gamepadButtons = gamepad.buttons;
-
     for( var index = 0; index < NUM_BUTTONS; index++ )
     {
       this.setButtonState( index, gamepadButtons[index] !== 0 ? BUTTON_STATE_PRESSED : BUTTON_STATE_RELEASED );
@@ -131,7 +130,6 @@ if( !!navigator.getGamepads )
     this.yAxis = gamepadAxes[1];
 
     var gamepadButtons = gamepad.buttons;
-
     for( var index = 0; index < NUM_BUTTONS; index++ )
     {
       this.setButtonState( index, gamepadButtons[index].pressed ? BUTTON_STATE_PRESSED : BUTTON_STATE_RELEASED );
