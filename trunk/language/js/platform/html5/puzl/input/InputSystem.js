@@ -70,13 +70,12 @@ function InputSystem()
     var gamepadList = navigator.getGamepads();
     if( gamepadList !== null )
     {
-      //console.log( gamepadList );
-      
       // Determine actual number of valid / defined gamepads.
       var gamepadListLength = gamepadList.length;
       for( index = 0; index < gamepadListLength; index++ )
       {
-        if( gamepadList[index] !== undefined )
+        gamepad = gamepadList[index];
+        if( gamepad !== undefined )
         {
           numberOfJoysticks++;
         }
@@ -84,14 +83,19 @@ function InputSystem()
     }
     
     this.numberOfJoysticks = numberOfJoysticks;
+    console.log( "Number of gamepads found:  " + numberOfJoysticks );
     
     var joysticks = this.joysticks = new Array();
     
     if( numberOfJoysticks !== 0 )
     {
+      var gamepad = null;
       for( index = 0; index < numberOfJoysticks; index++ )
       {
         joysticks.push( new InputJoystick() );
+        
+        gamepad = gamepadList[index];
+        console.log( index + ":  " + gamepad.id );
       }
     }
   }
@@ -197,10 +201,23 @@ InputSystem.prototype.update = function()
   {
     var gamepadList = navigator.getGamepads();
     if( gamepadList !== undefined )
-    {
+    { 
       deviceList = this.joysticks;
       
-      var numberOfGamepads = gamepadList.length;
+      // Get number of legit connected gamepads (must do until connected / disconnected events are abided).
+      var numberOfGamepads = 0;
+      var gamepad;
+      index = gamepadList.length - 1;
+      do
+      {
+        gamepad = gamepadList[index];
+        if( gamepad !== undefined )
+        {
+          numberOfGamepads++;
+        }
+      }
+      while( --index > -1 );
+      
       //numberOfDevices = this.numberOfJoysticks; // NOTE: numberOfDevices is already this.numberOfJoysticks!
       if( numberOfDevices < numberOfGamepads )
       {
@@ -216,7 +233,6 @@ InputSystem.prototype.update = function()
 
       // NOTE: This code assumes joystick and corresponding gamepad indexes are the same.
       // This notion needs to be investigated.
-      var gamepad;
       index = numberOfGamepads - 1;
       do
       {
