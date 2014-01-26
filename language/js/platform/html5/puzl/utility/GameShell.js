@@ -118,9 +118,9 @@ GameShell.prototype.shellPostInitialize = function()
   {
     this.postInitialize();
     this.initialized = true;
-    
-    this.shellLoop();
   }
+    
+  this.shellLoop();
 };
 
 GameShell.prototype.shellShutdown = function()
@@ -141,6 +141,7 @@ GameShell.prototype.shellLoop = function()
     if( this.loadingResources )
     {
       this.loadResources();
+      return;
     }
     
     this.input();
