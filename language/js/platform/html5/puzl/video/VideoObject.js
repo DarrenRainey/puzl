@@ -113,6 +113,47 @@ VideoObject.prototype.addObject = function( videoObject )
   }
 };
 
+VideoObject.prototype.addObjectBefore = function( videoObject, afterVideoObject )
+{
+  var objectList = this.objectList;
+  var objectListLength = objectList.length;
+  
+  var afterVideoObjectIndex = objectListLength - 1;
+  do
+  {
+    if( objectList[afterVideoObjectIndex] === afterVideoObject )
+    {
+      break;
+    }
+  }
+  while( --afterVideoObjectIndex > -1 );
+  
+  if( afterVideoObjectIndex === 0 )
+  {
+    videoObject.orderId = afterVideoObject.orderId / 2;
+  }
+  else
+  if( afterVideoObjectIndex > -1 )
+  {
+    var previousOrderId = objectList[afterVideoObjectIndex - 1].orderId;
+    var afterOrderId = afterVideoObject.orderId;
+    videoObject.orderId = previousOrderId + ( ( afterOrderId - previousOrderId ) / 2 );
+  }
+  else
+  {
+    this.addObject( videoObject );
+    return;
+  }
+  
+  Object2d.prototype.addObject.call( this, videoObject, afterVideoObjectIndex );
+  
+  if( videoObject.targetVideoObject === null )
+  {
+    videoObject.targetVideoObject = this;
+    this.addDirtyRectangle( videoObject );
+  }
+};
+
 VideoObject.prototype.removeObject = function( videoObject )
 {
   Object2d.prototype.removeObject.call( this, videoObject );

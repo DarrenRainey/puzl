@@ -97,7 +97,7 @@ Object2d.prototype.setDimensions = function( width, height )
   this.insertIntoParentQuadTree();
 };
 
-Object2d.prototype.addObject = function( object )
+Object2d.prototype.addObject = function( object, atIndex )
 {
   //console.log( object.name );
   // TODO: Make sure object2d is not already in the list.
@@ -118,7 +118,15 @@ Object2d.prototype.addObject = function( object )
   }
   
   object.parentObject = this;
-  this.objectList.push( object );
+  
+  if( atIndex )
+  {
+    this.objectList.splice( atIndex, 0, object );
+  }
+  else
+  {
+    this.objectList.push( object );
+  }
 
   this.quadTree.insert( object );
 };
