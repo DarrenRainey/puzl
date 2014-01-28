@@ -120,6 +120,12 @@ VideoObject.prototype.removeObject = function( videoObject )
   // NOTE: Don't bother with order ID?
   //videoObject.orderId = this.objectList.length - 1;
   
+  if( videoObject.targetVideoObject !== null )
+  {
+    videoObject.targetVideoObject = this;
+    this.addDirtyRectangle( videoObject );
+  }
+  
   videoObject.targetVideoObject = null;
 };
 
