@@ -109,7 +109,11 @@ VideoDisplay.prototype.drawRectangleTo = function( targetVideoObject, xPosition,
     tempDirtyRectangleEndPoint.x = xPosition + width - 1;
     tempDirtyRectangleEndPoint.y = yPosition + height - 1;
     
-    targetVideoObject.targetVideoObject.addDirtyRectangle( tempDirtyRectangle );
+    var indirectTargetVideoObject = targetVideoObject.targetVideoObject;
+    if( indirectTargetVideoObject )
+    {
+      indirectTargetVideoObject.addDirtyRectangle( tempDirtyRectangle );
+    }
   }
   else
   {
@@ -120,8 +124,12 @@ VideoDisplay.prototype.drawRectangleTo = function( targetVideoObject, xPosition,
     var rectangleEndPoint = rectangle.endPoint;
     context.fillRect( rectangleStartPointX, rectangleStartPointY,
                       rectangleEndPoint.x - rectangleStartPointX + 1, rectangleEndPoint.y - rectangleStartPointY + 1 );
-                      
-    targetVideoObject.targetVideoObject.addDirtyRectangle( rectangle );
+    
+    var indirectTargetVideoObject = targetVideoObject.targetVideoObject;
+    if( indirectTargetVideoObject )
+    {
+      indirectTargetVideoObject.addDirtyRectangle( rectangle );
+    }
   }
 };
 
