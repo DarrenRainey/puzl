@@ -10,7 +10,7 @@ function VideoCellImage( sourceVideoObject, videoCellImageData )
   //console.log( "Creating VideoCellImage" );
   VideoObject.call( this );
 
-  this.sourceVideoObject;
+  /*this.sourceVideoObject;
 
   this.cellWidth;
   this.cellHeight;
@@ -28,7 +28,7 @@ function VideoCellImage( sourceVideoObject, videoCellImageData )
   this.colorKey;
 
   this.cellList;
-  this.cellNameIndexHash;
+  this.cellNameIndexHash;*/
   
   // Constructor.
   if( sourceVideoObject === undefined )
@@ -93,8 +93,6 @@ function VideoCellImage( sourceVideoObject, videoCellImageData )
   var layers = videoCellImageData["layers"];
   if( layers !== undefined )
   {
-    var sourceVideoObjectCanvas = this.sourceVideoObject.getCanvas();
-    
     numberOfLayers = layers.length;
     layerIndex;
     for( layerIndex = 0; layerIndex < numberOfLayers; layerIndex++ )
@@ -105,7 +103,7 @@ function VideoCellImage( sourceVideoObject, videoCellImageData )
       SetCanvasDimensions( canvas, overallWidth, overallHeight );
       this.layerCanvas.push( canvas );
 
-      var canvasContext = GetCanvasContext2D( this.layerCanvas[layerIndex] );
+      var canvasContext = GetCanvasContext2D( canvas );
       canvasContext.drawImage( sourceVideoObjectCanvas, 0, 0 );
 
       var colorKey = layer["colorKey"];
