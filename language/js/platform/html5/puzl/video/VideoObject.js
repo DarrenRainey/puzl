@@ -138,13 +138,17 @@ VideoObject.prototype.drawTo = function( targetVideoObject, rectangle )
     var rectangleEndPoint = rectangle.endPoint;
     var rectangleEndPointX = rectangleEndPoint.x;
     var rectangleEndPointY = rectangleEndPoint.y;
+    
+    var thisStartPoint = this.startPoint;
+    var xOffset = rectangleStartPointX - thisStartPoint.x;
+    var yOffset = rectangleStartPointY - thisStartPoint.y;
 
     var rectangleWidth  = rectangleEndPointX - rectangleStartPointX + 1;
     var rectangleHeight = rectangleEndPointY - rectangleStartPointY + 1;
   
     // TODO: Needs to factor in scaled dimensions.
     targetVideoObject.context.drawImage( this.canvas,
-                                         rectangleStartPointX, rectangleStartPointY,
+                                         xOffset, yOffset,
                                          rectangleWidth, rectangleHeight,
                                          rectangleStartPointX, rectangleStartPointY,
                                          rectangleWidth, rectangleHeight );
