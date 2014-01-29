@@ -54,7 +54,7 @@ VideoDisplay.prototype.setDimensions = function( width, height )
   }
 };
 
-VideoDisplay.prototype.clear = function()
+VideoDisplay.prototype.clear = function( rectangle )
 {
   var context = this.context;
   if( this.backgroundColor !== undefined )
@@ -65,8 +65,21 @@ VideoDisplay.prototype.clear = function()
   {
     context.fillStyle = "#000000";
   }
-
-  context.fillRect( 0, 0, this._width, this._height );
+  
+  if( rectangle === undefined )
+  {
+    context.fillRect( 0, 0, this._width, this._height );
+  }
+  else
+  {
+    var rectangleStartPoint  = rectangle.startPoint;
+    var rectangleStartPointX = rectangleStartPoint.x;
+    var rectangleStartPointY = rectangleStartPoint.y;
+    var rectangleEndPoint = rectangle.endPoint;
+    
+    context.fillRect( rectangleStartPointX, rectangleStartPointY,
+                      rectangleEndPoint.x - rectangleStartPointX + 1, rectangleEndPoint.y - rectangleStartPointY + 1 );
+  }
 };
 
 VideoDisplay.prototype.setBackgroundColor = function( color )
