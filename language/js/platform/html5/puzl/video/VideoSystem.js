@@ -263,8 +263,9 @@ CocoonJSGetCanvasContext2d = function( canvas )
 GeneralGetCanvasContext2d = function( canvas )
 {
   var context = canvas.getContext( "2d" );
-  context.mozImageSmoothingEnabled    = false;
   context.webkitImageSmoothingEnabled = false;
+  context.mozImageSmoothingEnabled    = false;
+  context.msImageSmoothingEnabled     = false; // Supported in IE11?
   return context;
 };
 
