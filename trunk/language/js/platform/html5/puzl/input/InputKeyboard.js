@@ -164,8 +164,16 @@ function InputKeyboard()
   this.input = this.keyInput;
   GlobalKeyboard = this;
   
-  document.addEventListener( "keydown", ProcessKeyDown, false );
-  document.addEventListener( "keyup",   ProcessKeyUp,   false );
+  if( navigator.isIe )
+  {
+    window.addEventListener( "keydown", ProcessKeyDown, false );
+    window.addEventListener( "keyup",   ProcessKeyUp,   false );
+  }
+  else
+  {
+    document.addEventListener( "keydown", ProcessKeyDown, false );
+    document.addEventListener( "keyup",   ProcessKeyUp,   false );
+  }
 
   this.stateChangeBufferSize = 10;
   this.stateChange = new Array( this.stateChangeBufferSize );

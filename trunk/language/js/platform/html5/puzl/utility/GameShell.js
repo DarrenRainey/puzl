@@ -331,6 +331,11 @@ GameShell.prototype.processXmlHttpRequestLoadQueue = function()
   {
     xmlHttpRequest = this.xmlHttpRequestLoadQueue[index];
     xmlHttpRequest.open( "GET", xmlHttpRequest.filename, true );
+  }
+  
+  for( index = 0; index < numberOfIDQueuedXmlHttpRequests; index++ )
+  {
+    xmlHttpRequest = this.xmlHttpRequestLoadQueue[index];
     xmlHttpRequest.send();
   }
 };
@@ -356,7 +361,15 @@ function ProcessXmlHttpRequestLoad( loadEvent )
       //
       //}
 
-      xmlHttpRequest.resourceArray.push( xmlHttpRequest.response );
+      if( xmlHttpRequest.response !== undefined )
+      {
+        xmlHttpRequest.resourceArray.push( xmlHttpRequest.response );
+      }
+      else
+      {
+        xmlHttpRequest.resourceArray.push( xmlHttpRequest.responseText );
+      }
+      
       GlobalGameShell.xmlHttpRequestLoadQueue.splice( index, 1 );
       break;
     }

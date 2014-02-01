@@ -30,6 +30,8 @@ function puzLInclude( path )
   }
 }
 
+navigator.isIe = ( navigator.appName === "Microsoft Internet Explorer" );
+
 // puzLInclude( "puzl/utility/2dUtil.js" );
 // puzLInclude( "puzl/utility/QuadTree.js" );
 // puzLInclude( "puzl/utility/Object2d.js" );
