@@ -263,6 +263,94 @@ BlockGraphic.prototype.print = function( text )
   }
 };
 
+// Used to just clear out text space.
+BlockGraphic.prototype.clearPrint = function( length )
+{
+  // TODO: This function could (and should probably) be consolidated with print().
+  var targetVideoObject = this.targetVideoObject;
+  var context = targetVideoObject.context;
+  
+  var targetTargetVideoObject = targetVideoObject.targetVideoObject;
+
+  var hasAlpha; // TODO: Optimize. Could allocate this value once for each blockgraphic object.
+  if( this.alpha !== 1 )
+  {
+    hasAlpha = true;
+    context.globalAlpha = this.alpha;
+  }
+  else
+  {
+    hasAlpha = false;
+  }
+
+  var xPosition = VideoCellImage.prototype.getXPosition.call( this );
+  var yPosition = VideoCellImage.prototype.getYPosition.call( this );
+
+  var thisWidth  = this._width;
+  var thisHeight = this._height;
+  
+  var printWidth  = 0;
+  var printHeight = 0;
+
+  var alignment = this.alignment;
+  if( alignment === this.PRINT_ATTR_ALIGN_LEFT )
+  {
+    printWidth  = length * thisWidth;
+    printHeight = thisHeight;
+    
+    VideoCellImage.prototype.setPosition.call( this, xPosition + printWidth, yPosition );
+  }
+  else
+  if( alignment === this.PRINT_ATTR_ALIGN_RIGHT )
+  {
+    printWidth  = length * thisWidth;
+    printHeight = thisHeight;
+    
+    xPosition -= printWidth;
+    VideoCellImage.prototype.setPosition.call( this, xPosition, yPosition );
+  }
+  else
+  if( alignment === this.PRINT_ATTR_ALIGN_TOP )
+  {
+    printWidth  = thisWidth;
+    printHeight = length * thisHeight;
+    
+    VideoCellImage.prototype.setPosition.call( this, xPosition, yPosition + printHeight );
+  }
+  else
+  {
+    console.error( "BlockGraphic::print:  Unimplemented alignment:  " + this.alignment );
+    return;
+  }
+
+  if( targetTargetVideoObject )
+  {
+    var tempDirtyRectangle = this.tempDirtyRectangle;
+    var tempDirtyRectangleStartPoint = tempDirtyRectangle.startPoint;
+    tempDirtyRectangleStartPoint.x = xPosition;
+    tempDirtyRectangleStartPoint.y = yPosition;
+    var tempDirtyRectangleEndPoint = tempDirtyRectangle.endPoint;
+    tempDirtyRectangleEndPoint.x = xPosition + printWidth  - 1;
+    tempDirtyRectangleEndPoint.y = yPosition + printHeight - 1;
+  }
+  
+  context.clearRect( xPosition, yPosition, printWidth, printHeight );
+  
+  if( targetTargetVideoObject )
+  {
+    targetTargetVideoObject.addDirtyRectangle( this.tempDirtyRectangle );
+  }
+  
+  if( alignment !== this.PRINT_ATTR_ALIGN_TOP )
+  {
+    xPosition += thisWidth * length;
+  }
+  else
+  {
+    yPosition += thisHeight * length;
+  }
+};
+
 BlockGraphic.prototype.setPosition = function( xPosition, yPosition )
 {
   if( this.absolute !== true )
