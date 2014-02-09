@@ -9,20 +9,13 @@ var OPERATION_ATTRIBUTE_ONE_SHOT         = 8 // Operation will perform the seque
 
 function Operation()
 {
-  this.attributes;
-  this.state;
-  this.currentFrame;
-  this.currentSequence;
-  this.counter;
-  this.frameIndex;
-  this.countMaximum;
-  this.sequences;
-
   // Consturctor.
   this.attributes      = OPERATION_ATTRIBUTE_MULTI_SEQUENCE;
   this.state           = OPERATION_STATE_RESET;
   this.currentFrame    = 0;
   this.currentSequence = 0;
+  this.nextSequence    = 0;
+  this.resetSequenceOnChange = true;
   this.counter         = 0;
   this.frameIndex      = 0;
   this.countMaximum    = 1;
@@ -93,29 +86,63 @@ Operation.prototype.getCurrentSequence = function()
 //--------------------------------------------------------------------------------
 Operation.prototype.setCurrentSequence = function( sequenceIndex )
 {
-  // Set the animation index
-  // ADD SOME SORT OF CHECK FOR AVAILABLE SEQUENCE #'s
-  if( this.currentSequence !== sequenceIndex )
-  {
-    this.currentSequence = sequenceIndex;
+  // Set the animation index.
 
-    // Reset animation
-    this.frameIndex = 0;       // DESIGN ISSUE! (resets animation)
+  if( this.currentSequence === sequenceIndex )
+  {
+    return false;
   }
+  
+  var previousFrame = -1;
+  var sequenceList = this.sequences;
+  
+  // Check for available sequences (NOTE: not checking for less than 0).
+  if( sequenceIndex >= sequenceList.length )
+  {
+    console.error( "Operation does not have sequence: " + sequenceIndex );
+    return false;
+  }
+  
+  previousFrame = sequenceList[this.currentSequence][this.frameIndex];
+  
+  this.currentSequence = sequenceIndex;
+  var sequence = sequenceList[sequenceIndex];
 
   // Set up reference frame for MULTI_SEQUENCE (fixes bad initial frame)
-  if( this.attributes & OPERATION_ATTRIBUTE_MULTI_SEQUENCE )
+  if( ( this.attributes & OPERATION_ATTRIBUTE_MULTI_SEQUENCE ) === 0 )
   {
-    if( ( this.sequences.length - 1 ) < this.currentSequence )
+    // Reset animation.
+    this.frameIndex = 0;
+    this.currentFrame = sequence[0];
+  }
+  else // ( this.attributes & OPERATION_ATTRIBUTE_MULTI_SEQUENCE )
+  {
+    var currentFrameIndex = this.frameIndex;
+    if( this.resetSequenceOnChange )
     {
-      console.error( "Operation does not have currentSequence: " + this.currentSequence );
+      this.frameIndex = currentFrameIndex = 0;
     }
     else
     {
-      // TODO: Further error check this.
-      this.currentFrame = this.sequences[this.currentSequence][this.frameIndex];
+      if( ( currentFrameIndex >= sequence.length ) ||
+          ( sequence[currentFrameIndex] === -1 ) )
+      {
+        this.frameIndex = currentFrameIndex = 0;
+      }
     }
+    
+    this.currentFrame = sequence[currentFrameIndex];
+    
+    this.nextSequence = sequenceIndex; // NOTE: Setting nextSequence and then setting currentSequence is not compatible.
+    this.counter = 0;
   }
+  
+  if( previousFrame !== this.currentFrame )
+  {
+    return true;
+  }
+  
+  return false;
 };
 
 //--------------------------------------------------------------------------------
@@ -123,6 +150,12 @@ Operation.prototype.getCurrentFrame = function()
 {
   return this.currentFrame;
 };
+
+//--------------------------------------------------------------------------------
+Operation.prototype.setNextSequence = function( nextSequenceIndex )
+{
+  this.nextSequence = nextSequenceIndex;
+}
 
 //--------------------------------------------------------------------------------
 Operation.prototype.setCurrentFrame = function( frameIndex )
@@ -218,6 +251,13 @@ Operation.prototype.read = function()
   else*/
   if( this.attributes & OPERATION_ATTRIBUTE_MULTI_SEQUENCE )
   {
+    // See if there is a pending animation sequence change.
+    if( this.currentSequence !== this.nextSequence )
+    {
+      //this.currentSequence = this.nextSequence;
+      return this.setCurrentSequence( this.nextSequence );
+    }
+    
     // Look for next frame of sequence
 
     //cout << "OPERATION_ATTRIBUTE_MULTI_SEQUENCE" << endl;

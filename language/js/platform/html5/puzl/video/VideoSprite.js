@@ -344,16 +344,18 @@ VideoSprite.prototype.setCurrentSequence = function( currentSequence )
 {
   //console.log( currentSequence );
   var thisAnimation = this.animation;
-  var previousFrame = thisAnimation.getCurrentFrame();
-  
-  thisAnimation.setCurrentSequence( currentSequence );
-  if( previousFrame !== thisAnimation.getCurrentFrame() )
+  if( thisAnimation.setCurrentSequence( currentSequence ) )
   {
     if( this.targetVideoObject ) // NOTE: This check and others like it in this class could be optimized by checking it before it's previous condition (eg ...getCurrentFrame())
     {
       this.targetVideoObject.addDirtyRectangle( this );
     }
   }
+};
+
+VideoSprite.prototype.setNextSequence = function( nextSequence )
+{
+  this.animation.nextSequence = nextSequence;
 };
 
 VideoSprite.prototype.getFrameIndex = function()
