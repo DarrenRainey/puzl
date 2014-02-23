@@ -1,3 +1,5 @@
+var IMAGE_ATTRIBUTE_VISIBLE       = 16   // Image is visible.
+
 function VideoImage()
 {
   //console.log( "Creating VideoImage" );
@@ -26,6 +28,9 @@ function VideoImage()
   this.context = GetCanvasContext2D( this.canvas );
   
   this.filename = "";
+  
+  this.attributes = 0;
+  this.setAttribute( IMAGE_ATTRIBUTE_VISIBLE );
 }
 
 extend( VideoImage, VideoObject );
@@ -123,4 +128,49 @@ VideoImage.prototype.getCanvas = function()
 VideoImage.prototype.getContext = function()
 {
   return this.context;
+};
+
+VideoImage.prototype.setAttribute = function( attribute )
+{
+  var attributes = this.attributes | attribute;
+  if( this.attributes === attributes )
+  {
+    return;
+  }
+
+  this.attributes = attributes;
+
+  if( attribute & IMAGE_ATTRIBUTE_VISIBLE )
+  {
+    // Time to show image.
+    if( this.targetVideoObject !== null )
+    {
+      this.targetVideoObject.addDirtyRectangle( this );
+    }
+  }
+};
+
+VideoImage.prototype.clearAttribute = function( attribute )
+{
+  var attributes = this.attributes & ~attribute;
+  if( this.attributes === attributes )
+  {
+    return;
+  }
+
+  this.attributes = attributes;
+  
+  if( attribute & IMAGE_ATTRIBUTE_VISIBLE )
+  {
+    // Time to hide image.
+    if( this.targetVideoObject !== null )
+    {
+      this.targetVideoObject.addDirtyRectangle( this );
+    }
+  }
+};
+
+VideoImage.prototype.setAttributes = function( attributes )
+{
+  this.attributes = attributes;
 };

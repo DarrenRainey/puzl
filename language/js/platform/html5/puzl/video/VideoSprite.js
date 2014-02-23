@@ -98,6 +98,7 @@ function VideoSprite( sourceVideoObject, videoSpriteData )
     //console.warn( "Loading VideoSprite without animation information." );
   }
 
+  this.attributes = 0;
   this.setAttribute( SPRITE_ATTRIBUTE_VISIBLE );
 }
 
