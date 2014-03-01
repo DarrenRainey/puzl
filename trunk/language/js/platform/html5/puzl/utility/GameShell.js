@@ -1,12 +1,13 @@
+/** @constructor */
 function GameShellSettings()
 {
   this.width   = 0;
   this.height  = 0;
 }
 
-var GlobalGameShell;
+var GlobalGameShell = null;
 
-var GlobalVideoDisplay;
+var GlobalVideoDisplay = null;
 function DocumentBodyOnResize()
 {
   GlobalGameShell.documentBodyOnResize();
@@ -21,6 +22,7 @@ function VBlank()
   GlobalGameShell.shellLoop();
 }
 
+/** @constructor */
 function GameShell( gameShellSettings )
 {
   /*this.inputSystem;
@@ -62,11 +64,14 @@ function GameShell( gameShellSettings )
   this.loadingResources = false;
 }
 
+window['GameShell'] = GameShell;
+
 GameShell.prototype.run = function()
 {
   //console.log( "GameShell::run()" );
   this.shellInitialize();
 };
+GameShell.prototype['run'] = GameShell.prototype.run;
 
 GameShell.prototype.shellInitialize = function()
 {

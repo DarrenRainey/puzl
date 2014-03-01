@@ -124,7 +124,7 @@ var INPUT_TYPE_KEYBOARD_KEY        = 0;
 
 var NUM_KEY_CODES                  = 222;             // Number of possible key codes (SDL)
 
-var GlobalKeyboard;
+var GlobalKeyboard = null;
 
 function ProcessKeyDown( keyEvent )
 {
@@ -140,18 +140,18 @@ function ProcessKeyUp( keyEvent )
   keyEvent.preventDefault();
 }
 
+/** @constructor */
 function InputKeyboard()
 {
   InputDevice.call( this );
   
-  this.keyInput;
+  //this.keyInput;
   
   // Constructor.
   var thisKeyInput = this.keyInput = new Array();
   
-  var keyInput;
-  var index;
-  for( index = 0; index < NUM_KEY_CODES; index++ )
+  var keyInput = null;
+  for( var index = 0; index < NUM_KEY_CODES; index++ )
   {
     keyInput       = new Input();
     keyInput.id    = index;

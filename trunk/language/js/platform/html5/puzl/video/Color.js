@@ -1,11 +1,12 @@
+/** @constructor */
 function Color()
 {
-  this.red;
+  /*this.red;
   this.green;
   this.blue;
   this.alpha;
 
-  this.string;
+  this.string;*/
 
   var argumentsLength = arguments.length;
   if( argumentsLength === 1 )

@@ -1,3 +1,4 @@
+/** @constructor */
 function GameScreen( gameShell, parentScreen )
 {
   // Constructor.
@@ -8,6 +9,8 @@ function GameScreen( gameShell, parentScreen )
   this.nextSubScreen  = null;
   this.resetSubScreen = true;
 }
+
+window['GameScreen'] = GameScreen;
 
 GameScreen.prototype.setNextSubScreen = function( nextSubScreen, reset )
 {

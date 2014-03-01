@@ -3,6 +3,7 @@ var INPUT_STATE_RELEASED = 2; // 10b
 var INPUT_STATE_DOWN     = 1; // 01b
 var INPUT_STATE_PRESSED  = 3; // 11b
 
+/** @constructor */
 function Input()
 {
   this.state = 0;
@@ -12,16 +13,17 @@ function Input()
   return this;
 }
 
+/** @constructor */
 function InputDevice()
 {
-  this.input;
+  /*this.input;
   this.stateChange;
   
   this.stateChangeBufferSize;
   this.numberOfStateChanges;
   
   this.lastInputId;
-  this.lastInputType;
+  this.lastInputType;*/
 
   // Constructor.
   this.stateChangeBufferSize = 0;
@@ -80,7 +82,7 @@ InputDevice.prototype.setState = function( inputId, state )
   }
 };
 
-InputDevice.prototypegetLastInputId = function()
+InputDevice.prototype.getLastInputId = function()
 {
   return this.lastInputId;
 };

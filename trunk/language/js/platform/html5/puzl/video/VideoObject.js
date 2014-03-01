@@ -1,13 +1,14 @@
+/** @constructor */
 function VideoObject()
 {
   //console.log( "Creating VideoObject" );
   Object2d.call( this );
 
-  this.targetVideoObject;
+  /*this.targetVideoObject;
 
   this.orderId;
 
-  this.dirtyRectangleList;
+  this.dirtyRectangleList;*/
 
   // Constructor.
   this.targetVideoObject = null;

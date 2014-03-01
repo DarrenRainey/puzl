@@ -5,6 +5,7 @@ var IMAGE_ATTRIBUTE_TRANSPARENCY  = 1024 // Indicates image with transparency.
 var IMAGE_ATTRIBUTE_ALPHABLEND    = 2048 // Indicates image with alpha/semi transparency.
 var IMAGE_ATTRIBUTE_COLOR         = 4096 // Indicates image with color modulation.
 
+/** @constructor */
 function VideoCellImage( sourceVideoObject, videoCellImageData )
 {
   //console.log( "Creating VideoCellImage" );
@@ -94,7 +95,6 @@ function VideoCellImage( sourceVideoObject, videoCellImageData )
   if( layers !== undefined )
   {
     numberOfLayers = layers.length;
-    layerIndex;
     for( layerIndex = 0; layerIndex < numberOfLayers; layerIndex++ )
     {
       var layer = layers[layerIndex];

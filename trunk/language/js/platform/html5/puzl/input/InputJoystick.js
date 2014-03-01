@@ -8,20 +8,20 @@ var INPUT_TYPE_JOYSTICK_BUTTON = 2;
 
 GlobalJoystickList = new Array();
 
+/** @constructor */
 function InputJoystick()
 {
   InputDevice.call( this );
 
-  this.joystickInput;
+  /*this.joystickInput;
   this.xAxis;
-  this.yAxis;
+  this.yAxis;*/
 
   // Constructor.
   var thisJoystickInput = this.joystickInput = new Array();
 
-  var joystickInput;
-  var index;
-  for( index = 0; index < NUM_BUTTONS; index++ )
+  var joystickInput = null;
+  for( var index = 0; index < NUM_BUTTONS; index++ )
   {
     joystickInput       = new Input(); 
     joystickInput.id    = index;
@@ -109,11 +109,11 @@ if( !!navigator.webkitGetGamepads || !!navigator.isCocoonJS )
 {
   InputJoystick.prototype.updateWithGamepad = function( gamepad )
   {
-    var gamepadAxes = gamepad.axes;
+    var gamepadAxes = gamepad['axes'];
     this.xAxis = gamepadAxes[0];
     this.yAxis = gamepadAxes[1];
 
-    var gamepadButtons = gamepad.buttons;
+    var gamepadButtons = gamepad['buttons'];
     for( var index = 0; index < NUM_BUTTONS; index++ )
     {
       this.setButtonState( index, gamepadButtons[index] !== 0 ? BUTTON_STATE_PRESSED : BUTTON_STATE_RELEASED );
@@ -125,11 +125,11 @@ if( !!navigator.getGamepads )
 {
   InputJoystick.prototype.updateWithGamepad = function( gamepad )
   {
-    var gamepadAxes = gamepad.axes;
+    var gamepadAxes = gamepad['axes'];
     this.xAxis = gamepadAxes[0];
     this.yAxis = gamepadAxes[1];
 
-    var gamepadButtons = gamepad.buttons;
+    var gamepadButtons = gamepad['buttons'];
     for( var index = 0; index < NUM_BUTTONS; index++ )
     {
       this.setButtonState( index, gamepadButtons[index].pressed ? BUTTON_STATE_PRESSED : BUTTON_STATE_RELEASED );

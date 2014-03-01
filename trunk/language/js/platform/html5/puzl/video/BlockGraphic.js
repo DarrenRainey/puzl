@@ -1,3 +1,4 @@
+/** @constructor */
 function BlockGraphic( sourceVideoObject, blockgraphicData )
 {
   // console.log( "Creating BlockGraphic" );

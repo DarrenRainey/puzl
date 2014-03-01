@@ -31,6 +31,7 @@ var SPRITE_ATTRIBUTE_COLOR         = 4096 // Indicates sprite with color modulat
 var SPRITE_COLLISION_RECT          = 0    // Only check if two sprite rectangles intersect
 var SPRITE_COLLISION_PIXEL         = 1    // Also check if pixels from two sprite intersect
 
+/** @constructor */
 function VideoSprite( sourceVideoObject, videoSpriteData )
 {
   //console.log( "Creating VideoSprite" );
