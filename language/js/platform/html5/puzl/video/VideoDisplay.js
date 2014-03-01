@@ -1,12 +1,13 @@
+/** @constructor */
 function VideoDisplay( width, height )
 {
   //console.log( "Creating VideoDisplay" );
   VideoObject.call( this );
 
-  this.canvas;
+  /*this.canvas;
 
   this.backgroundColor;
-  this.foregroundColor;
+  this.foregroundColor;*/
   
   // Constructor.
   this.canvas = CreateOnScreenCanvas();

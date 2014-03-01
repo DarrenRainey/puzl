@@ -2,9 +2,10 @@ var QUAD_TREE_MAX_CAPACITY    = 2;
 var QUAD_TREE_MAX_DEPTH_LEVEL = 4;
 
 //-------------------------------------------------------------------------
+/** @constructor */
 function QuadTreeNode( parentNode, nodeId )
 {
-  this.parentNode;
+  /*this.parentNode;
   this.depthLevel;
   this.nodeId;
   
@@ -12,7 +13,7 @@ function QuadTreeNode( parentNode, nodeId )
   this.subNodeList;
 
   this.rectangle;
-  this.midPoint;
+  this.midPoint;*/
   
   // Constructor.
   this.parentNode = parentNode;
@@ -225,7 +226,7 @@ QuadTreeNode.prototype.getQuadrantId = function( rectangle )
     }
   }
 
-  return -1;
+  //return -1;
 };
 
 QuadTreeNode.prototype.insert = function( object2d )
@@ -341,11 +342,12 @@ QuadTreeNode.prototype.queryRecursive = function( rectangle, queryResultList )
 };
 
 //-------------------------------------------------------------------------
+/** @constructor */
 function QuadTree()
 {
   QuadTreeNode.call( this, null, -1 );
 
-  this.queryResultList;
+  //this.queryResultList;
 
   // Constructor.
   this.queryResultList = new Array();

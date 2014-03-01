@@ -1,8 +1,9 @@
+/** @constructor */
 function Object2d()
 {
   //console.log( "Creating Object2d" );
   Rectangle.call( this );
-  this._width;
+  /*this._width;
   this._height;
   
   this.parentObject;
@@ -12,7 +13,7 @@ function Object2d()
   this.quadTree; // This Object2d's quad tree root.
   this.quadTreeNode; // The quad tree node this object is contained in?
                      // Used for quick reference of currently contained node.
-
+  */
   // Constructor.
   this.objectList = new Array();
 

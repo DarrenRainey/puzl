@@ -10,16 +10,17 @@ RequestAnimationFrame = window.requestAnimationFrame       ||
                           window.setTimeout( callback, 1000 / 60 );
                         };
 
-var GlobalVideoSystem;
+var GlobalVideoSystem = null;
 
+/** @constructor */
 function VideoSystem( width, height )
 {
   GlobalVideoSystem = this;
   
-  this.videoImageIDList;
+  /*this.videoImageIDList;
   this.videoImageLoadQueue;
 
-  this.display;
+  this.display;*/
 
   // Constructor.
   this.videoImageIDList    = new Array();
@@ -263,9 +264,26 @@ CocoonJSGetCanvasContext2d = function( canvas )
 GeneralGetCanvasContext2d = function( canvas )
 {
   var context = canvas.getContext( "2d" );
-  context.webkitImageSmoothingEnabled = false;
-  context.mozImageSmoothingEnabled    = false;
-  context.msImageSmoothingEnabled     = false; // Supported in IE11?
+  if( context['imageSmoothingEnabled'] !== undefined )
+  {
+    context['imageSmoothingEnabled'] = false;
+  }
+  else
+  if( context['webkitImageSmoothingEnabled'] !== undefined )
+  {
+    context['webkitImageSmoothingEnabled'] = false;
+  }
+  else
+  if( context['mozImageSmoothingEnabled'] !== undefined )
+  {
+    context['mozImageSmoothingEnabled'] = false;
+  }
+  else
+  if( context['msImageSmoothingEnabled'] !== undefined )
+  {
+    context['msImageSmoothingEnabled'] = false; // Supported in IE11?
+  }
+  
   return context;
 };
 

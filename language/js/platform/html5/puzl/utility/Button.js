@@ -1,4 +1,5 @@
 // button functions
+/** @constructor */
 function Button( xPosition, yPosition, width, height )
 {
   this.xPosition = xPosition;

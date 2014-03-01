@@ -1,8 +1,9 @@
 // --------------------------------------------------------
+/** @constructor */
 function Vector2d()
 {
-  this.x;
-  this.y;
+  //this.x;
+  //this.y;
 
   // Constructor.
   if( arguments.length === 1 )
@@ -123,10 +124,11 @@ Vector2d.prototype.isInside = function( rectangle )
 };
 
 // --------------------------------------------------------
+/** @constructor */
 function Rectangle()
 {
-  this.startPoint;
-  this.endPoint;
+  //this.startPoint;
+  //this.endPoint;
 
   // Constructor.
   if( arguments.length === 1 )
@@ -347,3 +349,100 @@ Rectangle.prototype.getConvexHull = function( rectangle, resultRectangle )
   resultRectangle.endPoint.y =
     ( thisEndPointY > rectangleEndPointY ) ? thisEndPointY : rectangleEndPointY;
 };
+
+// --------------------------------------------------------
+areSameSigns = function( a, b )
+{
+  if( a > 0 && b < 0 )
+  {
+    return false;
+  }
+
+  if( a < 0 && b > 0 )
+  {
+    return false;
+  }
+
+  return true;
+};
+
+// --------------------------------------------------------
+// Lifted from author Mukesh Prasad (xlines.c). Some custom modifications apply.
+var DONT_INTERSECT = 0;
+var DO_INTERSECT   = 1;
+var COLLINEAR      = 2;
+GetSegmentToSegmentIntersection = function( segment0Start, segment0End,
+                                            segment1Start, segment1End,
+                                            intersectionPoint )
+{
+  var x1 = segment0Start.x;
+  var y1 = segment0Start.y;
+  var x2 = segment0End.x;
+  var y2 = segment0End.y;
+
+  var x3 = segment1Start.x;
+  var y3 = segment1Start.y;
+  var x4 = segment1End.x;
+  var y4 = segment1End.y;
+
+  //a1, a2, b1, b2, c1, c2; // Coefficients of line equations.
+  //r1, r2, r3, r4;         // 'Sign' values.
+
+  // Compute a1, b1, c1, where line joining points 1 and 2
+  // is "a1 x  +  b1 y  +  c1  =  0".
+  var a1 = y2 - y1;
+  var b1 = x1 - x2;
+  var c1 = x2 * y1 - x1 * y2;
+
+  // Compute r3 and r4.
+  var r3 = a1 * x3 + b1 * y3 + c1;
+  var r4 = a1 * x4 + b1 * y4 + c1;
+
+  // Check signs of r3 and r4. If both point 3 and point 4 lie on
+  // same side of line 1, the line segments do not intersect.
+  if( r3 !== 0 &&
+      r4 !== 0 &&
+      areSameSigns( r3, r4 ) )
+  {
+    return DONT_INTERSECT;
+  }
+  
+  // Compute a2, b2, c2.
+  var a2 = y4 - y3;
+  var b2 = x3 - x4;
+  var c2 = x4 * y3 - x3 * y4;
+
+  // Compute r1 and r2.
+  var r1 = a2 * x1 + b2 * y1 + c2;
+  var r2 = a2 * x2 + b2 * y2 + c2;
+
+  // Check signs of r1 and r2.  If both point 1 and point 2 lie
+  // on same side of second line segment, the line segments do
+  // not intersect.
+  if( r1 !== 0 &&
+      r2 !== 0 &&
+      areSameSigns( r1, r2 ) )
+  {
+    return DONT_INTERSECT;
+  }
+
+  // Line segments intersect: compute intersection point.
+  denom = a1 * b2 - a2 * b1;
+  if( denom === 0 )
+  {
+    return ( COLLINEAR );
+  }
+  
+  offset = ( denom < 0 ) ? -denom / 2 : denom / 2;
+
+  // The denom/2 is to get rounding instead of truncating.  It
+  // is added or subtracted to the numerator, depending upon the
+  // sign of the numerator.
+  num = b1 * c2 - b2 * c1;
+  intersectionPoint.x = ( num < 0 ? num - offset : num + offset ) / denom;
+
+  num = a2 * c1 - a1 * c2;
+  intersectionPoint.y = ( num < 0 ? num - offset : num + offset ) / denom;
+
+  return DO_INTERSECT;
+}

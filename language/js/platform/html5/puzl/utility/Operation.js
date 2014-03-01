@@ -7,6 +7,7 @@ var OPERATION_ATTRIBUTE_MULTI_FRAME      = 2   // Operation has multiple frames
 var OPERATION_ATTRIBUTE_MULTI_SEQUENCE   = 4       // Operation has multiple sequences
 var OPERATION_ATTRIBUTE_ONE_SHOT         = 8 // Operation will perform the sequence once
 
+/** @constructor */
 function Operation()
 {
   // Consturctor.
@@ -24,11 +25,10 @@ function Operation()
 
 Operation.prototype.destructor = function()
 {
-  var index;
   var numberOfSequences = sequences.length;
 
   // Clear out all the sequences
-  for( index = 0; index < numberOfSequences; index++ )
+  for( var index = 0; index < numberOfSequences; index++ )
   {
     sequences[index] = [];
   }

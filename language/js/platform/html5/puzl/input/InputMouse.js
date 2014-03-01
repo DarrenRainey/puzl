@@ -6,7 +6,7 @@ var BUTTON_STATE_PRESSED              = INPUT_STATE_PRESSED;
 var INPUT_TYPE_MOUSE_BUTTON = 1;
 var NUM_BUTTONS = 3;
 
-var GlobalMouse;
+var GlobalMouse = null;
 
 function ProcessMouseDown( mouseEvent )
 {
@@ -106,25 +106,25 @@ function ProcessTouchMove( touchEvent )
   touchEvent.preventDefault();
 }
 
+/** @constructor */
 function InputMouse( display )
 {
   InputDevice.call( this );
 
-  this.mouseInput;
+  /*this.mouseInput;
   this.xPosition;
   this.yPosition;
   
   this.xScale;
   this.yScale;
   this.xOffset;
-  this.yOffset;
+  this.yOffset;*/
 
   // Constructor.
   var thisMouseInput = this.mouseInput = new Array();
 
-  var mouseInput;
-  var index;
-  for( index = 0; index < NUM_BUTTONS; index++ )
+  var mouseInput = null;
+  for( var index = 0; index < NUM_BUTTONS; index++ )
   {
     mouseInput       = new Input();
     mouseInput.id    = index;

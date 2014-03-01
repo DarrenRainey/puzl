@@ -14,6 +14,8 @@ function extend( subConstructor, superConstructor )
   subConstructor.prototype = Object.create( superConstructor.prototype, constructor );
 }
 
+window['extend'] = extend;
+
 function puzLInclude( path )
 {
   if( navigator.isCocoonJS !== undefined )

@@ -1,6 +1,7 @@
+/** @constructor */
 function InputSystem()
 {
-  this.numberOfKeyboards;
+  /*this.numberOfKeyboards;
   this.numberOfMice;
   this.numberOfJoysticks;
   
@@ -10,7 +11,7 @@ function InputSystem()
   this.hasTouch;
   
   this.joysticks;
-  this.supportsGamepads;
+  this.supportsGamepads;*/
   
   // Constructor.
   this.numberOfKeyboards = 1;

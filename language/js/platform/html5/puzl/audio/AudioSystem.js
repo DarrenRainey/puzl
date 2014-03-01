@@ -1,3 +1,4 @@
+/** @constructor */
 function AudioSystem()
 {
   

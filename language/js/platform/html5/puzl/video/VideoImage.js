@@ -1,14 +1,15 @@
 var IMAGE_ATTRIBUTE_VISIBLE       = 16   // Image is visible.
 
+/** @constructor */
 function VideoImage()
 {
   //console.log( "Creating VideoImage" );
   VideoObject.call( this );
   
-  this.canvas;
+  /*this.canvas;
   this.context;
 
-  this.filename;
+  this.filename;*/
 
   // Constructor.
   /*if( arguments.length > 0 )
