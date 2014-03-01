@@ -132,7 +132,7 @@ if( !!navigator.getGamepads )
     var gamepadButtons = gamepad['buttons'];
     for( var index = 0; index < NUM_BUTTONS; index++ )
     {
-      this.setButtonState( index, gamepadButtons[index].pressed ? BUTTON_STATE_PRESSED : BUTTON_STATE_RELEASED );
+      this.setButtonState( index, gamepadButtons[index]['pressed'] ? BUTTON_STATE_PRESSED : BUTTON_STATE_RELEASED );
     }
   };
 }
