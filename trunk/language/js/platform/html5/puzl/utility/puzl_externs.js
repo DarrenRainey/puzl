@@ -48,4 +48,11 @@ navigator.webkitGetGamepads = function() {};
 
 // OUYA externs.
 navigator.isCocoonJS = function(){};
+
+/**
+ * @typedef {{}}
+ */
+var ext;
+ext.IDTK_APP = function(){};
+ext.IDTK_APP.makeCall = function(){};
 // End Ouya externs.
