@@ -37,6 +37,9 @@ function InputJoystick()
   this.stateChange = new Array( this.stateChangeBufferSize );
   this.numberOfStateChanges = 0;
   
+  this.id = "Gamepad";
+  this.name = this.id;
+  
   GlobalJoystickList.push( this );
 }
 

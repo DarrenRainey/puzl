@@ -84,18 +84,39 @@ function InputSystem()
     }
     
     this.numberOfJoysticks = numberOfJoysticks;
-    console.log( "Number of gamepads found:  " + numberOfJoysticks );
     
     var joysticks = this.joysticks = new Array();
     
-    if( numberOfJoysticks !== 0 )
+    if( numberOfJoysticks > 0 )
     {
+      console.log( "Number of gamepads found:  " + numberOfJoysticks );
+      
+      var joystick = null;
       var gamepad = null;
       for( index = 0; index < numberOfJoysticks; index++ )
       {
-        joysticks.push( new InputJoystick() );
+        joystick = new InputJoystick();
+        joysticks.push( joystick );
         
         gamepad = gamepadList[index];
+        
+        if( gamepad.id.length > 0 )
+        {
+          joystick.id = gamepad.id;
+          
+          var regExp = new RegExp( "(.*)\\(.*\\)" );
+          var matchList = regExp.exec( gamepad.id );
+          
+          if( matchList )
+          {
+            joystick.name = matchList[1];
+          }
+          else
+          {
+            joystick.name = joystick.id;
+          }
+        }
+        
         console.log( index + ":  " + gamepad.id );
       }
     }
