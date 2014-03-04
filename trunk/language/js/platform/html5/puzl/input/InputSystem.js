@@ -102,19 +102,7 @@ function InputSystem()
         
         if( gamepad.id.length > 0 )
         {
-          joystick.id = gamepad.id;
-          
-          var regExp = new RegExp( "(.*)\\(.*\\)" );
-          var matchList = regExp.exec( gamepad.id );
-          
-          if( matchList )
-          {
-            joystick.name = matchList[1];
-          }
-          else
-          {
-            joystick.name = joystick.id;
-          }
+          joystick.setId( gamepad.id );
         }
         
         console.log( index + ":  " + gamepad.id );
@@ -245,9 +233,17 @@ InputSystem.prototype.update = function()
       {
         // Newly attached / detected gamepad.
         // It needs to be registered into the input engine.
-        for( index = numberOfDevices - 1; index < numberOfGamepads; index++ )
+        for( index = numberOfDevices; index < numberOfGamepads; index++ )
         {
           deviceList[index] = new InputJoystick();
+          gamepad = gamepadList[index];
+          if( gamepad !== undefined )
+          {
+            if( gamepad.id.length > 0 )
+            {
+              deviceList[index].setId( gamepad.id );
+            }
+          }
         }
 
         this.numberOfJoysticks = numberOfGamepads;
