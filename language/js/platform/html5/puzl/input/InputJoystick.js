@@ -139,3 +139,20 @@ if( !!navigator.getGamepads )
     }
   };
 }
+
+InputJoystick.prototype.setId = function( id )
+{
+  this.id = id;
+          
+  var regExp = new RegExp( "(.*)\\(.*\\)" );
+  var matchList = regExp.exec( id );
+  
+  if( matchList )
+  {
+    this.name = matchList[1];
+  }
+  else
+  {
+    this.name = this.id;
+  }
+};
